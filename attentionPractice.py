@@ -166,6 +166,7 @@ if __name__=='__main__':
     output = torch.randint(low=0, hight=max_seq_lenght, size=(64, max_seq_lenght), dtype=torch.long)
     mask = torch.zeros((64, max_seq_lenght))
     mask[:,:30] = 1
+    ##print(mask)
 
     output= model(input,output,mask)
     _, pred = torch.max(output, dim=-1)
