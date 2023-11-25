@@ -27,7 +27,7 @@ class MultiHeadAttention(nn.Module):
 
         return tensor
     
-    def forward(self,q, k, v, mask=None):
+    def forward(self, q, k, v, mask=None):
         # 1. get the q, k, v weight value
         q, k, v = self.w_q(q), self.w_k(k), self.w_v(v)
 
