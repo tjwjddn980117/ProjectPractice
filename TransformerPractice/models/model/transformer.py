@@ -22,14 +22,12 @@ class Transformer(nn.Module):
                                n_layers=n_layers, drop_prob=drop_prob,
                                device=device)
     
-    # need to make code
     def make_src_mask(self, src):
         src_mask = (src != self.src_pad_idx).unsqueeze(1).unsqueeze(2)
         # if src size is [batch_size, sequence_length]
         # output will be [batch_size, 1, 1, sequence_lenght] with True / False
         return src_mask
     
-    # need to make code
     def make_tar_mask(self, tar):
         # size of tar is [batch_size, seq_length]
         # size of tar_pad_mask is [batch_size, 1, 1, seq_length]
