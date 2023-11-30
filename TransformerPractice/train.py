@@ -49,6 +49,40 @@ def train(model, iterator, optimizer, criterion, clip):
         trg = batch.trg
 
         optimizer.zero_grad()
-        output = model(src, trg[:, :-1])
-        output_reshape = output.contiguous(-1, output.shape[-1])
-        tar = trg[:, 1:].contiguous().view(-1)
+        output = model(src, trg[:, :-1]) # this is the reason why the last sequence should prediced
+        # output size will be [batch_size, seq_len, dec_vocal_size]
+        # output_reshape size will be [batch_size*seq_len, dec_vocal_size]
+        output_reshape = output.contiguous().view(-1, output.shape[-1])
+        # tar size was [batch_size, seq_len],
+        # but after resize, there size will be [batch_size*seq_len]
+        trg = trg[:, 1:].contiguous().view(-1) # this is the reason why the first sequence is '<sos>'
+
+        loss = criterion(output_reshape, trg)
+        loss.backward()
+        # When gradient exceeds a certain threshold, clipping is done.
+        torch.nn.utils.clip_grad_norm_(model.parameters(),clip)
+        optimizer.step()
+        
+        # use 'loss.item()' is more safe
+        epoch_loss += loss.item()
+        print('step :', round((i / len(iterator)) * 100, 2), '% , loss :', loss.item())
+    
+    return epoch_loss / len(iterator)
+
+def evaluation(model, iterator, optimizer, criterion, clip):
+    model.eval()
+    epoch_loss = 0
+    batch_bleu = []
+    with torch.no_grad():
+        for i, batch in enumerate(iterator):
+            src = batch.src
+            trg = batch.trg
+            output = model(src, trg[:,:-1])
+            output_reshape = output.contiguous().view(-1, output.shape[-1])
+            trg = trg[:, 1:].contiguous().view(-1)
+
+            loss = criterion(output_reshape, trg)
+            epoch_loss += loss.item()
+
+            # under this code is evaluation method
+            
