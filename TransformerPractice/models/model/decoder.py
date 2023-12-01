@@ -19,4 +19,5 @@ class Decoder(nn.Module):
         
         # pass the linear
         tar = self.linear(tar)
+        # output size will be [batch_size, seq_len, dec_vocal_size]
         return tar
