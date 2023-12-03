@@ -6,7 +6,7 @@ from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 from torchtext.datasets import WikiText2, WikiText103
 
-from constans import *
+from constants import *
 
 # the function just define 'get_english_tokenizer' for 'get_tokenizer'
 def get_english_tokenizer():
@@ -76,10 +76,42 @@ def collate_cbow(batch, text_pipeline: function):
     batch_output = torch.tensor(batch_output, dtype=torch.long)
     return batch_input, batch_output
 
-def collate_skipgram(batch, text_pipline: function):
+def collate_skipgram(batch, text_pipeline):
+    """
+    Collate_fn for Skip-Gram model to be used with Dataloader.
+    `batch` is expected to be list of text paragrahs.
+    
+    Context is represented as N=SKIPGRAM_N_WORDS past words 
+    and N=SKIPGRAM_N_WORDS future words.
+    
+    Long paragraphs will be truncated to contain
+    no more that MAX_SEQUENCE_LENGTH tokens.
+    
+    Each element in `batch_input` is a middle word.
+    Each element in `batch_output` is a context word.
+    """
     batch_input, batch_output = [], []
-    return batch_input, batch_output
+    for text in batch:
+        text_tokens_ids = text_pipeline(text)
 
+        if len(text_tokens_ids) < SKIPGRAM_N_WORDS * 2 + 1:
+            continue
+
+        if MAX_SEQUENCE_LENGTH:
+            text_tokens_ids = text_tokens_ids[:MAX_SEQUENCE_LENGTH]
+
+        for idx in range(len(text_tokens_ids) - SKIPGRAM_N_WORDS * 2):
+            token_id_sequence = text_tokens_ids[idx : (idx + SKIPGRAM_N_WORDS * 2 + 1)]
+            input_ = token_id_sequence.pop(SKIPGRAM_N_WORDS)
+            outputs = token_id_sequence
+
+            for output in outputs:
+                batch_input.append(input_)
+                batch_output.append(output)
+
+    batch_input = torch.tensor(batch_input, dtype=torch.long)
+    batch_output = torch.tensor(batch_output, dtype=torch.long)
+    return batch_input, batch_output
 
 def get_dataloader_and_vocab(
     model_name, ds_name, ds_type, data_dir, batch_size, shuffle, vocab=None
