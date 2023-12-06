@@ -53,24 +53,30 @@ def collate_cbow(batch, text_pipeline: function):
     """
     batch_input, batch_output = [], []
     for text in batch:
-
         # this 'text_pipeline' is lambda x: vocab(tokenizer(x))
-        # it take index from som token.
-        # it is possible that vocab is type of dictionary. (let's check it. that's not a function)
+        # the function work that 'text to index'
+        # this can possible because vocab is type of dictionary. (let's check it. that's not a function)
         text_tokens_ids = text_pipeline(text)
 
+        # text_token_index should inner in whole inedex
         if len(text_tokens_ids) < CBOW_N_WORDS * 2 + 1:
             continue
 
+        # resize text_tokens_index
         if MAX_SEQUENCE_LENGTH:
             text_tokens_ids = text_tokens_ids[:MAX_SEQUENCE_LENGTH]
         
+        # Let's say text_tokens_ids is set to '1234567' and CBOW_N_WORDS is set to 2
+        # for each iter, token_id_sequence will '12345', '23456', 34567'
         for idx in range(len(text_tokens_ids) - CBOW_N_WORDS * 2):
             token_id_sequence = text_tokens_ids[idx : (idx + CBOW_N_WORDS * 2 + 1)]
             output = token_id_sequence.pop(CBOW_N_WORDS)
             input_ = token_id_sequence
             batch_input.append(input_)
             batch_output.append(output)
+        
+        # batch_input will [[1,2,4,5], [2,3,5,6], [3,4,6,7]]
+        # batch_output will [3, 4, 5]
     
     batch_input = torch.tensor(batch_input, dtype=torch.long)
     batch_output = torch.tensor(batch_output, dtype=torch.long)
@@ -92,6 +98,9 @@ def collate_skipgram(batch, text_pipeline):
     """
     batch_input, batch_output = [], []
     for text in batch:
+        # this 'text_pipeline' is lambda x: vocab(tokenizer(x))
+        # the function work that 'text to index'
+        # this can possible because vocab is type of dictionary. (let's check it. that's not a function)
         text_tokens_ids = text_pipeline(text)
 
         if len(text_tokens_ids) < SKIPGRAM_N_WORDS * 2 + 1:
@@ -102,10 +111,14 @@ def collate_skipgram(batch, text_pipeline):
 
         for idx in range(len(text_tokens_ids) - SKIPGRAM_N_WORDS * 2):
             token_id_sequence = text_tokens_ids[idx : (idx + SKIPGRAM_N_WORDS * 2 + 1)]
+            # input wil int
+            # outputs will [1,2,4,5]
             input_ = token_id_sequence.pop(SKIPGRAM_N_WORDS)
             outputs = token_id_sequence
 
             for output in outputs:
+                # batch_input will [3,3,3,3,4,4,4,4,5,5,5,5]
+                # batch_output will [1,2,4,5,2,3,5,6,3,4,6,7]
                 batch_input.append(input_)
                 batch_output.append(output)
 
@@ -122,7 +135,8 @@ def get_dataloader_and_vocab(
 
     if not vocab:
         vocab = build_vocab(data_iter, tokenizer)
-        
+    
+    # it change tokenizer to index
     text_pipeline = lambda x: vocab(tokenizer(x))
 
     if model_name == "cbow":
@@ -132,6 +146,12 @@ def get_dataloader_and_vocab(
     else:
         raise ValueError("Choose model from: cbow, skipgram")
 
+    # DataLoader class is basicaly type of iter class
+    # data_iter is full dataseet
+    # class split the data_iter with batch_size
+    # and collate_fn can resize batched data.
+    # it could run with just one parameter(collate_fn) (basicaly, collate_fn need two parameter)
+    #   because DataLoader can automaticaly give partial an iter_data (batched data)
     dataloader = DataLoader(
         data_iter,
         batch_size=batch_size,

@@ -21,6 +21,8 @@ class CBOW_Model(nn.Module):
 
     def forward(self, inputs_):
         x = self.embeddings(inputs_)
+        # Because you have to predict the central word from the surrounding words, 
+        # it makes it one average.
         x = x.mean(axis=1)
         x = self.linear(x)
         return x
