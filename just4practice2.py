@@ -13,10 +13,13 @@ for text in batch:
         token_id_sequence = text[idx : (idx + SKIPGRAM_N_WORDS * 2 + 1)]
         # input wil int
         # outputs will [1,2,4,5]
-        outputs = token_id_sequence.pop(SKIPGRAM_N_WORDS)
-        input_ = token_id_sequence
-        batch_input.append(input_)
-        batch_output.append(outputs)
+        input_ = token_id_sequence.pop(SKIPGRAM_N_WORDS)
+        outputs = token_id_sequence
+        for output in outputs:
+            # batch_input will [3,3,3,3,4,4,4,4,5,5,5,5]
+            # batch_output will [1,2,4,5,2,3,5,6,3,4,6,7]
+            batch_input.append(input_)
+            batch_output.append(output)
 
 
 print(batch_input)

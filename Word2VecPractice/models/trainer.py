@@ -29,6 +29,7 @@ class Trainer:
         self.model.to(self.device)
     
     def train(self):
+        best_loss = float('inf')
         for epoch in range(self.epochs):
             self._train_epoch()
             self._validate_epoch()
@@ -40,6 +41,11 @@ class Trainer:
                     self.loss["val"][-1],
                 )
             )
+            
+            if self.loss["val"][-1] < best_loss:
+                best_loss = self.loss["val"][-1]
+                torch.save(self.model.state_dict(), 'saved/model-{0}.pt'.format(self.loss["val"][-1]))
+
             self.lr_scheduler.step()
             if self.checkpoint_frequency:
                 self._save_checkpoint(epoch)
