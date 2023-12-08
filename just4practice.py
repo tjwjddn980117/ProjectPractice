@@ -1,20 +1,15 @@
-from torchtext.vocab import build_vocab_from_iterator
-from torchtext.data.utils import get_tokenizer
+import torch
+from torch import nn
 
-# 토크나이저 설정
-tokenizer = get_tokenizer('basic_english')
+hidden = 3
 
-# 데이터 반복자 생성
-data_iter = ["This is an example sentence", "This is another sentence", "This is is is"]
+l = [[[1,3,4],[4,3,5],[3,6,3]],
+     [[6,4,3],[3,4,5],[6,1,4]],
+     [[5,4,5],[3,7,7],[4,7,6]]]
+l = torch.Tensor(l)
+i2h = nn.Linear(hidden,hidden)
+#print(l.size())
+#print(l[:,0])
 
-# 각 문장을 토크나이즈한 후, 이를 하나의 반복자로 만듭니다.
-tokenized_iter = map(tokenizer, data_iter)
-
-# build_vocab_from_iterator 함수를 사용하여 어휘 사전 구축
-vocab = build_vocab_from_iterator(tokenized_iter, specials=["<unk>", "<pad>", "<sos>", "<eos>"])
-vocab.set_default_index(vocab["<unk>"])
-
-# 어휘 사전 출력
-print(vocab)
-print(type(vocab))
-print(vocab.get_itos())
+output = i2h(l[:,0])
+print(output)
