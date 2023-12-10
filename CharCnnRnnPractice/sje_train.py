@@ -44,3 +44,9 @@ def sje_loss(feat1, feat2):
     accuracy = 100 * num_correct / cost.size(0)
 
     return loss, accuracy
+
+def main(args):
+    rng_init(args.seed)
+    device = 'cuda' if torch.cuda.is_available() and args.use_gpu else 'cpu'
+    dataset = MultimodalDataset(args.data_dir, args.train_split)
+    loader = DataLoader(dataset, batch_size=args.batchsize)
