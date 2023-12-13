@@ -49,7 +49,7 @@ class char_cnn_rnn(nn.Module):
         self.use_maxpool3 = use_maxpool3
 
         # network_setup
-        # (B, 70, 201)
+        # (B, 70, 201) , its (Batch, number_of_char, max_length)
         # (batch_size, in_channels, size) -> (batch_size, out_channels, resize)
         # if Conv1d (batch_size, in_channels, seq) -> (batch_size, out_channels, re_seq)
         # if Conv2d (batch_size, in_channels, (H*W)) -> (batch_size, out_channels, re(H*W))
