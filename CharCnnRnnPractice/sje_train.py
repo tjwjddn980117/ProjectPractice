@@ -136,3 +136,58 @@ def main(args):
                         acc1_smooth, acc2_smooth,
                         sched_txt.get_lr()[0])
                 tqdm.write(run_info)
+            
+        net_txt.eval()
+        tqdm.write('Saving checkpoint to: {}'.format(ckpt_path))
+        # we save our net evaluation in 'ckpt_path'
+        torch.save(net_txt.state_dict(), ckpt_path)
+
+        sched_txt.step()
+
+    writer.close()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', type=str, required=True,
+            choices=['birds', 'flowers'],
+            help='Dataset type')
+    parser.add_argument('--model_type', type=str, required=True,
+            choices=['cvpr', 'icml'],
+            help='Model type')
+    parser.add_argument('--data_dir', type=str, required=True,
+            help='Data directory')
+    parser.add_argument('--train_split', type=str, required=True,
+            choices=['train', 'val', 'test', 'trainval', 'all'],
+            help='Which dataset split is used for training')
+
+    parser.add_argument('--epochs', type=int,
+            default=300,
+            help='Number of epochs')
+    parser.add_argument('--batch_size', type=int,
+            default=40,
+            help='Training batch size')
+    parser.add_argument('--symmetric', type=bool,
+            default=True,
+            help='Whether or not to use symmetric form of SJE')
+    parser.add_argument('--learning_rate', type=float,
+            default=0.0004,
+            help='Learning rate')
+    parser.add_argument('--learning_rate_decay', type=float,
+            default=0.98,
+            help='Learning rate decay')
+
+    parser.add_argument('--seed', type=int, required=True,
+            help='RNG seed')
+    parser.add_argument('--use_gpu', type=bool,
+            default=True,
+            help='Whether or not to use GPU')
+    parser.add_argument('--print_every', type=int,
+            default=100,
+            help='How many steps/mini-batches between printing out the loss')
+    parser.add_argument('--checkpoint_dir', type=str, required=True,
+            help='Output directory where model checkpoints get saved at')
+    parser.add_argument('--save_file', type=str, required=True,
+            help='Name to autosave model checkpoint to')
+
+    args = parser.parse_args()
+    main(args)

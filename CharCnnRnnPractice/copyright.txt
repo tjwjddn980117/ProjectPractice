@@ -1,0 +1,2 @@
+The copyright for this code is owned by the following.
+https://github.com/martinduartemore/char_cnn_rnn_pytorch/tree/master

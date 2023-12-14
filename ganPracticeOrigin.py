@@ -1,3 +1,7 @@
+'''
+The copyright for this code is owned by the following.
+https://github.com/godeastone/GAN-torch/blob/main/models/GAN.py
+'''
 import os
 import torch.nn as nn
 import torch.utils.data

@@ -1,0 +1,2 @@
+The copyright for this code is owned by the following.
+https://github.com/OlgaChernytska/word2vec-pytorch/tree/main

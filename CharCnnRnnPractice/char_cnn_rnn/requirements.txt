@@ -1,0 +1,9 @@
+python=3.7
+numpy=1.16
+pytorch=1.9.0
+cuda=10.2
+torchvision=0.10.0
+torchfile
+tensorboard
+tqdm
+future

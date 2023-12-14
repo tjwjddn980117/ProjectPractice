@@ -1,12 +1,13 @@
 import torch
-cls_id = torch.randint(5, (1,))
 
-print(cls_id)
+example = torch.tensor([[[1,2,3,4,5],
+                         [6,7,8,9,10]], 
+                        [[1,2,3,4,5],
+                         [6,7,8,9,10]]])
 
-diagonal = torch.tensor([[1], [2], [1]])
+print(example.size())
 
-scores = torch.tensor([[3, 3, 3],
-                       [3, 3, 3],
-                       [3, 3, 3]])
+example = example.permute(0, 2, 1)
 
-print(diagonal.expand_as(scores))
+print(example.size())
+print(example)
