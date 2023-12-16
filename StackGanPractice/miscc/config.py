@@ -1,5 +1,63 @@
-from easydict import EasyDict as edict
+from __future__ import division
+from __future__ import print_function
+
+import os.path as osp
 import numpy as np
+# it is dictionary, but it can easy to use. (use '.')
+from easydict import EasyDict as edict
+
+__C = edict()
+cfg = __C
+
+# Dataset name: flowers, birds
+__C.DATASET_NAME = 'birds'
+__C.EMBEDDING_TYPE = 'cnn-rnn'
+__C.CONFIG_NAME = ''
+__C.DATA_DIR = ''
+
+__C.GPU_ID = '0'
+__C.CUDA = True
+
+__C.WORKERS = 6
+
+__C.TREE = edict()
+__C.TREE.BRANCH_NUM = 3
+__C.TREE.BASE_SIZE = 64
+
+# Test options
+__C.TEST = edict()
+__C.TEST.B_EXAMPLE = True
+__C.TEST.SAMPLE_NUM = 30000
+
+# Training options
+__C.TRAIN = edict()
+__C.TRAIN.BATCH_SIZE = 64
+__C.TRAIN.VIS_COUNT = 64
+__C.TRAIN.MAX_EPOCH = 600
+__C.TRAIN.SNAPSHOT_INTERVAL = 2000
+__C.TRAIN.DISCRIMINATOR_LR = 2e-4
+__C.TRAIN.GENERATOR_LR = 2e-4
+__C.TRAIN.FLAG = True
+__C.TRAIN.NET_G = ''
+__C.TRAIN.NET_D = ''
+
+__C.TRAIN.COEFF = edict()
+__C.TRAIN.COEFF.KL = 2.0
+__C.TRAIN.COEFF.UNCOND_LOSS = 0.0
+__C.TRAIN.COEFF.COLOR_LOSS = 0.0
+
+# Modal options
+__C.GAN = edict()
+__C.GAN.EMBEDDING_DIM = 128
+__C.GAN.DF_DIM = 64
+__C.GAN.GF_DIM = 64
+__C.GAN.Z_DIM = 100
+__C.GAN.NETWORK_TYPE = 'default'
+__C.GAN.R_NUM = 2
+__C.GAN.B_CONDITION = False
+
+__C.TEXT = edict()
+__C.TEXT.DIMENSION = 1024
 
 def _merge_a_into_b(a, b):
     '''
@@ -37,11 +95,4 @@ def _merge_a_into_b(a, b):
                 raise
         else:
             b[key] = value
-
-def merge_dicts():
-    a = edict({'foo': 3, 'bar': np.array([1, 2])})
-    b = edict({'foo': 4, 'bar': np.array([3, 4]), 'hello': 5})
-    _merge_a_into_b(a, b)
-    print(b)  # 출력: {'foo': 3, 'bar': array([1, 2])}
-
-merge_dicts()
+    
