@@ -3,6 +3,7 @@ import torch
 import torchfile
 
 import char_cnn_rnn as ccr
+import ccr_utils
 
 def encode_data(net_txt, net_img, data_dir, split, num_txts_eval, batch_size, device):
     '''
@@ -82,9 +83,9 @@ def encode_data(net_txt, net_img, data_dir, split, num_txts_eval, batch_size, de
         # TODO: adapt code to support batched version
         txt_onehot = []
         for txt in data_txt: # txt is descriptions
-            # size of one_hot is [emb_size, max_str_len]
+            # size of output 'ccr_utils.labelvec_to_onehot' is [emb_size, max_str_len]
             # so, we append [emb_size, max_str_len]
-            txt_onehot.append(ccr.labelvec_to_onehot(txt))
+            txt_onehot.append(ccr_utils.labelvec_to_onehot(txt))
         # size of txt_onehot is [num_txts_eval, emb_size, max_str_len]
         txt_onehot = torch.stack(txt_onehot)
 

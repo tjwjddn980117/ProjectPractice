@@ -2,7 +2,7 @@ import random
 import torch
 import torchfile
 
-from char_cnn_rnn import char_cnn_rnn
+import char_cnn_rnn.char_cnn_rnn as ccr
 
 def rng_init(seed):
     random.seed(seed)
@@ -29,7 +29,7 @@ def extract_char_cnn_rnn_weights(model_path, dataset, model_type):
 
     model_torch = torchfile.load(model_path)
     enc_doc = model_torch[b'protos'][b'enc_doc']
-    model_pytorch = char_cnn_rnn(dataset, model_type)
+    model_pytorch = ccr.char_cnn_rnn(dataset, model_type)
 
     # convolutional segment
     # Torch storage for TemporalConvolution weights:

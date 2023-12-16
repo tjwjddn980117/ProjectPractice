@@ -3,7 +3,7 @@ import torch
 import torchfile
 from torch.utils.data import Dataset
 
-from char_cnn_rnn.char_cnn_rnn import labelvec_to_onehot
+from char_cnn_rnn.ccr_utils import labelvec_to_onehot
 
 class MultimodalDataset(Dataset):
     '''

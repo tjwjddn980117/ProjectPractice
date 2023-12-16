@@ -10,7 +10,7 @@ from dataset import MultimodalDataset
 from torch.utils.data import DataLoader
 
 from utils import rng_init, init_weights
-import char_cnn_rnn as ccr
+import char_cnn_rnn.char_cnn_rnn as ccr
 
 def sje_loss(feat1, feat2):
     ''' Structured Joint Embedding loss '''
