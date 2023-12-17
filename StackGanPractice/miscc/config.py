@@ -64,8 +64,8 @@ def _merge_a_into_b(a, b):
     Merge config dictionary a into config dictionary b, 
     clobbering the options in b whenever they are also specified in a.
     Arguments:
-        a (edict): 
-        b (edict): 
+        a (edict): the edict which be new edict
+        b (edict): the edict which was the origin
     '''
 
     if type(a) is not edict:
@@ -85,7 +85,7 @@ def _merge_a_into_b(a, b):
             else:
                 raise ValueError(('Type mismatch ({} vs. {}) '
                                   'for config key: {}').format(type(b[key]),type(value), key))
-            
+        
         # recursively merge dicts
         if type(key) is edict:
             try:
@@ -94,5 +94,15 @@ def _merge_a_into_b(a, b):
                 print('Error under config key: {}'.format(key))
                 raise
         else:
+            # it just repace the value b to a
             b[key] = value
-    
+
+def cfg_from_file(filename):
+    '''
+    Load a config file and merge it into the default options.
+    '''
+    import yaml
+    with open(filename, 'r') as f:
+        yaml_cfg = edict(yaml.load(f))
+
+    _merge_a_into_b(yaml_cfg, __C)
