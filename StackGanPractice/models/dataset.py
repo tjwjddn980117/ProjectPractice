@@ -204,7 +204,7 @@ class ImageFolder(data.Dataset):
 ######################
 class LSUNClass(data.Dataset):
     '''
-    class about LSUNC data
+    class about LSUNC data (Large-scale Scene Understanding data)
 
     Attributes:
         db_path (str): it is the path of database
@@ -212,6 +212,37 @@ class LSUNClass(data.Dataset):
     def __init__(self, db_path, base_size=64,
                  transform=None, target_transform=None):
         import lmdb
+        # Storing LMDB data path
         self.db_path = db_path
+        # Store the LMDB environment, 
+        #  which is used to access the database.
         self.env = lmdb.open(db_path, max_readers=1, readonly=True, lock=False,
                              readahead=False, meminit=False)
+        # Stores the number of items stored in the database.
+        with self.env.begin(write=False) as txn:
+            self.length = txn.stat()['entries']
+            print('length: ', self.length) # number of items.
+
+        # approach with cache file
+        cache_file = db_path + '/cache'
+        # Store the number of keys stored in the database.
+        # If cache_file is exist, Load the cache
+        #  but it wasn't, store cache_file
+        if os.path.isfile(cache_file):
+            self.keys = pickle.load(open(cache_file, "rb"))
+            print('Load:', cache_file, 'keys: ', len(self.keys))
+        else:
+            with self.env.begin(write=False) as txn:
+                self.keys = [key for key, _ in txn.cursor()]
+            pickle.dump(self.keys, open(cache_file, "wb"))
+            
+        self.imsize = []
+        for i in range(cfg.TREE.BRANCH_NUM):
+            self.imsize.append(base_size)
+            base_size = base_size * 2
+
+        self.transform = transform
+        self.target_transform = target_transform
+        self.norm = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
