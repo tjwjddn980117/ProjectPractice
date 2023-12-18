@@ -46,7 +46,7 @@ def get_imgs(img_path, imsize, bbox=None, transform=None, normalize=None):
         normalize ( ) : the parameter that standard normalize
     
     Returns:
-        list [] : list of resized images
+        list [Image] : list of resized images data type is (Imgae)
     '''
     img = Image.open(img_path).convert('RGB')
     width, height = img.size
@@ -80,12 +80,53 @@ def get_imgs(img_path, imsize, bbox=None, transform=None, normalize=None):
     
     return ret
 
+
+######################
+###   Image Data   ###
+######################
 class ImageFolder(data.Dataset):
+    '''
+    class about Image Data.
+
+    Attributes:
+        root (str): this is the root path of image data.
+        imgs (list[(path, class_index)]): this is the list of image data tuple (path, class_index).
+        classes (list[path]): this is the list of each class path.
+        num_classes (int): this is the number of classes.
+        class_to_idx (dict{class_path: int}): index information with class_path and index
+
+        transform ( ): information to define of transform
+        target_transform ( ): information to define of target_transform
+        norm (transforms): transforms for narmalize
+
+        imsize (list): list of image size [64, 128, 256, ...]
+    '''
     def __init__(self, root, split_dir='train', custom_classes=None,
                  base_size=64, transform=None, target_transform=None):
         root = os.path.join(root, split_dir)
         classes, class_to_idx = self.find_classes(root, custom_classes)
+        imgs = self.make_dataset(classes, class_to_idx)
+        if len(imgs) == 0:
+            raise(RuntimeError("Found 0 images in subfolders of: " + root + "\n"
+                               "Supported image extensions are: " + ",".join(IMG_EXTENSIONS)))
+        self.root = root
+        self.imgs = imgs
+        self.classes = classes
+        self.num_classes = len(classes)
+        self.class_to_idx = class_to_idx
 
+        self.transform = transform
+        self.target_transform = target_transform
+        self.norm = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        
+        # imsize should be [64, 128, 256, ...]
+        self.imsize = []
+        for i in range(cfg.TREE.BRANCH_NUM):
+            self.imsize.append(base_size)
+            base_size = base_size * 2
+        print('num_classes', self.num_classes)
 
     def find_classes(self, dir:str, custom_classes):
         ''' 
@@ -122,7 +163,7 @@ class ImageFolder(data.Dataset):
                                 Index each class in the classes list\
                                 and save it in the form of a dictionary.
         Returns:
-            images (list): 
+            images (list): image files [(path, class_index)...]
         '''
         images = []
         for class_dir in classes:
@@ -133,6 +174,44 @@ class ImageFolder(data.Dataset):
                     if is_image_file(file):
                         path = os.path.join(root, file)
                         item = (path, class_to_idx[class_dir])
+                        # save the tuple
                         images.append(item)
         print('The number of images: ', len(images))
+        # put image files [(path, class_index)...]
         return images
+    
+    def __getitem__(self, index)->list:
+        '''
+        call the data
+        Arguments:
+            index (int): index of image. the image is tuple of (path, class_idx)
+        Returns:
+            imgs_list (list[Image]): list of resized images data type is (Imgae)
+        '''
+        # imgs tuple of (path, class_idx)
+        path, target = self.imgs[index]
+        imgs_list = get_imgs(path, self.imsize,
+                             transform=self.transform,
+                             normalize=self.norm)
+        return imgs_list
+    
+    def __len__(self):
+        return len(self.imgs)
+    
+
+######################
+###   LSUN Data    ###
+######################
+class LSUNClass(data.Dataset):
+    '''
+    class about LSUNC data
+
+    Attributes:
+        db_path (str): it is the path of database
+    '''
+    def __init__(self, db_path, base_size=64,
+                 transform=None, target_transform=None):
+        import lmdb
+        self.db_path = db_path
+        self.env = lmdb.open(db_path, max_readers=1, readonly=True, lock=False,
+                             readahead=False, meminit=False)
