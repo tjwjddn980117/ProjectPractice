@@ -26,13 +26,13 @@ class ImageFolder(data.Dataset):
         imgs (list[(path, class_index)]): this is the list of image data tuple (path, class_index).
         classes (list[path]): this is the list of each class path.
         num_classes (int): this is the number of classes.
-        class_to_idx (dict{class_path: int}): index information with class_path and index
+        class_to_idx (dict{class_path: int}): index information with class_path and index.
 
-        transform ( ): information to define of transform
-        target_transform ( ): information to define of target_transform
-        norm (transforms): transforms for narmalize
+        transform ( ): information to define of transform.
+        target_transform ( ): information to define of target_transform.
+        norm (transforms): transforms for narmalize.
 
-        imsize (list): list of image size [64, 128, 256, ...]
+        imsize (list): list of image size [64, 128, 256, ...].
     '''
     def __init__(self, root, split_dir='train', custom_classes=None,
                  base_size=64, transform=None, target_transform=None):
@@ -63,14 +63,15 @@ class ImageFolder(data.Dataset):
 
     def find_classes(self, dir:str, custom_classes):
         ''' 
-        the function that find classes 
+        the function that find classes.
+        
         Arguments:
-            dir (str): the root of directory
+            dir (str): the root of directory.
             custom_classes (list): The list of classes you want to find. \
                                     If this value is None, find all classes.
 
         Returns:
-            clsses (list): classes path list which selected sorted
+            clsses (list): classes path list which selected sorted.
             class_to_idx (dict): {class_path: index} \
                                 Index each class in the classes list \
                                 and save it in the form of a dictionary.
@@ -89,12 +90,14 @@ class ImageFolder(data.Dataset):
     
     def make_dataset(self, classes:list, class_to_idx:dict):
         '''
-        the function that make dataset
+        the function that make dataset.
+
         Arguments:
-            classes (list): classes path list wich selected sorted
+            classes (list): classes path list wich selected sorted.
             class_to_idx (dict): {class_path: index} \
                                 Index each class in the classes list\
                                 and save it in the form of a dictionary.
+
         Returns:
             images (list): image files [(path, class_index)...]
         '''
@@ -115,11 +118,13 @@ class ImageFolder(data.Dataset):
     
     def __getitem__(self, index)->list:
         '''
-        call the data
+        call the data.
+
         Arguments:
             index (int): index of image. the image is tuple of (path, class_idx)
+
         Returns:
-            imgs_list (list[Image]): list of resized images data type is (Imgae)
+            imgs_list (list[Image]): list of resized images data type is (Image)
         '''
         # imgs tuple of (path, class_idx)
         path, target = self.imgs[index]

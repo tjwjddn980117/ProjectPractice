@@ -17,14 +17,14 @@ def get_imgs(img_path, imsize, bbox=None, transform=None, normalize=None):
     and returns the normalized results to the list.
 
     Arguments:
-        img_path (str) : the path of image dir
-        imsize ( ) : it should width, height
-        bbox ( ) : boundary box. standard for cutting out a picture
-        transform ( ) : the parameter that standard transform
-        normalize ( ) : the parameter that standard normalize
+        img_path (str) : the path of image dir.
+        imsize ( ) : it should width, height.
+        bbox ( ) : boundary box. standard for cutting out a picture.
+        transform ( ) : the parameter that standard transform.
+        normalize ( ) : the parameter that standard normalize.
     
     Returns:
-        list [Image] : list of resized images data type is (Imgae)
+        list [Image] : list of resized images data type is (Image).
     '''
     img = Image.open(img_path).convert('RGB')
     width, height = img.size

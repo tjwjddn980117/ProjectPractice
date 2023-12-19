@@ -25,16 +25,16 @@ class LSUNClass(data.Dataset):
     class about LSUNC data (Large-scale Scene Understanding data).
 
     Attributes:
-        db_path (str): it is the path of database
-        env ( ): it is the environment o lmdb
-        lenght (int): it is the number of all instance items
-        keys ( ): load LSUNC keys
+        db_path (str): it is the path of database.
+        env ( ): it is the environment o lmdb.
+        lenght (int): it is the number of all instance items.
+        keys ( ): load LSUNC keys.
 
-        transform ( ): information to define of transform
-        target_transform ( ): information to define of target_transform
-        norm (transforms): transforms for narmalize
+        transform ( ): information to define of transform.
+        target_transform ( ): information to define of target_transform.
+        norm (transforms): transforms for narmalize.
 
-        imsize (list): list of image size [64, 128, 256, ...]
+        imsize (list): list of image size [64, 128, 256, ...].
     '''
     def __init__(self, db_path, base_size=64,
                  transform=None, target_transform=None):
@@ -75,6 +75,15 @@ class LSUNClass(data.Dataset):
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
     def __getitem__(self, index):
+        '''
+        call the data.
+
+        Arguments:
+            index (int): index of image. we get images from imgbuf.
+            
+        Returns:
+            imgs_list (list[Image]): list of resized images data type is (Image).
+        '''
         env = self.env
         with env.begin(write=False) as txn:
             imgbuf = txn.get(self.keys[index])
