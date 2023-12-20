@@ -11,8 +11,6 @@ from ..miscc.config import cfg
 from utils import *
 
 import torch.utils.data as data
-import os
-import os.path
 
 ######################
 ###   Image Data   ###

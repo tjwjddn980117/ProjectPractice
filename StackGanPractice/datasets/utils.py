@@ -19,7 +19,7 @@ def get_imgs(img_path, imsize, bbox=None, transform=None, normalize=None):
     Arguments:
         img_path (str) : the path of image dir.
         imsize ( ) : it should width, height.
-        bbox ( ) : boundary box. standard for cutting out a picture.
+        bbox (list) : boundary box. standard for cutting out a picture.
         transform ( ) : the parameter that standard transform.
         normalize ( ) : the parameter that standard normalize.
     

@@ -3,26 +3,18 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-
+import random
 import torch.utils.data as data
 import torchvision.transforms as transforms
-from PIL import Image
-import PIL
 import os
 import os.path
 import pickle
 import numpy as np
 import pandas as pd
 from miscc.config import cfg
+from utils import get_imgs
 
 import torch.utils.data as data
-from PIL import Image
-import os
-import os.path
-import six
-import string
-import sys
-import torch
 
 ######################
 ###   Text Data    ###
@@ -65,6 +57,11 @@ class TextDataset(data.Dataset):
         self.embeddings = self.load_embedding(split_dir, embedding_type)
         self.class_id = self.load_class_id(split_dir, len(self.filenames))
         self.captions = self.load_all_captions()
+
+        if cfg.TRAIN.FLAG:
+            self.iterator = self.prepair_training_pairs
+        else:
+            self.iterator = self.prepair_test_pairs
 
     def load_bbox(self):
         '''
@@ -139,7 +136,7 @@ class TextDataset(data.Dataset):
 
         Returns:
             embeddings (ndarray): normaly, embedding size should 
-                        [number_of_sequences_you_have, define_embedding_dim].
+                        [batch, number_of_sequences(captions), embedding_dim].
         '''
         if embedding_type == 'cnn-rnn':
             embedding_filename = '/char-CNN-RNN-embeddings.pickle'
@@ -158,14 +155,16 @@ class TextDataset(data.Dataset):
     
     def load_class_id(self, data_dir, total_num):
         '''
-        This function works for making class index.
+        This function works for making key index.
+          If we already have class_info, we allocate prepaired class of files.
+          But we haven't that information, then we just allocate linealy class_id.
 
         Arguments:
             data_dir (str): path of data directory.
-            total_num (int): total number of class.
+            total_num (int): total number of keys.
         
         Returns:
-            class_id (ndarray): ndarray about class index.
+            class_id (ndarray): ndarray about key index.
         '''
         if os.path.isfile(data_dir + '/class_info.pickle'):
             with open(data_dir + '/class_info.pickle', 'rb') as f:
@@ -195,9 +194,15 @@ class TextDataset(data.Dataset):
         The function that prepare to match the pairs of training set.
 
         Arguments:
-            index (int): selected index of class
+            index (int): selected index of file.
+        
+        Returns:
+            imgs (list): list of preprocessing images.
+            wrong_imgs (list): list of preprocessing adversarial images.
+            embedding (ndarray): embedding of one caption. [emb_dim].
+            key (str): name of imgs.
         '''
-        # key is class name
+        # key is file name
         key = self.filenames[index]
 
         if self.bbox is not None:
@@ -206,3 +211,67 @@ class TextDataset(data.Dataset):
         else:
             bbox = None
             data_dir = self.data_dir
+        # captions = self.captions[key]
+        embeddings = self.embeddings[index, :, :]
+        img_name = '%s/images/%s.jpg' % (data_dir, key)
+        imgs = get_imgs(img_name, self.imsize,
+                        bbox, self.transform, normalize=self.norm)
+        
+        # setup the wrong data on purpose randomly
+        wrong_ix = random.randint(0, len(self.filenames) - 1)
+        if(self.class_id[index] == self.class_id[wrong_ix]):
+            wrong_ix = random.randint(0, len(self.filenames) - 1)
+        wrong_key = self.filenames[wrong_ix]
+        if self.bbox is not None:
+            wrong_bbox = self.bbox[wrong_key]
+        else:
+            wrong_bbox = None
+        wrong_img_name = '%s/images/%s.jpg' % (data_dir, wrong_key)
+        wrong_imgs = get_imgs(wrong_img_name, self.imsize,
+                              wrong_bbox, self.transform, normalize=self.norm)
+        
+        # select just one caption randomly
+        embedding_ix = random.randint(0, embeddings.shape[0] - 1)
+        embedding = embeddings[embedding_ix, :]
+        if self.target_transform is not None:
+            embedding = self.target_transform(embedding)
+        
+        return imgs, wrong_imgs, embedding, key  # captions
+    
+    def prepair_test_pairs(self, index):
+        '''
+        The function that prepare to match the pairs of test set.
+
+        Arguments:
+            index (int): selected index of file.
+        
+        Returns:
+            imgs (list): list of preprocessing images.
+            embeddings (ndarray): embedding of one caption. [num_captions, emb_dim].
+            key (str): name of imgs.
+        '''
+        # key is file name
+        key = self.filenames[index]
+
+        if self.bbox is not None:
+            bbox = self.bbox[key]
+            data_dir = '%s/CUB_200_2011' % self.data_dir
+        else:
+            bbox = None
+            data_dir = self.data_dir
+        # captions = self.captions[key]
+        embeddings = self.embeddings[index, :, :]
+        img_name = '%s/images/%s.jpg' % (data_dir, key)
+        imgs = get_imgs(img_name, self.imsize,
+                        bbox, self.transform, normalize=self.norm)
+        
+        if self.target_transform is not None:
+            embeddings = self.target_transform(embeddings)
+
+        return imgs, embeddings, key  # captions
+    
+    def __getitem__(self, index):
+        return self.iterator(index)
+
+    def __len__(self):
+        return len(self.filenames)

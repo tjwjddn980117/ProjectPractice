@@ -12,8 +12,6 @@ from ..miscc.config import cfg
 from utils import get_imgs
 
 import torch.utils.data as data
-import os
-import os.path
 
 import six
 
