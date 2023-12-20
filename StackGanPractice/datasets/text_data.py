@@ -61,12 +61,17 @@ class TextDataset(data.Dataset):
             self.bbox = None
         split_dir = os.path.join(data_dir, split)
 
+        self.filenames = self.load_filenames(split_dir)
+        self.embeddings = self.load_embedding(split_dir, embedding_type)
+        self.class_id = self.load_class_id(split_dir, len(self.filenames))
+        self.captions = self.load_all_captions()
+
     def load_bbox(self):
         '''
         this is the function that making bbox.
 
         Returns:
-            filename_bbox (dict[img_file_name, bbox]).
+            filename_bbox (dict{img_file_name: bbox}).
         '''
         data_dir = self.data_dir
         bbox_path = os.path.join(data_dir, 'CUB_200_2011/bounding_boxes.txt')
@@ -177,10 +182,27 @@ class TextDataset(data.Dataset):
             data_dir (str): path of data directory.
         
         Returns:
-            filenames ( ): list of file names
+            filenames (list): list of file names. File names are images name.
         '''
         filepath = os.path.join(data_dir, 'filenames.pickle')
         with open(filepath, 'rb') as f:
             filenames = pickle.load(f)
         print('Load filenames from: %s (%d)' % (filepath, len(filenames)))
         return filenames
+    
+    def prepair_training_pairs(self, index):
+        '''
+        The function that prepare to match the pairs of training set.
+
+        Arguments:
+            index (int): selected index of class
+        '''
+        # key is class name
+        key = self.filenames[index]
+
+        if self.bbox is not None:
+            bbox = self.bbox[key]
+            data_dir = '%s/CUB_200_2011' % self.data_dir
+        else:
+            bbox = None
+            data_dir = self.data_dir

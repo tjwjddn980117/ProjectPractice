@@ -2,13 +2,14 @@ from easydict import EasyDict as edict
 import numpy as np
 
 def _merge_a_into_b(a, b):
-    '''
+    """
     Merge config dictionary a into config dictionary b, 
     clobbering the options in b whenever they are also specified in a.
+
     Arguments:
-        a (edict): 
+        a (edict):
         b (edict): 
-    '''
+    """
 
     if type(a) is not edict:
         return
