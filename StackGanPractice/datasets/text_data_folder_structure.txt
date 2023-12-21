@@ -1,0 +1,21 @@
+Data/
+├── class_info.pickle/
+├── filenames.pickle/
+├── text/
+│   ├── filename1.txt/
+│   │   ├── caption1.(str)
+│   │   ├── cpqtion2.(str)
+│   │   ├── ...
+│   ├── filename2.txt/
+│   │   ├── caption1.(str)
+│   │   ├── cpqtion2.(str)
+│   │   ├── ...
+│   ├── ...
+├── image/
+│   ├── filename1.jpg/
+│   ├── filename2.jpg/
+│   ├── ...
+├── CUB_200_2011/
+│   ├── bounding_boxes.txt/
+│   ├── images.txt/
+├── ...
