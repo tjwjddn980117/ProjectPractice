@@ -70,3 +70,8 @@ class GLU(nn.Module):
         assert nc % 2 == 0, 'channels dont divide 2!'
         nc = int(nc/2)
         return x[:, :nc] * F.sigmoid(x[:, nc:])
+    
+def conv3x3(in_planes, out_planes):
+    "3x3 convolution with padding"
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=1,
+                     padding=1, bias=False)
