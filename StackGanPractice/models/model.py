@@ -61,12 +61,22 @@ class INCEPTION_V3(nn.Module):
 class GLU(nn.Module):
     '''
     GLU is the activate function named 'Gated Linear Unit'.
+    GLUs can control the flow of information about some of the inputs.
+    This helps the neural network selectively focus important information.
+    This helps the model learn more complex patterns 
+        and filter out unnecessary information.
+    
+    Inputs: 
+        [batch, channels]
+    
+    Outputs:
+        [batch, channels/2]
     '''
     def __init__(self):
         super(GLU, self).__init__()
 
     def forward(self, x):
-        nc = x.size(1)
+        nc = x.size(1) # check channel is add
         assert nc % 2 == 0, 'channels dont divide 2!'
         nc = int(nc/2)
         return x[:, :nc] * F.sigmoid(x[:, nc:])
