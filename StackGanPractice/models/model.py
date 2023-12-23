@@ -279,3 +279,35 @@ class INIT_STAGE_G(nn.Module):
 
         return out_code
     
+class NEXT_STAGE_G(nn.Module):
+    '''
+    This is the model of next stage of Generation.
+    '''
+    def __init__(self, ngf, num_residual=cfg.GAN.R_NUM):
+        super(NEXT_STAGE_G, self).__init__()
+        self.gf_dim = ngf
+        if cfg.GAN.B_CONDITION:
+            self.ef_dim = cfg.GAN.EMBEDDING_DIM
+        else:
+            self.ef_dim = cfg.GAN.Z_DIM
+        self.num_residual = num_residual
+        self.define_module()
+
+    def _make_layer(self, block, channel_num):
+        '''
+        This is the function for make layer.
+        '''
+        layers = []
+        for i in range(self.num_residual):
+            layers.append(block(channel_num))
+        return nn.Sequential(*layers)
+
+    def define_module(self):
+        '''
+        This is the model of defining module of layers.
+        '''
+        ngf = self.gf_dim
+        efg = self.ef_dim
+        self.jointConv = Block3x3_relu(ngf + efg, ngf)
+        self.residual = self._make_layer(ResBlock, ngf)
+        self.upsample = upBlock(ngf, ngf // 2)
