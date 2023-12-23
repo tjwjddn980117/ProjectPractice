@@ -240,7 +240,7 @@ class INIT_STAGE_G(nn.Module):
     
     def define_module(self):
         '''
-        this is the model of defining module
+        This is the model of defining module of layers.
         '''
         in_dim = self.in_dim
         ngf = self.gf_dim
@@ -257,25 +257,25 @@ class INIT_STAGE_G(nn.Module):
     
     def forward(self, z_code, c_code=None):
         if cfg.GAN.B_CONDITION and c_code is not None:
+            # in_code size is [B, (c_code + z_code)]
             in_code = torch.cat((c_code, z_code), 1)
         else:
+            # in_code size is [B, z_code]
             in_code = z_code
 
-        # state size 16ngf x 4 x 4
+        # [B, in_code]
         out_code = self.fc(in_code)
+        # [B, [ngf x 4 x 4]]
         out_code = out_code.view(-1, self.gf_dim, 4, 4)
-        # state size 8ngf x 8 x 8
+        # state size 16ngf x 4 x 4
         out_code = self.upsample1(out_code)
-        # state size 4ngf x 16 x 16
+        # state size 8ngf x 8 x 8
         out_code = self.upsample2(out_code)
-        # state size 2ngf x 32 x 32
+        # state size 4ngf x 16 x 16
         out_code = self.upsample3(out_code)
-        # state size ngf x 64 x 64
+        # state size 2ngf x 32 x 32
         out_code = self.upsample4(out_code)
+        # state size ngf x 64 x 64
 
         return out_code
     
-class NEXT_STAGE_G(nn.Module):
-    def __init__(self, ngf, num_residual=cfg.GAN.R_NUM):
-        super(NEXT_STAGE_G, self).__init__()
-        self.gf_dim = ngf
