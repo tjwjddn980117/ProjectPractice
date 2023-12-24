@@ -266,16 +266,18 @@ class INIT_STAGE_G(nn.Module):
         # [B, in_code]
         out_code = self.fc(in_code)
         # [B, [ngf x 4 x 4]]
+        # However, we will assume that ngf is 16ngf for easy calculation.
+        # so, the size will [B, [16ngf x 4 x 4]]
         out_code = out_code.view(-1, self.gf_dim, 4, 4)
-        # state size 16ngf x 4 x 4
+        # [B, 16ngf, 4, 4]
         out_code = self.upsample1(out_code)
-        # state size 8ngf x 8 x 8
+        # [B, 8ngf, 8, 8]
         out_code = self.upsample2(out_code)
-        # state size 4ngf x 16 x 16
+        # [B, 4ngf, 16, 16]
         out_code = self.upsample3(out_code)
-        # state size 2ngf x 32 x 32
+        # [B, 2ngf, 32, 32]
         out_code = self.upsample4(out_code)
-        # state size ngf x 64 x 64
+        # [B, ngf, 64, 64]
 
         return out_code
     
@@ -296,6 +298,7 @@ class NEXT_STAGE_G(nn.Module):
     def _make_layer(self, block, channel_num):
         '''
         This is the function for make layer.
+        The layer don't change the size.
         '''
         layers = []
         for i in range(self.num_residual):
@@ -311,3 +314,17 @@ class NEXT_STAGE_G(nn.Module):
         self.jointConv = Block3x3_relu(ngf + efg, ngf)
         self.residual = self._make_layer(ResBlock, ngf)
         self.upsample = upBlock(ngf, ngf // 2)
+    
+    def forward(self, h_code, c_code):
+        s_size = h_code.size(2)
+        c_code = c_code.view(-1, self.ef_dim, 1, 1)
+        c_code = c_code.repeat(1, 1, s_size, s_size)
+        # state size (ngf+egf) x in_size x in_size
+        h_c_code = torch.cat((c_code, h_code), 1)
+        # state size ngf x in_size x in_size
+        out_code = self.jointConv(h_c_code)
+        out_code = self.residual(out_code)
+        # state size ngf/2 x 2in_size x 2in_size
+        out_code = self.upsample(out_code)
+
+        return out_code
