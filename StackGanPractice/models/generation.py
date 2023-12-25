@@ -246,3 +246,5 @@ class NEXT_STAGE_G(nn.Module):
         out_code = self.upsample(out_code)
 
         return out_code
+    
+    
