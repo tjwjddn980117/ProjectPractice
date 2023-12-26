@@ -259,3 +259,6 @@ class NEXT_STAGE_G(nn.Module):
         # [B, (ngf/2), h_code_size*2, h_code_size*2]
         return out_code
     
+class GET_IMAGE_G(nn.Module):
+    def __init__(self, ngf):
+        super(GET_IMAGE_G).__init__()
