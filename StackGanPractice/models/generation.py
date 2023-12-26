@@ -261,4 +261,13 @@ class NEXT_STAGE_G(nn.Module):
     
 class GET_IMAGE_G(nn.Module):
     def __init__(self, ngf):
-        super(GET_IMAGE_G).__init__()
+        super(GET_IMAGE_G, self).__init__()
+        self.gf_dim = ngf
+        self.img = nn.Sequential(
+            conv3x3(ngf, 3),
+            nn.Tanh()
+        )
+
+    def forward(self, h_code):
+        out_img = self.img(h_code)
+        return out_img
