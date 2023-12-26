@@ -200,6 +200,13 @@ class INIT_STAGE_G(nn.Module):
 class NEXT_STAGE_G(nn.Module):
     '''
     This is the model of next stage of Generation.
+
+    Inputs:
+        h_code ( ): [B, img_dim, img_size, img_size]
+        c_code ( ): [B, emb_dim]
+    
+    Outputs:
+        out_code ( ): [B, (ngf/2), h_code_size*2, h_code_size*2]
     '''
     def __init__(self, ngf, num_residual=cfg.GAN.R_NUM):
         super(NEXT_STAGE_G, self).__init__()
@@ -236,8 +243,12 @@ class NEXT_STAGE_G(nn.Module):
         s_size = h_code.size(2)
         # c_code will resize the text to image
         c_code = c_code.view(-1, self.ef_dim, 1, 1)
+        # we resize the c_code to img_size
+        # for example, if ef_dim is [[1,2,3], [4,5,6]]
+        #  then, it become [[[[1,1],[1,1]],[[2,2],[2,2]]...]
         c_code = c_code.repeat(1, 1, s_size, s_size)
         # state size (ngf+egf) x in_size x in_size
+        # [B, (ngf+egf), in_size, in_size]
         h_c_code = torch.cat((c_code, h_code), 1)
         # state size ngf x in_size x in_size
         out_code = self.jointConv(h_c_code)
@@ -245,6 +256,6 @@ class NEXT_STAGE_G(nn.Module):
         # state size ngf/2 x 2in_size x 2in_size
         out_code = self.upsample(out_code)
 
+        # [B, (ngf/2), h_code_size*2, h_code_size*2]
         return out_code
-    
     
