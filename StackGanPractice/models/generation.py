@@ -260,6 +260,9 @@ class NEXT_STAGE_G(nn.Module):
         return out_code
     
 class GET_IMAGE_G(nn.Module):
+    '''
+    This is the function that Get Image from Generator.
+    '''
     def __init__(self, ngf):
         super(GET_IMAGE_G, self).__init__()
         self.gf_dim = ngf
