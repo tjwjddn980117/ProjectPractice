@@ -274,3 +274,7 @@ class GET_IMAGE_G(nn.Module):
     def forward(self, h_code):
         out_img = self.img(h_code)
         return out_img
+
+class G_NET(nn.Module):
+    def __init__(self):
+        super(G_NET, self).__init__()
