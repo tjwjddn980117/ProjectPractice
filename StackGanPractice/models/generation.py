@@ -262,12 +262,19 @@ class NEXT_STAGE_G(nn.Module):
 class GET_IMAGE_G(nn.Module):
     '''
     This is the function that Get Image from Generator.
+    We adjust the input value of the weights of the convolution to the value between -1 and 1.
+    
+    Inputs:
+        h_code ( ): [batch_size, in_planes, H, W]
+
+    Outputs:
+        out_img ( ): [batch_size, out_planes, H, W]
     '''
     def __init__(self, ngf):
         super(GET_IMAGE_G, self).__init__()
         self.gf_dim = ngf
         self.img = nn.Sequential(
-            conv3x3(ngf, 3),
+            conv3x3(self.gf_dim, 3),
             nn.Tanh()
         )
 
