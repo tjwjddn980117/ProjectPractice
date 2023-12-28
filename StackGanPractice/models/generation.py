@@ -51,15 +51,15 @@ def Block3x3_relu(in_planes, out_planes):
 
 
 class ResBlock(nn.Module):
-    '''
-    This block work for ResBlock.
-    
-    Inputs:
-        [B, channel_num, H, W]
-    Outputs:
-        [B, channel_num, H, W]
-    '''
     def __init__(self, channel_num):
+        '''
+        This block work for ResBlock.
+
+        Inputs:
+            [B, channel_num, H, W]
+        Outputs:
+            [B, channel_num, H, W]
+        '''
         super(ResBlock, self).__init__()
         self.block = nn.Sequential(
             conv3x3(channel_num, channel_num * 2),
@@ -68,7 +68,6 @@ class ResBlock(nn.Module):
             conv3x3(channel_num, channel_num),
             nn.BatchNorm2d(channel_num)
         )
-
 
     def forward(self, x):
         residual = x
@@ -79,19 +78,19 @@ class ResBlock(nn.Module):
 class CA_NET(nn.Module):
     # some code is modified from vae examples
     # (https://github.com/pytorch/examples/blob/master/vae/main.py)
-    '''
-    Conditioning Augumentation Network. 
-    This is a key idea that enables backpropagation using the Reparametricization technique of VAEs.
-
-    Inputs:
-        [batch_size, cfg.TEXT.DIMENSION]
-
-    Returns:
-        [batch_size, cfg.GAN.EMBEDDING_DIM], 
-        [batch_size, cfg.GAN.EMBEDDING_DIM],
-        [batch_size, cfg.GAN.EMBEDDING_DIM].
-    '''
     def __init__(self):
+        '''
+        Conditioning Augumentation Network. 
+        This is a key idea that enables backpropagation using the Reparametricization technique of VAEs.
+
+        Inputs:
+            [batch_size, cfg.TEXT.DIMENSION]
+
+        Returns:
+            [batch_size, cfg.GAN.EMBEDDING_DIM], 
+            [batch_size, cfg.GAN.EMBEDDING_DIM],
+            [batch_size, cfg.GAN.EMBEDDING_DIM].
+        '''
         super(CA_NET).__init__()
         self.t_dim = cfg.TEXT.DIMENSION
         self.ef_dim = cfg.GAN.EMBEDDING_DIM
@@ -120,8 +119,10 @@ class CA_NET(nn.Module):
         '''
         The reparametrize method samples latent vectors using mean and variance. 
         This is a key idea that enables backpropagation using the Reparametricization technique of VAEs.
+
         Inputs:
             [batch_size, cfg.GAN.EMBEDDING_DIM], [batch_size, cfg.GAN.EMBEDDING_DIM].
+
         Outputs:
             [batch_size, cfg.GAN.EMBEDDING_DIM]
         '''
@@ -142,10 +143,19 @@ class CA_NET(nn.Module):
         return c_code, mu, logvar
     
 class INIT_STAGE_G(nn.Module):
-    '''
-    This is the code about initialize G_Stage
-    '''
     def __init__(self, ngf):
+        '''
+        This is the code about initialize G_Stage. 
+        We concatate z_code and c_code,
+         then we decode the embedding containing sequence information as an image.
+        
+        Inputs:
+            z_code ( ): [B, z_code]
+            c_code ( ): [B, c_code]
+        
+        Outputs:
+            out_code ( ): [B, ngf, 64, 64]
+        '''
         super(INIT_STAGE_G, self).__init__()
         self.gf_dim = ngf
         if cfg.GAN.B_CONDITION:
@@ -156,7 +166,7 @@ class INIT_STAGE_G(nn.Module):
     
     def define_module(self):
         '''
-        this is the model of defining module
+        this is the model of defining module.
         '''
         in_dim = self.in_dim
         ngf = self.gf_dim
@@ -198,17 +208,18 @@ class INIT_STAGE_G(nn.Module):
         return out_code
     
 class NEXT_STAGE_G(nn.Module):
-    '''
-    This is the model of next stage of Generation.
-
-    Inputs:
-        h_code ( ): [B, img_dim, img_size, img_size]
-        c_code ( ): [B, emb_dim]
-    
-    Outputs:
-        out_code ( ): [B, (ngf/2), h_code_size*2, h_code_size*2]
-    '''
     def __init__(self, ngf, num_residual=cfg.GAN.R_NUM):
+        '''
+        This is the model of next stage of Generation. 
+        We residual in this layer, then we upsample just one time.
+
+        Inputs:
+            h_code ( ): [B, img_dim, img_size, img_size]
+            c_code ( ): [B, emb_dim]
+
+        Outputs:
+            out_code ( ): [B, (ngf/2), h_code_size*2, h_code_size*2]
+        '''
         super(NEXT_STAGE_G, self).__init__()
         self.gf_dim = ngf
         if cfg.GAN.B_CONDITION:
@@ -260,17 +271,17 @@ class NEXT_STAGE_G(nn.Module):
         return out_code
     
 class GET_IMAGE_G(nn.Module):
-    '''
-    This is the function that Get Image from Generator.
-    We adjust the input value of the weights of the convolution to the value between -1 and 1.
-    
-    Inputs:
-        h_code ( ): [batch_size, in_planes, H, W]
-
-    Outputs:
-        out_img ( ): [batch_size, out_planes, H, W]
-    '''
     def __init__(self, ngf):
+        '''
+        This is the function that Get Image from Generator.
+        We adjust the input value of the weights of the convolution to the value between -1 and 1.
+
+        Inputs:
+            h_code ( ): [batch_size, in_planes, H, W]
+
+        Outputs:
+            out_img ( ): [batch_size, out_planes, H, W]
+        '''
         super(GET_IMAGE_G, self).__init__()
         self.gf_dim = ngf
         self.img = nn.Sequential(
@@ -281,7 +292,3 @@ class GET_IMAGE_G(nn.Module):
     def forward(self, h_code):
         out_img = self.img(h_code)
         return out_img
-
-class G_NET(nn.Module):
-    def __init__(self):
-        super(G_NET, self).__init__()

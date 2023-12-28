@@ -20,20 +20,20 @@ import torch.utils.data as data
 ###   Text Data    ###
 ######################
 class TextDataset(data.Dataset):
-    '''
-    class about text data.
-
-    Attributes:
-        data_dir (str): parameter about data path.
-
-        transform ( ): information to define of transform.
-        target_transform ( ): information to define of target_transform.
-        norm (transforms): transforms for narmalize.
-
-        imsize (list): list of image size [64, 128, 256, ...].
-    '''
     def __init__(self, data_dir, split='train', embedding_type='cnn-rnn',
                  base_size=64, transform=None, target_transform=None):
+        '''
+        class about text data.
+    
+        Attributes:
+            data_dir (str): parameter about data path.
+    
+            transform ( ): information to define of transform.
+            target_transform ( ): information to define of target_transform.
+            norm (transforms): transforms for narmalize.
+    
+            imsize (list): list of image size [64, 128, 256, ...].
+        '''
         self.transform = transform
         self.norm = transforms.Compose([
             transforms.ToTensor(),

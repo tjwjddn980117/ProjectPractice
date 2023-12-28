@@ -10,18 +10,18 @@ import torch.utils.model_zoo as model_zoo
 #  it is also good to compute inception score using fine-tuned model and manually examine the image quality.
 
 class INCEPTION_V3(nn.Module):
-    '''
-    INCEPTION_V3 is the pre-trained model.
-    We don't update this model in this code.
-    This model has a structure of normalization, upsampling, and sigmoid.
-
-    Inputs:
-        [batch, 3, 299, 299]
-
-    Returns:
-        [batch, 1000]
-    '''
     def __init__(self):
+        '''
+        INCEPTION_V3 is the pre-trained model.
+        We don't update this model in this code.
+        This model has a structure of normalization, upsampling, and sigmoid.
+
+        Inputs:
+            [batch, 3, 299, 299]
+
+        Returns:
+            [batch, 1000]
+        '''
         super(INCEPTION_V3, self).__init__()
         self.model = models.inception_v3()
         url = 'https://download.pytorch.org/models/inception_v3_google-1a9a5a14.pth'
@@ -57,20 +57,20 @@ class INCEPTION_V3(nn.Module):
         return x
 
 class GLU(nn.Module):
-    '''
-    GLU is the activate function named 'Gated Linear Unit'.
-    GLUs can control the flow of information about some of the inputs.
-    This helps the neural network selectively focus important information.
-    This helps the model learn more complex patterns 
-        and filter out unnecessary information.
-    
-    Inputs: 
-        [batch, channels]
-    
-    Outputs:
-        [batch, channels/2]
-    '''
     def __init__(self):
+        '''
+        GLU is the activate function named 'Gated Linear Unit'.
+        GLUs can control the flow of information about some of the inputs.
+        This helps the neural network selectively focus important information.
+        This helps the model learn more complex patterns 
+            and filter out unnecessary information.
+        
+        Inputs: 
+            [batch, channels]
+        
+        Outputs:
+            [batch, channels/2]
+        '''
         super(GLU, self).__init__()
 
     def forward(self, x):

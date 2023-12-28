@@ -16,24 +16,24 @@ import torch.utils.data as data
 ###   Image Data   ###
 ######################
 class ImageFolder(data.Dataset):
-    '''
-    class about image data.
-
-    Attributes:
-        root (str): this is the root path of image data.
-        imgs (list[(path, class_index)]): this is the list of image data tuple (path, class_index).
-        classes (list[path]): this is the list of each class path.
-        num_classes (int): this is the number of classes.
-        class_to_idx (dict{class_path: int}): index information with class_path and index.
-
-        transform ( ): information to define of transform.
-        target_transform ( ): information to define of target_transform.
-        norm (transforms): transforms for narmalize.
-
-        imsize (list): list of image size [64, 128, 256, ...].
-    '''
     def __init__(self, root, split_dir='train', custom_classes=None,
                  base_size=64, transform=None, target_transform=None):
+        '''
+        class about image data.
+    
+        Attributes:
+            root (str): this is the root path of image data.
+            imgs (list[(path, class_index)]): this is the list of image data tuple (path, class_index).
+            classes (list[path]): this is the list of each class path.
+            num_classes (int): this is the number of classes.
+            class_to_idx (dict{class_path: int}): index information with class_path and index.
+    
+            transform ( ): information to define of transform.
+            target_transform ( ): information to define of target_transform.
+            norm (transforms): transforms for narmalize.
+    
+            imsize (list): list of image size [64, 128, 256, ...].
+        '''
         root = os.path.join(root, split_dir)
         classes, class_to_idx = self.find_classes(root, custom_classes)
         imgs = self.make_dataset(classes, class_to_idx)

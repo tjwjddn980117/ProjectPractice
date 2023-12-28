@@ -19,23 +19,23 @@ import six
 ###   LSUN Data    ###
 ######################
 class LSUNClass(data.Dataset):
-    '''
-    class about LSUNC data (Large-scale Scene Understanding data).
-
-    Attributes:
-        db_path (str): it is the path of database.
-        env ( ): it is the environment o lmdb.
-        lenght (int): it is the number of all instance items.
-        keys ( ): load LSUNC keys.
-
-        transform ( ): information to define of transform.
-        target_transform ( ): information to define of target_transform.
-        norm (transforms): transforms for narmalize.
-
-        imsize (list): list of image size [64, 128, 256, ...].
-    '''
     def __init__(self, db_path, base_size=64,
                  transform=None, target_transform=None):
+        '''
+        class about LSUNC data (Large-scale Scene Understanding data).
+    
+        Attributes:
+            db_path (str): it is the path of database.
+            env ( ): it is the environment o lmdb.
+            lenght (int): it is the number of all instance items.
+            keys ( ): load LSUNC keys.
+    
+            transform ( ): information to define of transform.
+            target_transform ( ): information to define of target_transform.
+            norm (transforms): transforms for narmalize.
+    
+            imsize (list): list of image size [64, 128, 256, ...].
+        '''
         import lmdb
         # Storing LMDB data path
         self.db_path = db_path
