@@ -292,3 +292,73 @@ class GET_IMAGE_G(nn.Module):
     def forward(self, h_code):
         out_img = self.img(h_code)
         return out_img
+
+class G_NET(nn.Module):
+    def __init__(self):
+        '''
+        This is the main Generation net. 
+        The number of fake images stored varies depending on the depth.
+
+        Input:
+            z_code ( ): [B, z_code]
+            text_embedding ( ): [batch_size, cfg.TEXT.DIMENSION]
+        
+        Outputs:
+            fake_imgs (list[array]): the size of array is [batch_size, out_planes, H, W]
+            mu ( ): [batch_size, cfg.GAN.EMBEDDING_DIM]
+            logvar ( ): [batch_size, cfg.GAN.EMBEDDING_DIM]
+        '''
+        super(G_NET, self).__init__()
+        self.gf_dim = cfg.GAN.GF_DIM
+        self.define_module()
+
+    def define_module(self):
+        '''
+        This is the function define the modules.
+        '''
+        if cfg.GAN.B_CONDITION:
+            # conditioning argument net.
+            self.ca_net = CA_NET()
+        
+        # If the branch get deeper, the layer get deeper too.
+        if cfg.TREE.BRANCH_NUM > 0:
+            self.h_net1 = INIT_STAGE_G(self.gf_dim * 16)
+            self.img_net1 = GET_IMAGE_G(self.gf_dim)
+        if cfg.TREE.BRANCH_NUM > 1:
+            self.h_net2 = NEXT_STAGE_G(self.gf_dim)
+            self.img_net2 = GET_IMAGE_G(self.gf_dim // 2)
+        if cfg.TREE.BRANCH_NUM > 2:
+            self.h_net3 = NEXT_STAGE_G(self.gf_dim // 2)
+            self.img_net3 = GET_IMAGE_G(self.gf_dim // 4)
+        if cfg.TREE.BRANCH_NUM > 3: # Recommended structure (mainly limited by GPU memory), and not test yet
+            self.h_net4 = NEXT_STAGE_G(self.gf_dim // 4, num_residual=1)
+            self.img_net4 = GET_IMAGE_G(self.gf_dim // 8)
+        if cfg.TREE.BRANCH_NUM > 4:
+            self.h_net4 = NEXT_STAGE_G(self.gf_dim // 8, num_residual=1)
+            self.img_net4 = GET_IMAGE_G(self.gf_dim // 16)
+
+    def forward(self, z_code, text_embedding):
+        if cfg.GAN.B_CONDITION and text_embedding is not None:
+            c_code, mu, logvar = self.ca_net(text_embedding)
+        else:
+            c_code, mu, logvar = z_code, None, None
+
+        fake_imgs = []
+        if cfg.TREE.BRANCH_NUM > 0:
+            h_code1 = self.h_net1(z_code, c_code)
+            fake_img1 = self.img_net1(h_code1)
+            fake_imgs.append(fake_img1)
+        if cfg.TREE.BRANCH_NUM > 1:
+            h_code2 = self.h_net2(h_code1, c_code)
+            fake_img2 = self.img_net2(h_code2)
+            fake_imgs.append(fake_img2)
+        if cfg.TREE.BRANCH_NUM > 2:
+            h_code3 = self.h_net3(h_code2, c_code)
+            fake_img3 = self.img_net3(h_code3)
+            fake_imgs.append(fake_img3)
+        if cfg.TREE.BRANCH_NUM > 3:
+            h_code4 = self.h_net4(h_code3, c_code)
+            fake_img4 = self.img_net4(h_code4)
+            fake_imgs.append(fake_img4)
+
+        return fake_imgs, mu, logvar
