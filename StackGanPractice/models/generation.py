@@ -13,6 +13,7 @@ def upBlock(in_planes, out_planes):
     
     Inputs:
         [B, in_planes, H, W]
+
     Outputs:
         [B, out_planes, H*2, W*2]
     '''
@@ -36,6 +37,7 @@ def Block3x3_relu(in_planes, out_planes):
     
     Inputs:
         [B, in_planes, H, W]
+
     Outputs:
         [B, out_planes, H, W]
     '''
@@ -52,8 +54,12 @@ class ResBlock(nn.Module):
         '''
         This block work for ResBlock.
 
+        Arguments:
+            channel_num (int): the number of channel.
+
         Inputs:
             [B, channel_num, H, W]
+
         Outputs:
             [B, channel_num, H, W]
         '''
@@ -146,6 +152,9 @@ class INIT_STAGE_G(nn.Module):
         We concatate z_code and c_code,
          then we decode the embedding containing sequence information as an image.
         
+        Arguments:
+            ngf (int): defined channel num.
+         
         Inputs:
             z_code ( ): [B, z_code]
             c_code ( ): [B, c_code]
@@ -210,6 +219,10 @@ class NEXT_STAGE_G(nn.Module):
         This is the model of next stage of Generation. 
         We residual in this layer, then we upsample just one time.
 
+        Arguments:
+            ngf (int): defined channel num.
+            num_residual (int): defined iterate number of layers.
+
         Inputs:
             h_code ( ): [B, img_dim, img_size, img_size]
             c_code ( ): [B, emb_dim]
@@ -272,6 +285,9 @@ class GET_IMAGE_G(nn.Module):
         '''
         This is the function that Get Image from Generator.
         We adjust the input value of the weights of the convolution to the value between -1 and 1.
+
+        Arguments:
+            ngf (int): defined channel num.
 
         Inputs:
             h_code ( ): [batch_size, in_planes, H, W]
