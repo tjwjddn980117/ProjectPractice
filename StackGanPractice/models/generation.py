@@ -2,9 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.parallel
 from miscc.config import cfg
-import torch.nn.functional as F
-from torchvision import models
-import torch.utils.model_zoo as model_zoo
 
 from utils import *
 

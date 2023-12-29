@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 import torch.nn.parallel
 import torch.nn.functional as F
@@ -64,10 +63,10 @@ class GLU(nn.Module):
         This helps the neural network selectively focus important information.
         This helps the model learn more complex patterns 
             and filter out unnecessary information.
-        
+
         Inputs: 
             [batch, channels]
-        
+
         Outputs:
             [batch, channels/2]
         '''
