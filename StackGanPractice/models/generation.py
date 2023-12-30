@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.parallel
 from miscc.config import cfg
 
-from utils import *
+from utils import conv3x3, GLU
 
 # ############## G networks ################################################
 # Upsale the spatial size by a factor of 2
