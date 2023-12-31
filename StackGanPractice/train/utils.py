@@ -71,6 +71,9 @@ def KL_loss(mu, logvar):
     return KLD
 
 def weights_init(m):
+    '''
+    This is the function of init the weights of modules.
+    '''
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
         nn.init.orthogonal(m.weight.data, 1.0)
