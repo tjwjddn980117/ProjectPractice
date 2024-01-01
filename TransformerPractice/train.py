@@ -148,4 +148,3 @@ def run(total_epoch, best_loss):
 
 if __name__ == '__main__':
     run(total_epoch=epoch, best_loss=inf)
-    
