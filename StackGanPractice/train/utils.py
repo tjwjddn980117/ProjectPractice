@@ -18,7 +18,7 @@ from miscc.utils import mkdir_p
 from tensorboard import summary
 from tensorboard import FileWriter
 
-from ..models.generation import G_NET
+from ..models.generation import G_NETrr
 from ..models.discriminator import D_NET64, D_NET128, D_NET256, D_NET512, D_NET1024
 from ..models.utils import INCEPTION_V3
 
@@ -56,7 +56,9 @@ def compute_mean_covariance(img):
 
 def KL_loss(mu, logvar):
     '''
-    This is the function for calculate KL loss.
+    This is the function for calculate KLD loss.
+    In this function, we use the KLD in auto-encoder.
+    It's KL(q(z|x)||p(z)) = E[log q(z|x) - log p(z)].
     
     Inputs:
         mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]
