@@ -65,7 +65,7 @@ def KL_loss(mu, logvar):
         logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]
 
     Outputs:
-        KLD ( ):
+        KLD (float): Loss of KLD.
     '''
     # -0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
@@ -75,6 +75,9 @@ def KL_loss(mu, logvar):
 def weights_init(m):
     '''
     This is the function of init the weights of modules.
+    
+    Inputs:
+        m (nn.Module): the module we want to define.
     '''
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -86,3 +89,90 @@ def weights_init(m):
         nn.init.orthogonal(m.weight.data, 1.0)
         if m.bias is not None:
             m.bias.data.fill_(0.0)
+
+def load_params(model, new_param):
+    '''
+    This is the function for loading the parameters.
+
+    Inputs:
+        model (nn.Module): the model already we have.
+        new_param ( ): information of loading parameters.
+    '''
+    for p, new_p in zip(model.parameters(), new_param):
+        p.data.copy_(new_p)
+
+
+def copy_G_params(model):
+    '''
+    This is the function for copy Generative model's parameters.
+
+    Inputs:
+        model (nn.Module): the model which want to copy.
+    
+    Outputs:
+        flatten (list[]): list of model's parameters.
+    '''
+    flatten = deepcopy(list(p.data for p in model.parameters()))
+    return flatten
+
+def compute_inception_score(predictions:np, num_splits=1):
+    '''
+    Calculate the Inception score and return its mean and standard deviation.
+    The Inception score is a measure of the quality of the generating model, 
+    which gives high diversity and high scores to models that produce lifelike images.
+
+    Inputs:
+        predictions (nparray): [batch, num_class].
+        Indicates the predicted probability by class 
+        obtained by passing through the Inception network.
+        num_splits (int): size of split (mini_batch)
+    
+    Outputs:
+        np.mean(scores) (nparray): the mean of kl scores.
+        np.std(scores) (nparray): the std of kl scores.
+    '''
+    # print('predictions', predictions.shape)
+    scores = []
+    for i in range(num_splits):
+        istart = i * predictions.shape[0] // num_splits
+        iend = (i + 1) * predictions.shape[0] // num_splits
+        # ex) part = np.array([[0.1, 0.2, 0.7], [0.3, 0.4, 0.3], [0.2, 0.5, 0.3]])
+        part = predictions[istart:iend, :]
+        # ex) np.log(part) = [[-2.302, -1.609, -0.357], [-1.204, -0.916, -1.204], [-1.609, -0.693, -1.204]]
+        # ex) np.mean(part, 0) = [0.2, 0.367, 0.433] (mean of each class)
+        # ex) np.expand_dims = [[0.2, -.367, 0.433]]
+        kl = part * \
+            (np.log(part) - np.log(np.expand_dims(np.mean(part, 0), 0)))
+        # ex) np.sum(kl, 1) = [0.145, 0.046, 0.044]
+        # ex) np.mean(np.sum(kl, 1)) = 0.07868
+        kl = np.mean(np.sum(kl, 1))
+        # scores = [1.08186]
+        scores.append(np.exp(kl))
+    return np.mean(scores), np.std(scores)
+
+def negative_log_posterior_probability(predictions, num_splits=1):
+    '''
+    Negative log post-probability is a measure 
+    that gives a high score to a model 
+    that accurately predicts a class with a high probability.
+
+    Inputs:
+        predictions (nparray): [batch, num_class].
+        Indicates the predicted probability by class 
+        obtained by passing through the Inception network.
+        num_splits (int): size of split (mini_batch)
+    
+    Outputs:
+        np.mean(scores) (nparray): the mean of negative_log scores.
+        np.std(scores) (nparray): the std of negative_log scores.
+    '''
+    # print('predictions', predictions.shape)
+    scores = []
+    for i in range(num_splits):
+        istart = i * predictions.shape[0] // num_splits
+        iend = (i + 1) * predictions.shape[0] // num_splits
+        part = predictions[istart:iend, :]
+        result = -1. * np.log(np.max(part, 1))
+        result = np.mean(result)
+        scores.append(result)
+    return np.mean(scores), np.std(scores)
