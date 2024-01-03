@@ -1,19 +1,13 @@
 from __future__ import print_function
 
-import torch.backends.cudnn as cudnn
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 import torch.optim as optim
 import torchvision.utils as vutils
 import numpy as np
-import os
-import time
-from PIL import Image, ImageFont, ImageDraw
 from copy import deepcopy
 
 from miscc.config import cfg
-from miscc.utils import mkdir_p
 
 from tensorboard import summary
 from tensorboard import FileWriter
@@ -296,3 +290,49 @@ def save_model(netG, avg_param_G, netsD, epoch, model_dir):
             netD.state_dict(),
             '%s/netD%d.pth' % (model_dir, i))
     print('Save G/Ds models.')
+
+def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
+                     count, image_dir, summary_writer):
+    '''
+    saving results of image.
+    
+    Inputs:
+        imgs_tcpu ( ): list of real images.
+        fake_imgs (list): list of fake images.
+        num_imgs (int): the number of images.
+        count (int): index of generation model.
+        image_dir (str): the path of saving image.
+        summary_writer ( ): maybe for the tensorboard.
+    '''
+    num = cfg.TRAIN.VIS_COUNT
+
+    # The range of real_img (i.e., self.imgs_tcpu[i][0:num]).
+    # is changed to [0, 1] by function vutils.save_image.
+    real_img = imgs_tcpu[-1][0:num]
+    vutils.save_image(
+        real_img, '%s/real_samples.png' % (image_dir),
+        normalize=True)
+    real_img_set = vutils.make_grid(real_img).numpy()
+    real_img_set = np.transpose(real_img_set, (1, 2, 0))
+    real_img_set = real_img_set * 255
+    real_img_set = real_img_set.astype(np.uint8)
+    sup_real_img = summary.image('real_img', real_img_set)
+    summary_writer.add_summary(sup_real_img, count)
+
+    for i in range(num_imgs):
+        fake_img = fake_imgs[i][0:num]
+        # The range of fake_img.data (i.e., self.fake_imgs[i][0:num])
+        # is still [-1. 1]...
+        vutils.save_image(
+            fake_img.data, '%s/count_%09d_fake_samples%d.png' %
+            (image_dir, count, i), normalize=True)
+
+        fake_img_set = vutils.make_grid(fake_img.data).cpu().numpy()
+
+        fake_img_set = np.transpose(fake_img_set, (1, 2, 0))
+        fake_img_set = (fake_img_set + 1) * 255 / 2
+        fake_img_set = fake_img_set.astype(np.uint8)
+
+        sup_fake_img = summary.image('fake_img%d' % i, fake_img_set)
+        summary_writer.add_summary(sup_fake_img, count)
+        summary_writer.flush()

@@ -3,7 +3,10 @@ import errno
 
 def mkdir_p(path):
     '''
-    The function that make dirs
+    The function that make dirs.
+
+    Inputs:
+        path (str): the path we have to make.
     '''
     try:
         os.makedirs(path)
