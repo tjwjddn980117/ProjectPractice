@@ -18,7 +18,7 @@ from miscc.utils import mkdir_p
 from tensorboard import summary
 from tensorboard import FileWriter
 
-from ..models.generation import G_NETrr
+from ..models.generation import G_NET
 from ..models.discriminator import D_NET64, D_NET128, D_NET256, D_NET512, D_NET1024
 from ..models.utils import INCEPTION_V3
 
@@ -125,7 +125,7 @@ def compute_inception_score(predictions:np, num_splits=1):
         predictions (nparray): [batch, num_class].
         Indicates the predicted probability by class 
         obtained by passing through the Inception network.
-        num_splits (int): size of split (mini_batch)
+        num_splits (int): size of split (mini_batch).
     
     Outputs:
         np.mean(scores) (nparray): the mean of kl scores.
@@ -160,7 +160,7 @@ def negative_log_posterior_probability(predictions, num_splits=1):
         predictions (nparray): [batch, num_class].
         Indicates the predicted probability by class 
         obtained by passing through the Inception network.
-        num_splits (int): size of split (mini_batch)
+        num_splits (int): size of split (mini_batch).
     
     Outputs:
         np.mean(scores) (nparray): the mean of negative_log scores.
@@ -176,3 +176,70 @@ def negative_log_posterior_probability(predictions, num_splits=1):
         result = np.mean(result)
         scores.append(result)
     return np.mean(scores), np.std(scores)
+
+def load_network(gpus):
+    '''
+    The function that loading models.
+    We get models from cfg files.
+
+    Inputs:
+        gpus: afordable gpus.
+    Outputs:
+        netG (nn.Module): Generation model.
+        netsD (list[nn.Module]): Discrimination model with Branches.
+        len(netsD) (int): number of discrimination models.
+        inception_model (nn.Module): INCEPTION_V3 pre-trained model.
+        count: 
+    '''
+    #just init G_NET.
+    netG = G_NET()
+    netG.apply(weights_init)
+    netG = torch.nn.DataParallel(netG, device_ids=gpus)
+    print(netG)
+
+    netsD = []
+    if cfg.TREE.BRANCH_NUM > 0:
+        netsD.append(D_NET64())
+    if cfg.TREE.BRANCH_NUM > 1:
+        netsD.append(D_NET128())
+    if cfg.TREE.BRANCH_NUM > 2:
+        netsD.append(D_NET256())
+    if cfg.TREE.BRANCH_NUM > 3:
+        netsD.append(D_NET512())
+    if cfg.TREE.BRANCH_NUM > 4:
+        netsD.append(D_NET1024())
+    # TODO: if cfg.TREE.BRANCH_NUM > 5:
+
+    for i in range(len(netsD)):
+        netsD[i].apply(weights_init)
+        netsD[i] = torch.nn.DataParallel(netsD[i], device_ids=gpus)
+        # print(netsD[i])
+    print('# of netsD', len(netsD))
+
+    count = 0
+    if cfg.TRAIN.NET_G != '':
+        state_dict = torch.load(cfg.TRAIN.NET_G)
+        netG.load_state_dict(state_dict)
+        print('Load ', cfg.TRAIN.NET_G)
+
+        istart = cfg.TRAIN.NET_G.rfind('_') + 1
+        iend = cfg.TRAIN.NET_G.rfind('.')
+        count = cfg.TRAIN.NET_G[istart:iend]
+        count = int(count) + 1
+
+    if cfg.TRAIN.NET_D != '':
+        for i in range(len(netsD)):
+            print('Load %s_%d.pth' % (cfg.TRAIN.NET_D, i))
+            state_dict = torch.load('%s%d.pth' % (cfg.TRAIN.NET_D, i))
+            netsD[i].load_state_dict(state_dict)
+
+    inception_model = INCEPTION_V3()
+
+    if cfg.CUDA:
+        netG.cuda()
+        for i in range(len(netsD)):
+            netsD[i].cuda()
+        inception_model = inception_model.cuda()
+    inception_model.eval()
+
+    return netG, netsD, len(netsD), inception_model, count
