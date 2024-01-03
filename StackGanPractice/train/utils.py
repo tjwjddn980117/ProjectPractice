@@ -96,7 +96,7 @@ def load_params(model, new_param):
 
     Inputs:
         model (nn.Module): the model already we have.
-        new_param ( ): information of loading parameters.
+        new_param (parameter): information of loading parameters.
     '''
     for p, new_p in zip(model.parameters(), new_param):
         p.data.copy_(new_p)
@@ -184,12 +184,13 @@ def load_network(gpus):
 
     Inputs:
         gpus: afordable gpus.
+
     Outputs:
         netG (nn.Module): Generation model.
         netsD (list[nn.Module]): Discrimination model with Branches.
         len(netsD) (int): number of discrimination models.
         inception_model (nn.Module): INCEPTION_V3 pre-trained model.
-        count: 
+        count (int): number of G_Net
     '''
     #just init G_NET.
     netG = G_NET()
@@ -243,3 +244,55 @@ def load_network(gpus):
     inception_model.eval()
 
     return netG, netsD, len(netsD), inception_model, count
+
+def define_optimizers(netG, netsD):
+    '''
+    defining optimizers in each of netG and netsD.
+    
+    Inputs:
+        netG (nn.Module): generation model.
+        netsD (list[nn.Module]): list of discrimination models.
+
+    Outputs:
+        optimizerG (optim): optimizer for generation model.
+        optimizersD (list[optim]): optimizer for discriminator models.
+    '''
+    optimizersD = []
+    num_Ds = len(netsD)
+    for i in range(num_Ds):
+        opt = optim.Adam(netsD[i].parameters(),
+                         lr=cfg.TRAIN.DISCRIMINATOR_LR,
+                         betas=(0.5, 0.999))
+        optimizersD.append(opt)
+
+    # G_opt_paras = []
+    # for p in netG.parameters():
+    #     if p.requires_grad:
+    #         G_opt_paras.append(p)
+    optimizerG = optim.Adam(netG.parameters(),
+                            lr=cfg.TRAIN.GENERATOR_LR,
+                            betas=(0.5, 0.999))
+    return optimizerG, optimizersD
+
+
+def save_model(netG, avg_param_G, netsD, epoch, model_dir):
+    '''
+    the function that save the model.
+
+    Inputs:
+        netG (nn.Module): the generation model already we have.
+        avg_param_G (parameter): information of loading parameters of generation.
+        netsD (list[nn.Module]): the list of discrimination model already we have.
+        epoch (int): the number of epochs we have trained.
+        model_dir (str): the path of saving way.
+    '''
+    load_params(netG, avg_param_G)
+    torch.save(
+        netG.state_dict(),
+        '%s/netG_%d.pth' % (model_dir, epoch))
+    for i in range(len(netsD)):
+        netD = netsD[i]
+        torch.save(
+            netD.state_dict(),
+            '%s/netD%d.pth' % (model_dir, i))
+    print('Save G/Ds models.')
