@@ -10,7 +10,6 @@ from copy import deepcopy
 from miscc.config import cfg
 
 from tensorboard import summary
-from tensorboard import FileWriter
 
 from ..models.generation import G_NET
 from ..models.discriminator import D_NET64, D_NET128, D_NET256, D_NET512, D_NET1024
@@ -231,11 +230,12 @@ def load_network(gpus):
 
     inception_model = INCEPTION_V3()
 
-    if cfg.CUDA:
-        netG.cuda()
-        for i in range(len(netsD)):
-            netsD[i].cuda()
-        inception_model = inception_model.cuda()
+    device = torch.device("cuda" if cfg.CUDA else "cpu")
+    netG.to(device)
+    for i in range(len(netsD)):
+        netsD[i].to(device)
+
+    inception_model.to(device)
     inception_model.eval()
 
     return netG, netsD, len(netsD), inception_model, count

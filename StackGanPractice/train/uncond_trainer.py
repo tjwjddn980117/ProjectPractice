@@ -13,9 +13,11 @@ from miscc.config import cfg
 from miscc.utils import mkdir_p
 
 from tensorboard import summary
-from tensorboard import FileWriter
+from torch.utils.tensorboard import SummaryWriter
 
 from utils import *
+
+device = torch.device('cuda' if cfg.CUDA else 'cpu')
 
 class GANTrainer(object):
     def __init__(self, output_dir, data_loader, imsize):
@@ -23,7 +25,8 @@ class GANTrainer(object):
         GAN Trainer.
 
         Arguments:
-            output_dir: the direction of output.
+            output_dir (str): the direction of output.
+            data_loader (data_loader): data loader.
         '''
         if cfg.TRAIN.FLAG:
             self.model_dir = os.path.join(output_dir, 'Model')
@@ -32,7 +35,7 @@ class GANTrainer(object):
             mkdir_p(self.model_dir)
             mkdir_p(self.image_dir)
             mkdir_p(self.log_dir)
-            self.summary_writer = FileWriter(self.log_dir)
+            self.summary_writer = SummaryWriter(self.log_dir)
 
         s_gpus = cfg.GPU_ID.split(',')
         self.gpus = [int(ix) for ix in s_gpus]
@@ -60,7 +63,6 @@ class GANTrainer(object):
         '''
         imgs = data
         vimgs = []
-        device = torch.device('cuda' if cfg.CUDA else 'cpu')
 
         for i in range(self.num_Ds):
             vimgs.append(imgs[i].to(device))
@@ -189,18 +191,12 @@ class GANTrainer(object):
 
         self.criterion = nn.BCELoss()
 
-        self.real_labels = torch.FloatTensor(self.batch_size).fill_(1)
-        self.fake_labels = torch.FloatTensor(self.batch_size).fill_(0)
+        self.real_labels = torch.full((self.batch_size, ), 1.0, device=device)
+        self.fake_labels = torch.full((self.batch_size, ), 0.0, device=device)
         nz = cfg.GAN.Z_DIM
-        noise = torch.FloatTensor(self.batch_size, nz)
-        fixed_noise = torch.FloatTensor(self.batch_size, nz).normal_(0, 1)
+        noise = torch.FloatTensor(self.batch_size, nz).to(device)
+        fixed_noise = torch.FloatTensor(self.batch_size, nz).normal_(0, 1).to(device)
         
-        # we can use gpu.
-        if cfg.CUDA: 
-            self.criterion.cuda()
-            noise, fixed_noise = noise.cuda(), fixed_noise.cuda()
-            self.real_labels = self.real_labels.cuda()
-            self.fake_labels = self.fake_labels.cuda()
 
         predictions = []
         count = start_count
@@ -335,4 +331,51 @@ class GANTrainer(object):
             im = Image.fromarray(ndarr)
             im.save(fullpath)
 
-    
+    def evaluate(self, split_dir):
+        if cfg.TRAIN.NET_G == '':
+            print('Error: the path for morels is not found!')
+        else:
+            # Build and load the generator
+            # only generator.
+            netG = G_NET()
+            netG.apply(weights_init)
+            netG = torch.nn.DataParallel(netG, device_ids=self.gpus)
+            print(netG)
+            # state_dict = torch.load(cfg.TRAIN.NET_G)
+            state_dict = \
+                torch.load(cfg.TRAIN.NET_G,
+                           map_location=lambda storage, loc: storage)
+            netG.load_state_dict(state_dict)
+            print('Load ', cfg.TRAIN.NET_G)
+
+            # the path to save generated images
+            s_tmp = cfg.TRAIN.NET_G
+            istart = s_tmp.rfind('_') + 1
+            iend = s_tmp.rfind('.')
+            iteration = int(s_tmp[istart:iend])
+            s_tmp = s_tmp[:s_tmp.rfind('/')]
+            save_dir = '%s/iteration%d/%s' % (s_tmp, iteration, split_dir)
+            if cfg.TEST.B_EXAMPLE:
+                folder = '%s/super' % (save_dir)
+            else:
+                folder = '%s/single' % (save_dir)
+            print('Make a new folder: ', folder)
+            mkdir_p(folder)
+
+            nz = cfg.GAN.Z_DIM
+            noise = torch.FloatTensor(self.batch_size, nz).to(device)
+
+            # switch to evaluate mode
+            netG.eval()
+            num_batches = int(cfg.TEST.SAMPLE_NUM / self.batch_size)
+            cnt = 0
+            for step in range(num_batches):
+                noise.data.normal_(0, 1)
+                fake_imgs, _, _ = netG(noise)
+                if cfg.TEST.B_EXAMPLE:
+                    self.save_superimages(fake_imgs[-1], folder, cnt, 256)
+                else:
+                    self.save_singleimages(fake_imgs[-1], folder, cnt, 256)
+                    # self.save_singleimages(fake_imgs[-2], folder, 128)
+                    # self.save_singleimages(fake_imgs[-3], folder, 64)
+                cnt += self.batch_size

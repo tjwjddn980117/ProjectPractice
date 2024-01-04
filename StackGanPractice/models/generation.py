@@ -87,12 +87,12 @@ class CA_NET(nn.Module):
         This is a key idea that enables backpropagation using the Reparametricization technique of VAEs.
 
         Inputs:
-            [batch_size, cfg.TEXT.DIMENSION]
+            text_embedding (nparray): [batch_size, cfg.TEXT.DIMENSION]
 
         Returns:
-            [batch_size, cfg.GAN.EMBEDDING_DIM], 
-            [batch_size, cfg.GAN.EMBEDDING_DIM],
-            [batch_size, cfg.GAN.EMBEDDING_DIM].
+            c_code (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. reparametrized numpy.
+            mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, :self.ef_dim] after fc.
+            logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, self.ef_dim:] after fc.
         '''
         super(CA_NET).__init__()
         self.t_dim = cfg.TEXT.DIMENSION
@@ -108,10 +108,11 @@ class CA_NET(nn.Module):
         mean and variance during the learning process.
         
         Inputs:
-            [batch_size, cfg.TEXT.DIMENSION].
+            text_embedding (nparray): [batch_size, cfg.TEXT.DIMENSION].
 
         Outputs:
-            [batch_size, cfg.GAN.EMBEDDING_DIM], [batch_size, cfg.GAN.EMBEDDING_DIM].
+            mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, :self.ef_dim] after fc.
+            logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, self.ef_dim:] after fc.
         '''
         x = self.relu(self.fc(text_embedding))
         mu = x[:, :self.ef_dim]
@@ -124,20 +125,19 @@ class CA_NET(nn.Module):
         This is a key idea that enables backpropagation using the Reparametricization technique of VAEs.
 
         Inputs:
-            [batch_size, cfg.GAN.EMBEDDING_DIM], [batch_size, cfg.GAN.EMBEDDING_DIM].
+            mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, :self.ef_dim] after fc.
+            logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, self.ef_dim:] after fc.
 
         Outputs:
-            [batch_size, cfg.GAN.EMBEDDING_DIM]
+            c_code (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. reparametrized numpy.
         '''
         # Divide the log var by 2 
         #  and apply an exponential function to calculate the standard deviation (std).
         # std = [batch_size, cfg.GAN.EMBEDDING_DIM]
         std = logvar.mul(0.5).exp_()
         # eps = [batch_size, cfg.GAN.EMBEDDING_DIM]
-        if cfg.CUDA:
-             eps = torch.randn_like(std).to('cuda')
-        else:
-             eps = torch.randn_like(std)
+        device = torch.device("cuda" if cfg.CUDA else "cpu") 
+        eps = torch.randn_like(std).to(device)
         return eps.mul(std).add_(mu)
 
     def forward(self, text_embedding):
@@ -156,11 +156,11 @@ class INIT_STAGE_G(nn.Module):
             ngf (int): defined channel num.
          
         Inputs:
-            z_code ( ): [B, z_code]
-            c_code ( ): [B, c_code]
+            z_code (nparray): [B, z_code]
+            c_code (nparray): [B, c_code]
         
         Outputs:
-            out_code ( ): [B, ngf, 64, 64]
+            out_code (nparray): [B, ngf, 64, 64]
         '''
         super(INIT_STAGE_G, self).__init__()
         self.gf_dim = ngf
@@ -224,11 +224,11 @@ class NEXT_STAGE_G(nn.Module):
             num_residual (int): defined iterate number of layers.
 
         Inputs:
-            h_code ( ): [B, img_dim, img_size, img_size]
-            c_code ( ): [B, emb_dim]
+            h_code (nparray): [B, img_dim, img_size, img_size]
+            c_code (nparray): [B, emb_dim]
 
         Outputs:
-            out_code ( ): [B, (ngf/2), h_code_size*2, h_code_size*2]
+            out_code (nparray): [B, (ngf/2), h_code_size*2, h_code_size*2]
         '''
         super(NEXT_STAGE_G, self).__init__()
         self.gf_dim = ngf
@@ -290,10 +290,10 @@ class GET_IMAGE_G(nn.Module):
             ngf (int): defined channel num.
 
         Inputs:
-            h_code ( ): [batch_size, in_planes, H, W]
+            h_code (nparray): [batch_size, in_planes, H, W]
 
         Outputs:
-            out_img ( ): [batch_size, out_planes, H, W]
+            out_img (nparray): [batch_size, out_planes, H, W]
         '''
         super(GET_IMAGE_G, self).__init__()
         self.gf_dim = ngf
@@ -313,13 +313,13 @@ class G_NET(nn.Module):
         The number of fake images stored varies depending on the depth.
 
         Input:
-            z_code ( ): [B, z_code]
-            text_embedding ( ): [batch_size, cfg.TEXT.DIMENSION]
+            z_code (nparray): [B, z_code]
+            text_embedding (nparray): [batch_size, cfg.TEXT.DIMENSION]
         
         Outputs:
             fake_imgs (list[array]): the size of array is [batch_size, out_planes, H, W]
-            mu ( ): [batch_size, cfg.GAN.EMBEDDING_DIM]
-            logvar ( ): [batch_size, cfg.GAN.EMBEDDING_DIM]
+            mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, :self.ef_dim] after fc.
+            logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, self.ef_dim:] after fc.
         '''
         super(G_NET, self).__init__()
         self.gf_dim = cfg.GAN.GF_DIM
