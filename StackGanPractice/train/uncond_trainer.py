@@ -72,7 +72,7 @@ class GANTrainer(object):
 
         Inputs:
             idx (int): number of index.
-            count (int): number of count.
+            count (int): number of training count.
         
         Outputs:
             errD (float): sum of error about errD_real+errD_fake. BCELoss.
@@ -114,7 +114,7 @@ class GANTrainer(object):
         training the Generation model.
 
         Inputs:
-            count (int): number of count.
+            count (int): number of training count.
         
         Outputs:
             errG_total (float): sum of error about errG+like_mu1+like_cov1. errG is BCELoss and others are MSE.
@@ -223,20 +223,32 @@ class GANTrainer(object):
 
                 #######################################################
                 # (2) Update D network
+                #     we have backward in 'train_Dnet'
                 ######################################################
                 errD_total = 0
                 for i in range(self.num_Ds):
+                    # we already have real_imgs and fake_imgs.
                     errD = self.train_Dnet(i, count)
+                    # error of Discriminator
                     errD_total += errD
 
                 #######################################################
                 # (3) Update G network: maximize log(D(G(z)))
+                #     we have backward in 'train_Gnet'
                 ######################################################
+                # error of Generator
                 errG_total = self.train_Gnet(count)
+
+                # we normalize the netG parameters.
+                # avg_param_G is the parameters that copied before training.
                 for p, avg_p in zip(self.netG.parameters(), avg_param_G):
                     avg_p.mul_(0.999).add_(0.001, p.data)
 
                 # for inception score
+                # this is for double checking that it could make the right picture.
+                # The moving average thus implemented can be interpreted as applying 99.9% 
+                #  to the previous parameter value and 0.1% to the current parameter value. 
+                # This way, the parameters of the model can be stabilized and updated smoothly.
                 pred = self.inception_model(self.fake_imgs[-1].detach())
                 predictions.append(pred.data.cpu().numpy())
 
@@ -250,7 +262,8 @@ class GANTrainer(object):
                            % (epoch, self.max_epoch, step, self.num_batches,
                               errD_total.data[0], errG_total.data[0]))
                 count = count + 1
-
+                
+                # saving point.
                 if count % cfg.TRAIN.SNAPSHOT_INTERVAL == 0:
                     save_model(self.netG, avg_param_G, self.netsD, count, self.model_dir)
                     save_model(self.netG, avg_param_G, self.netsD, count, self.model_dir)
@@ -288,10 +301,30 @@ class GANTrainer(object):
         self.summary_writer.close()
 
     def save_superimages(self, images, folder, startID, imsize):
+        '''
+        This function save multiple images at once.
+
+        Inputs:
+            images (Tensor): Tensor of images to be saved.
+            folder (str): Path to the folder where images will be saved.
+            startID (int): Starting ID used in the image filenames.
+            imsize (int): Size of image.
+        '''
         fullpath = '%s/%d_%d.png' % (folder, startID, imsize)
         vutils.save_image(images.data, fullpath, normalize=True)
 
     def save_singleimages(self, images, folder, startID, imsize):
+        '''
+        This function individually saves each image. 
+        The function transforms the range of image values from [-1, 1] to [0, 1], 
+        converts them to integer values between 0 and 255, and saves the images.
+
+        Inputs:
+            images (Tensor): Tensor of images to be saved.
+            folder (str): Path to the folder where images will be saved.
+            startID (int): Starting ID used in the image filenames.
+            imsize (int): Size of image.
+        '''
         for i in range(images.size(0)):
             fullpath = '%s/%d_%d.png' % (folder, startID + i, imsize)
             # range from [-1, 1] to [0, 1]
@@ -301,3 +334,5 @@ class GANTrainer(object):
             ndarr = img.permute(1, 2, 0).data.cpu().numpy()
             im = Image.fromarray(ndarr)
             im.save(fullpath)
+
+    
