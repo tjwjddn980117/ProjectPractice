@@ -1,21 +1,23 @@
-import numpy as np
-# ex) np.log(part) = [[-2.302, -1.609, -0.357], [-1.204, -0.916, -1.204], [-1.609, -0.693, -1.204]]
-# ex) np.mean(part, 0) = [0.2, 0.367, 0.433] (mean of each class)
-# ex) np.expand_dims = [[0.2, -.367, 0.433]]
-part = np.array([[0.1, 0.2, 0.7], [0.3, 0.4, 0.3], [0.2, 0.5, 0.3]])
-scores = []
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
-print(f'np.log(part): {np.log(part)}')
-print(f'np.expand_dims(np.mean(part, 0), 0): {np.expand_dims(np.mean(part, 0), 0)}')
-print(f'np.log(np.expand_dims(np.mean(part, 0), 0)): {np.log(np.expand_dims(np.mean(part, 0), 0))}')
+# 예시 데이터 생성
+# 입력 데이터 (여기서는 각각 5개의 샘플과 1개의 이진 레이블을 가정)
+inputs = torch.randn(5, requires_grad=True)
+targets = torch.randint(0, 2, (5,), dtype=torch.float32)
 
-print()
+# Binary Cross Entropy Loss 정의
+criterion = nn.BCELoss()
 
-kl = part * (np.log(part) - np.log(np.expand_dims(np.mean(part, 0), 0)))
-print(f'kl: {kl}')
-print(f'np.sum(kl, 1): {np.sum(kl, 1)}')
-print(f'np.mean(np.sum(kl, 1)): {np.mean(np.sum(kl, 1))}')
-kl = np.mean(np.sum(kl, 1))
-scores.append(np.exp(kl))
-print(scores)
-print(np.mean(scores), np.std(scores))
+# 모델의 출력(inputs)과 실제 레이블(targets) 간의 BCE Loss 계산
+loss = criterion(torch.sigmoid(inputs), targets)
+
+# backward pass: 손실에 대한 그래디언트 계산
+loss.backward()
+
+# 손실 값 출력
+print(inputs)
+print([inputs.view(-1)])
+print(targets)
+print("BCE Loss:", loss.item())

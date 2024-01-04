@@ -85,12 +85,12 @@ class D_NET64(nn.Module):
         But, it isn't condition, we only use x_code.
 
         Inputs:
-            x_var (nparray):  [B, 3, 64, 64]. originial image.
+            x_var (nparray):  [B, 3, 64, 64]. originial image.\n
             c_code (nparray): [B, emb_dim]. originial code.
 
         Outputs:
             output (list): 
-                if condition : [2B]
+                if condition : [2B]\n
                 if uncondition : [B]
         '''
         super(D_NET64, self).__init__()
@@ -155,12 +155,12 @@ class D_NET128(nn.Module):
         But, it isn't condition, we only use x_code.
 
         Inputs:
-            x_var (nparray):  [B, 3, 128, 128]. originial image.
+            x_var (nparray):  [B, 3, 128, 128]. originial image.\n
             c_code (nparray): [B, emb_dim]. originial code.
 
         Outputs:
             output (list): 
-                if condition : [2B]
+                if condition : [2B]\n
                 if uncondition : [B]
         '''
         super(D_NET128, self).__init__()
@@ -234,12 +234,12 @@ class D_NET256(nn.Module):
         But, it isn't condition, we only use x_code.
 
         Inputs:
-            x_var (nparray):  [B, 3, 256, 256]. originial image.
+            x_var (nparray):  [B, 3, 256, 256]. originial image.\n
             c_code (nparray): [B, emb_dim]. originial code.
 
         Outputs:
             output (list): 
-                if condition : [2B]
+                if condition : [2B]\n
                 if uncondition : [B]
         '''
         super(D_NET256).__init__()
@@ -316,12 +316,12 @@ class D_NET512(nn.Module):
         But, it isn't condition, we only use x_code.
 
         Inputs:
-            x_var (nparray):  [B, 3, 512, 512]. originial image.
+            x_var (nparray):  [B, 3, 512, 512]. originial image. \n
             c_code (nparray): [B, emb_dim]. originial code.
 
         Outputs:
             output (list): 
-                if condition : [2B]
+                if condition : [2B]\n
                 if uncondition : [B]
         '''
         super(D_NET512).__init__()
@@ -405,12 +405,12 @@ class D_NET1024(nn.Module):
         But, it isn't condition, we only use x_code.
 
         Inputs:
-            x_var (nparray):  [B, 3, 1024, 1024]. originial image.
+            x_var (nparray):  [B, 3, 1024, 1024]. originial image.\n
             c_code (nparray): [B, emb_dim]. originial code.
 
         Outputs:
             output (list): 
-                if condition : [2B]
+                if condition : [2B]\n
                 if uncondition : [B]
         '''
         super(D_NET1024).__init__()

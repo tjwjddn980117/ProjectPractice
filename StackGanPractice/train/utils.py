@@ -24,7 +24,7 @@ def compute_mean_covariance(img):
         img (nparray): [B, C, H, W]. original image.
     
     Outputs:
-        mu (nparray): [B, C, 1, 1] .
+        mu (nparray): [B, C, 1, 1]. \n
         covariance (nparray): [B, C, C]. covariance for channels.
     '''
     batch_size = img.size(0)
@@ -55,8 +55,8 @@ def KL_loss(mu, logvar):
     It's KL(q(z|x)||p(z)) = E[log q(z|x) - log p(z)].
     
     Inputs:
-        mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]
-        logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]
+        mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. \n
+        logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM].
 
     Outputs:
         KLD (float): Loss of KLD.
@@ -89,7 +89,7 @@ def load_params(model, new_param):
     This is the function for loading the parameters.
 
     Inputs:
-        model (nn.Module): the model already we have.
+        model (nn.Module): the model already we have. \n
         new_param (parameter): information of loading parameters.
     '''
     for p, new_p in zip(model.parameters(), new_param):
@@ -118,11 +118,11 @@ def compute_inception_score(predictions:np, num_splits=1):
     Inputs:
         predictions (nparray): [batch, num_class].
         Indicates the predicted probability by class 
-        obtained by passing through the Inception network.
+        obtained by passing through the Inception network. \n
         num_splits (int): size of split (mini_batch).
     
     Outputs:
-        np.mean(scores) (nparray): the mean of kl scores.
+        np.mean(scores) (nparray): the mean of kl scores. \n
         np.std(scores) (nparray): the std of kl scores.
     '''
     # print('predictions', predictions.shape)
@@ -153,11 +153,11 @@ def negative_log_posterior_probability(predictions, num_splits=1):
     Inputs:
         predictions (nparray): [batch, num_class].
         Indicates the predicted probability by class 
-        obtained by passing through the Inception network.
+        obtained by passing through the Inception network. \n
         num_splits (int): size of split (mini_batch).
     
     Outputs:
-        np.mean(scores) (nparray): the mean of negative_log scores.
+        np.mean(scores) (nparray): the mean of negative_log scores. \n
         np.std(scores) (nparray): the std of negative_log scores.
     '''
     # print('predictions', predictions.shape)
@@ -180,11 +180,11 @@ def load_network(gpus):
         gpus: afordable gpus.
 
     Outputs:
-        netG (nn.Module): Generation model.
+        netG (nn.Module): Generation model. 
         netsD (list[nn.Module]): Discrimination model with Branches.
         len(netsD) (int): number of discrimination models.
         inception_model (nn.Module): INCEPTION_V3 pre-trained model.
-        count (int): number of G_Net
+        count (int): number of training count. 
     '''
     #just init G_NET.
     netG = G_NET()
@@ -192,6 +192,7 @@ def load_network(gpus):
     netG = torch.nn.DataParallel(netG, device_ids=gpus)
     print(netG)
 
+    # it's getting deeper, D_NET's size getting bigger.
     netsD = []
     if cfg.TREE.BRANCH_NUM > 0:
         netsD.append(D_NET64())
@@ -300,7 +301,7 @@ def save_img_results(imgs_tcpu, fake_imgs, num_imgs,
         imgs_tcpu ( ): list of real images.
         fake_imgs (list): list of fake images.
         num_imgs (int): the number of images.
-        count (int): index of generation model.
+        count (int): number of training count.
         image_dir (str): the path of saving image.
         summary_writer ( ): maybe for the tensorboard.
     '''
