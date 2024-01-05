@@ -145,7 +145,7 @@ class GANTrainer(object):
 
         # Compute color preserve losses
         if cfg.TRAIN.COEFF.COLOR_LOSS > 0:
-            # Being bigger and not changing the mood of the painting.
+            # Size getting bigger and not changing the mood of the painting.
             # so, we sould check fake_imgs[-1](lagest size) 
             #  and the things just before (fake_imgs[-2],...)
             if self.num_Ds > 1:
@@ -195,7 +195,6 @@ class GANTrainer(object):
         nz = cfg.GAN.Z_DIM
         noise = torch.FloatTensor(self.batch_size, nz).to(device)
         fixed_noise = torch.FloatTensor(self.batch_size, nz).normal_(0, 1).to(device)
-        
 
         predictions = []
         count = start_count
