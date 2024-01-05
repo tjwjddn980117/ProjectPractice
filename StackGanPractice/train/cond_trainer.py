@@ -85,6 +85,16 @@ class condGANTrainer(object):
         return imgs, real_vimgs, wrong_vimgs, vembedding
 
     def train_Dnet(self, idx, count):
+        '''
+        training the Discriminate model.
+
+        Inputs:
+            idx (int): number of index.
+            count (int): number of training count.
+        
+        Outputs:
+            errD (float): sum of error about errD_real+errD_wrong+errD_fake with some lambda. BCELoss.
+        '''
         flag = count % 100
         batch_size = self.real_imgs[0].size(0)
         # self.mu come from netG. 
@@ -133,3 +143,33 @@ class condGANTrainer(object):
         errD.backward()
         # update parameters
         optD.step()
+
+        # log
+        if flag == 0:
+            summary_D = summary.scalar('D_loss%d' % idx, errD.data[0])
+            self.summary_writer.add_summary(summary_D, count)
+        return errD
+    
+    def train_Gnet(self, count):
+        '''
+        training the Generation model.
+
+        Inputs:
+            count (int): number of training count.
+        
+        Outputs:
+            errG_total (float): sum of error about errG+like_mu1+like_cov1. errG is BCELoss and others are MSE.
+        '''
+        self.netG.zero_grad()
+        errG_total = 0
+        flag = count % 100
+        batch_size = self.real_imgs[0].size(0)
+        # self.mu come from netG. 
+        # mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, :self.ef_dim] after fc.
+        criterion, mu = self.criterion, self.mu
+        real_labels = self.real_labels[:batch_size]
+
+        for i in range(self.num_Ds):
+            netD = self.netsD[i]
+            outputs = netD(self.fake_imgs[i])
+            errG = criterion(outputs[0], real_labels)

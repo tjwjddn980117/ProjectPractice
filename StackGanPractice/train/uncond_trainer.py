@@ -80,7 +80,6 @@ class GANTrainer(object):
             errD (float): sum of error about errD_real+errD_fake. BCELoss.
         '''
         flag = count % 100
-        # if real_imgaes already cut for batches?
         # real_imgs [size_info, B, C, H, W]
         batch_size = self.real_imgs[0].size(0)
         criterion = self.criterion
