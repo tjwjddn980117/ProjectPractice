@@ -4,6 +4,7 @@ import torch.nn.parallel
 from miscc.config import cfg
 
 from utils import conv3x3, GLU
+device = torch.device("cuda" if cfg.CUDA else "cpu") 
 
 # ############## G networks ################################################
 # Upsale the spatial size by a factor of 2
@@ -86,6 +87,11 @@ class CA_NET(nn.Module):
         Conditioning Augumentation Network. 
         This is a key idea that enables backpropagation using the Reparametricization technique of VAEs.
 
+        mu and logvars will represent the 
+        mean and variance of the joint probability distribution learned by the encoder.
+        The dimension expressed by the multidimensional combination distribution is just embedsing_dim, 
+        and it only draws the average and variance in which the batch is located for each dimension.
+
         Inputs:
             text_embedding (nparray): [batch_size, cfg.TEXT.DIMENSION]
 
@@ -123,20 +129,22 @@ class CA_NET(nn.Module):
         '''
         The reparametrize method samples latent vectors using mean and variance. 
         This is a key idea that enables backpropagation using the Reparametricization technique of VAEs.
+        
+        It just randomly sample re-parametrize based with gaussian distribution.
 
         Inputs:
             mu (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, :self.ef_dim] after fc.
             logvar (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. just x[:, self.ef_dim:] after fc.
 
         Outputs:
-            c_code (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. reparametrized numpy.
+            c_code (nparray): [batch_size, cfg.GAN.EMBEDDING_DIM]. reparametrized numpy. 
+            it result based with gaussian distribution.(mu, logvar)
         '''
         # Divide the log var by 2 
         #  and apply an exponential function to calculate the standard deviation (std).
         # std = [batch_size, cfg.GAN.EMBEDDING_DIM]
         std = logvar.mul(0.5).exp_()
         # eps = [batch_size, cfg.GAN.EMBEDDING_DIM]
-        device = torch.device("cuda" if cfg.CUDA else "cpu") 
         eps = torch.randn_like(std).to(device)
         return eps.mul(std).add_(mu)
 

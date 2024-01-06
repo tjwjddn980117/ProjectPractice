@@ -50,6 +50,7 @@ def compute_mean_covariance(img):
 def KL_loss(mu, logvar):
     '''
     This is the function for calculate KLD loss.
+    We make it close to normal distribution.
     In this function, we use the KLD in auto-encoder.
     It's KL(q(z|x)||p(z)) = E[log q(z|x) - log p(z)].
     

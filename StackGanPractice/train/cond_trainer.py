@@ -283,3 +283,90 @@ class condGANTrainer(object):
                     self.summary_writer.add_summary(summary_KL, count)
 
                 count = count + 1
+
+                if count % cfg.TRAIN.SNAPSHOT_INTERVAL == 0:
+                    save_model(self.netG, avg_param_G, self.netsD, count, self.model_dir)
+                    # Save images
+                    backup_para = copy_G_params(self.netG)
+                    load_params(self.netG, avg_param_G)
+                    #
+                    self.fake_imgs, _, _ = \
+                        self.netG(fixed_noise, self.txt_embedding)
+                    save_img_results(self.imgs_tcpu, self.fake_imgs, self.num_Ds,
+                                     count, self.image_dir, self.summary_writer)
+                    #
+                    load_params(self.netG, backup_para)
+
+                    # Compute inception score
+                    if len(predictions) > 500:
+                        predictions = np.concatenate(predictions, 0)
+                        mean, std = compute_inception_score(predictions, 10)
+                        # print('mean:', mean, 'std', std)
+                        m_incep = summary.scalar('Inception_mean', mean)
+                        self.summary_writer.add_summary(m_incep, count)
+                        #
+                        mean_nlpp, std_nlpp = \
+                            negative_log_posterior_probability(predictions, 10)
+                        m_nlpp = summary.scalar('NLPP_mean', mean_nlpp)
+                        self.summary_writer.add_summary(m_nlpp, count)
+                        #
+                        predictions = []
+
+            end_t = time.time()
+            print('''[%d/%d][%d]
+                         Loss_D: %.2f Loss_G: %.2f Loss_KL: %.2f Time: %.2fs
+                      '''  # D(real): %.4f D(wrong):%.4f  D(fake) %.4f
+                  % (epoch, self.max_epoch, self.num_batches,
+                     errD_total.data[0], errG_total.data[0],
+                     kl_loss.data[0], end_t - start_t))
+
+        save_model(self.netG, avg_param_G, self.netsD, count, self.model_dir)
+        self.summary_writer.close()
+
+    def save_superimages(self, images_list, filenames, save_dir, split_dir, imsize):
+        '''
+        This function save multiple images at once.
+
+        Inputs:r
+            images_list (list[Tensor]): Tensor of images to be saved.
+            folder (str): Path to the folder where images will be saved.
+            startID (int): Starting ID used in the image filenames.
+            imsize (int): Size of image. 
+        '''
+        batch_size = images_list[0].size(0)
+        num_sentences = len(images_list)
+        for i in range(batch_size):
+            s_tmp = '%s/super/%s/%s' %\
+                (save_dir, split_dir, filenames[i])
+            folder = s_tmp[:s_tmp.rfind('/')]
+            if not os.path.isdir(folder):
+                print('Make a new folder: ', folder)
+                mkdir_p(folder)
+            #
+            savename = '%s_%d.png' % (s_tmp, imsize)
+            super_img = []
+            for j in range(num_sentences):
+                img = images_list[j][i]
+                # print(img.size())
+                img = img.view(1, 3, imsize, imsize)
+                # print(img.size())
+                super_img.append(img)
+                # break
+            super_img = torch.cat(super_img, 0)
+            vutils.save_image(super_img, savename, nrow=10, normalize=True)
+
+    def save_singleimages(self, images, filenames, save_dir, split_dir, sentenceID, imsize):
+        for i in range(images.size(0)):
+            s_tmp = '%s/single_samples/%s/%s' %\
+                (save_dir, split_dir, filenames[i])
+            folder = s_tmp[:s_tmp.rfind('/')]
+            if not os.path.isdir(folder):
+                print('Make a new folder: ', folder)
+                mkdir_p(folder)
+
+            fullpath = '%s_%d_sentence%d.png' % (s_tmp, imsize, sentenceID)
+            # range from [-1, 1] to [0, 255]
+            img = images[i].add(1).div(2).mul(255).clamp(0, 255).byte()
+            ndarr = img.permute(1, 2, 0).data.cpu().numpy()
+            im = Image.fromarray(ndarr)
+            im.save(fullpath)
