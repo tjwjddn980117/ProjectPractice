@@ -165,7 +165,7 @@ class GANTrainer(object):
                     nn.MSELoss()(covariance1, covariance2)
                 errG_total = errG_total + like_mu1 + like_cov1
 
-            if flag == 0:
+            if flag == 0: 
                 sum_mu = summary.scalar('G_like_mu2', like_mu2.data[0])
                 self.summary_writer.add_summary(sum_mu, count)
                 sum_cov = summary.scalar('G_like_cov2', like_cov2.data[0])
