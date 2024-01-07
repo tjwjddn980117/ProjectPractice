@@ -147,7 +147,7 @@ class GANTrainer(object):
         if cfg.TRAIN.COEFF.COLOR_LOSS > 0:
             # Size getting bigger and not changing the mood of the painting.
             # so, we sould check fake_imgs[-1](lagest size) 
-            #  and the things just before (fake_imgs[-2],...)
+            #  and the things just before (fake_imgs[-2],...) 
             if self.num_Ds > 1:
                 mu1, covariance1 = compute_mean_covariance(self.fake_imgs[-1])
                 mu2, covariance2 = \
