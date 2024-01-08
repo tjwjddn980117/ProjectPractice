@@ -329,8 +329,9 @@ class condGANTrainer(object):
 
         Inputs:r
             images_list (list[Tensor]): Tensor of images to be saved.
-            folder (str): Path to the folder where images will be saved.
-            startID (int): Starting ID used in the image filenames.
+            filenames (str): Name of images for savee
+            save_dir (str): Path to the folder where images will be saved.
+            split_dir (int): Starting ID used in the image filenames.
             imsize (int): Size of image. 
         '''
         batch_size = images_list[0].size(0)
