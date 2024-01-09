@@ -3,14 +3,11 @@ from __future__ import print_function
 import torch.backends.cudnn as cudnn
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-import torch.optim as optim
 import torchvision.utils as vutils
 import numpy as np
 import os
 import time
-from PIL import Image, ImageFont, ImageDraw
-from copy import deepcopy
+from PIL import Image
 
 from miscc.config import cfg
 from miscc.utils import mkdir_p
@@ -327,11 +324,11 @@ class condGANTrainer(object):
         '''
         This function save multiple images at once.
 
-        Inputs:r
+        Inputs:
             images_list (list[Tensor]): Tensor of images to be saved.
-            filenames (str): Name of images for savee
+            filenames (str): Name of images for saving.
             save_dir (str): Path to the folder where images will be saved.
-            split_dir (int): Starting ID used in the image filenames.
+            split_dir (int): Starting ID used in the image folder.
             imsize (int): Size of image. 
         '''
         batch_size = images_list[0].size(0)
@@ -357,6 +354,19 @@ class condGANTrainer(object):
             vutils.save_image(super_img, savename, nrow=10, normalize=True)
 
     def save_singleimages(self, images, filenames, save_dir, split_dir, sentenceID, imsize):
+        '''
+        This function individually saves each image. 
+        The function transforms the range of image values from [-1, 1] to [0, 1], 
+        converts them to integer values between 0 and 255, and saves the images.
+
+        Inputs:
+            images (Tensor): Tensor of images to be saved.
+            ilenames (str): Name of images for saving.
+            save_dir (str): Path to the folder where images will be saved.
+            split_dir (int): Starting ID used in the image folder.
+            sentenceID (int): Starting ID used in the image file.
+            imsize (int): Size of image.
+        '''
         for i in range(images.size(0)):
             s_tmp = '%s/single_samples/%s/%s' %\
                 (save_dir, split_dir, filenames[i])
@@ -371,3 +381,4 @@ class condGANTrainer(object):
             ndarr = img.permute(1, 2, 0).data.cpu().numpy()
             im = Image.fromarray(ndarr)
             im.save(fullpath)
+            
