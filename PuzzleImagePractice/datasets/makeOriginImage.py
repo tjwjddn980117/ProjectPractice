@@ -43,6 +43,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 print(device)
 
 data_path = mydir + '\content'
+cloud_path = data_path + '\\reArrange'
 train_df = pd.read_csv(data_path+'\\train.csv')
 test_df = pd.read_csv(data_path+'\\test.csv')
 
@@ -117,3 +118,55 @@ def check_img_save_origin(train_df, show_num, save_origin=False):
                 dict_tile[numbers[i]] = tile
 
                 i += 1
+        
+        # 4x4 이미지 행렬 생성
+        origin_img = Image.new("RGB", (width, height))  
+        # 각 부분 이미지 크기 계산
+        tile_width = origin_img.width // 4
+        tile_height = origin_img.height // 4    
+        # 16개 부분 이미지를 4x4 행렬로 배열
+        i = 1
+        for row in range(4):
+            for col in range(4):
+                tile = dict_tile[i] 
+                i += 1  
+                # 부분 이미지를 4x4 행렬 위치에 합성
+                left = col * tile_width
+                upper = row * tile_height
+                right = left + tile_width
+                lower = upper + tile_height
+                origin_img.paste(tile, (left, upper, right, lower)) 
+        # 재정려된 이미지 저장
+        if save_origin == False:
+           pass
+        else:
+           origin_name = f'ORIGIN_{count:05}.jpg'
+           origin_path = cloud_path+'/DATA/origin/'+origin_name
+           origin_img.save(origin_path) 
+           dict_origin['ID'].append(origin_name)
+           dict_origin['img_path'].append(origin_path)  
+        # train 및 재정렬된 이미지 출력
+        fig = plt.figure()  
+        ax1 = fig.add_subplot(1, 2, 1)
+        ax1.imshow(train_img)
+        ax1.set_title('Train Image')
+        ax1.axis('off') 
+        ax2 = fig.add_subplot(1, 2, 2)
+        ax2.imshow(origin_img)
+        ax2.set_title('Original Image')
+        ax2.axis('off') 
+        if count > show_num:
+           pass
+        else:
+           print(train_path)
+           plt.show()
+           print()  
+        count += 1
+
+    # 재정렬한 이미지 데이터 프레임 저장
+    if save_origin == False:
+       pass
+
+    else:
+       origin_df = pd.DataFrame(dict_origin)
+       origin_df.to_csv(data_path+'/origin.csv', index=False)
