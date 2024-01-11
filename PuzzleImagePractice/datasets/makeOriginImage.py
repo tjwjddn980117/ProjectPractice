@@ -13,7 +13,6 @@ import torchvision.models as models
 import random
 from tqdm.auto import tqdm
 import os
-mydir = os.getcwd()
 
 from PIL import Image
 from PIL import ImageDraw
@@ -23,6 +22,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 import warnings
+
+from conf import *
 
 def seed_everything(seed):
     '''
@@ -40,12 +41,6 @@ seed=42
 seed_everything(seed) # Seed 고정
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-print(device)
-
-data_path = mydir + '\content'
-cloud_path = data_path + '\\reArrange'
-train_df = pd.read_csv(data_path+'\\train.csv')
-test_df = pd.read_csv(data_path+'\\test.csv')
 
 def check_img_save_origin(train_df, show_num, save_origin=False):
 
