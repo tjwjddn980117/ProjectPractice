@@ -7,6 +7,9 @@ from conf import *
 
 def aug_img_save(train_df, show_num, save_aug=False):
 
+    if not os.path.exists(save_augment_path):
+        os.makedirs(save_augment_path)
+
     # 증강된 이미지 데이터 프레임 생성
     dict_augment = {'ID':[],
                    'img_path':[]}
@@ -18,9 +21,9 @@ def aug_img_save(train_df, show_num, save_aug=False):
     count = 0
 
     if save_aug == False:
-       repeat = [i for i in range(show_num)]
+        repeat = [i for i in range(show_num)]
     else:
-       repeat = [i for i in range(len(train_df))]
+        repeat = [i for i in range(len(train_df))]
 
     for index in tqdm(repeat):
 
@@ -81,14 +84,13 @@ def aug_img_save(train_df, show_num, save_aug=False):
 
         # 재정려된 이미지 저장
         if save_aug == False:
-          pass
+            pass
         else:
-          augment_name = f'AUGMENT{count:05}.jpg'
-          augment_path = cloud_path+'/DATA/augment/'+augment_name
-          augment_img.save(augment_path)
-
-          dict_augment['ID'].append(augment_name)
-          dict_augment['img_path'].append(augment_path)
+            augment_name = f'AUGMENT{count:05}.jpg'
+            augment_path = save_augment_path + '/' + augment_name
+            augment_img.save(augment_path)  
+            dict_augment['ID'].append(augment_name)
+            dict_augment['img_path'].append(augment_path)
 
         # train 및 재정렬된 이미지 출력
         fig = plt.figure()
@@ -106,16 +108,16 @@ def aug_img_save(train_df, show_num, save_aug=False):
         if count > show_num:
           pass
         else:
-          print(train_path)
-          plt.show()
-          print()
+            print(train_path)
+            plt.show()
+            print()
 
         count += 1
 
     # 재정렬한 이미지 데이터 프레임 저장
     if save_aug == False:
-      pass
+        pass
 
     else:
-      augment_df = pd.DataFrame(dict_augment)
-      augment_df.to_csv(data_path+'/augment.csv', index=False)
+        augment_df = pd.DataFrame(dict_augment)
+        augment_df.to_csv(data_path+'/augment.csv', index=False)

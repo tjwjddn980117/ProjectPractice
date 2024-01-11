@@ -23,7 +23,9 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 mydir = os.getcwd()
 
-data_path = mydir + '\content'
-cloud_path = data_path + '\\reArrange'
+data_path = mydir + '\\content'
+data_path = 'C:\\Users\\qowor\\Desktop\\open'
+save_origin_path = data_path+'\\origin'
+save_augment_path = data_path+'\\augment'
 train_df = pd.read_csv(data_path+'\\train.csv')
 test_df = pd.read_csv(data_path+'\\test.csv')

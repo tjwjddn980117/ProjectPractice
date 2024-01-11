@@ -10,6 +10,9 @@ from conf import *
 
 def check_img_save_origin(train_df, show_num, save_origin=False):
 
+    if not os.path.exists(save_origin_path):
+        os.makedirs(save_origin_path)
+
     # 재정렬한 이미지 데이터 프레임 생성
     dict_origin = {'ID':[],
                    'img_path':[]}
@@ -32,9 +35,9 @@ def check_img_save_origin(train_df, show_num, save_origin=False):
     # save origin 이면 train_df만큼, 
     # save origin 이 아니면, 정해놓은 show_num만큼.
     if save_origin == False:
-       repeat = [i for i in range(show_num)]
+        repeat = [i for i in range(10,show_num)]
     else:
-       repeat = [i for i in range(len(train_df))]
+        repeat = [i for i in range(len(train_df))]
 
     for index in tqdm(repeat):
 
@@ -48,22 +51,22 @@ def check_img_save_origin(train_df, show_num, save_origin=False):
         raw_img = Image.open(data_path+'/train/'+train_path) 
 
         # train 이미지에 숫자 표기
-        draw = ImageDraw.Draw(train_img)    
+        #draw = ImageDraw.Draw(train_img)    
         width, height = train_img.size  
         cell_width = width // 4
         cell_height = height // 4   
-        font_size = 50
-        font = ImageFont.truetype("LiberationSans-Regular.ttf", font_size)  
+        #font_size = 50
+        #font = ImageFont.truetype("LiberationSans-Regular.ttf", font_size)  
 
         # 데이터에 저장되어있는 숫자들. 
         # ex) 8,1,16,12,5,10,...
         numbers = list(sample_df)[2:]   
-        for i, number in enumerate(numbers):
-            row = i // 4
-            col = i % 4
-            x = col * cell_width + (cell_width - font_size) // 2
-            y = row * cell_height + (cell_height - font_size) // 2
-            draw.text((x, y), str(number), fill="red", font=font)   
+        #for i, number in enumerate(numbers):
+        #    row = i // 4
+        #    col = i % 4
+        #    x = col * cell_width + (cell_width - font_size) // 2
+        #    y = row * cell_height + (cell_height - font_size) // 2
+        #    draw.text((x, y), str(number), fill="red", font=font)   
 
         # 정렬된 이미지 생성 및 저장
         i = 0
@@ -100,14 +103,14 @@ def check_img_save_origin(train_df, show_num, save_origin=False):
 
         # 재정려된 이미지 저장
         if save_origin == False:
-           pass
+            pass
 
         else:
-           origin_name = f'ORIGIN_{count:05}.jpg'
-           origin_path = cloud_path+'/DATA/origin/'+origin_name
-           origin_img.save(origin_path) 
-           dict_origin['ID'].append(origin_name)
-           dict_origin['img_path'].append(origin_path)  
+            origin_name = f'ORIGIN_{count:05}.jpg'
+            origin_path = save_origin_path + '/' + origin_name
+            origin_img.save(origin_path) 
+            dict_origin['ID'].append(origin_name)
+            dict_origin['img_path'].append(origin_path)  
 
         # train 및 재정렬된 이미지 출력
         fig = plt.figure()  
@@ -119,13 +122,13 @@ def check_img_save_origin(train_df, show_num, save_origin=False):
         ax2.imshow(origin_img)
         ax2.set_title('Original Image')
         ax2.axis('off') 
-        
+
         if count > show_num:
-           pass
+            pass
         else:
-           print(train_path)
-           plt.show()
-           print()  
+            print(train_path)
+            plt.show()
+            print()  
         count += 1
 
     # 재정렬한 이미지 데이터 프레임 저장
@@ -133,5 +136,5 @@ def check_img_save_origin(train_df, show_num, save_origin=False):
         pass
 
     else:
-       origin_df = pd.DataFrame(dict_origin)
-       origin_df.to_csv(data_path+'/origin.csv', index=False)
+        origin_df = pd.DataFrame(dict_origin)
+        origin_df.to_csv(data_path+'/origin.csv', index=False)
