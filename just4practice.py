@@ -1,20 +1,9 @@
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import math
 
-# 예시 데이터 생성
-# 입력 데이터 (여기서는 각각 5개의 샘플과 1개의 이진 레이블을 가정)
-inputs = torch.tensor([[0,2*math.log(2),8*math.log(1)],[0,8*math.log(2),18*math.log(2)]])
+# 예시로 y와 residual 텐서를 생성
+y = torch.rand([32, 64, 64, 128])  # [B, H, W, C]
+residual = torch.rand([32, 32, 32, 64])  # [B, H/2, W/2, C']
 
-print(inputs)
-
-print(inputs.mul(0.5))
-
-std = inputs.mul(0.5).exp_()
-
-print(std)
-
-eps = torch.randn_like(std)
-
-print(eps)
+# 두 번째 차원을 따라 텐서를 연결 (axis=3)
+result = torch.cat((y, residual), dim=3)
+print(result.shape)
