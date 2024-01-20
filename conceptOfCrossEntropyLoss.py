@@ -19,4 +19,3 @@ log_softmax = torch.nn.LogSoftmax(dim=1)
 x_log = log_softmax(output)
 print(x_log)
 print(NLLLoss(x_log, y)) # tensor(2.1438)
-
