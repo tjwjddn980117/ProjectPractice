@@ -16,7 +16,7 @@ train_iter, valid_iter, test_iter = loader.make_iter(train=train,
                                                      test=test,
                                                      batch_size=batch_size,
                                                      device=device)
-
+    
 # The source or target has the original text data. 
 # And the vocab property of the source represents the vocabulary of that text data. 
 # This vocabulary book has a dictionary form that maps each word to its own integer index.
