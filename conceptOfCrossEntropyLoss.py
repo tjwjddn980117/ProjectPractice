@@ -12,6 +12,12 @@ output = torch.Tensor(
         [0.9457, 0.0195, 0.9846, 0.3231, 0.1605, 0.3143, 0.9508, 0.2762, 0.7276, 0.4332]
     ]
 )
+output2 = torch.Tensor(
+    [
+        [1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,1,0,0,0,0,0]
+    ]
+)
 y = torch.LongTensor([1, 5])
 
 # Case 2
@@ -19,3 +25,5 @@ log_softmax = torch.nn.LogSoftmax(dim=1)
 x_log = log_softmax(output)
 print(x_log)
 print(NLLLoss(x_log, y)) 
+print()
+print(log_softmax(output2))
