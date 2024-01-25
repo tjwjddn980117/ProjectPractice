@@ -19,7 +19,7 @@ class JigsawDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(DATA_PATH, self.data_frame.iloc[idx, 1])
         image = Image.open(img_name)
-        labels = self.data_frame.iloc[idx, 2:].astype(int).tolist()
+        labels = torch.tensor(self.data_frame.iloc[idx, 2:].astype(int).tolist(), dtype=torch.float32)
 
         if self.transform:
             image = self.transform(image)

@@ -1,15 +1,27 @@
 import torch
 import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
 
-# 입력 데이터 예시 (배치 크기, 채널 수, 높이, 너비)
-input_data = torch.rand(1, 1, 4, 4)  # 1개의 데이터, 1채널, 4x4 크기의 이미지
+# 예시 데이터
+labels_tensor = torch.tensor([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], dtype=torch.float32)
+labels_list = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
 
-# MaxPooling2d 레이어 생성 (stride를 명시하지 않음)
-max_pooling_layer = nn.MaxPool2d(kernel_size=2)
+print(f'size of tensor: {labels_tensor.shape}')
+# 결과: torch.Size([3, 3])
 
-# 입력 데이터에 MaxPooling2d 적용
-output_data = max_pooling_layer(input_data)
+print(f'size of list: {len(labels_list)}')
+# 결과: 3
 
-# 결과 출력
-print("Input shape:", input_data.shape)
-print("Output shape:", output_data.shape)
+print()
+data_loader_tensor = DataLoader(labels_tensor, batch_size=2)
+for batch in data_loader_tensor:
+    print(batch.shape)
+    print(batch)
+
+print()
+# DataLoader 예시
+data_loader_list = DataLoader(labels_list, batch_size=2)
+for batch in data_loader_list:
+    print(len(batch))
+    print(batch)
+# 결과: 2, 1
