@@ -7,7 +7,6 @@ output = torch.Tensor(
     ]
 )
 
-# 클래스 인덱스로 변환
 target = torch.LongTensor([1])
 
 criterion = nn.CrossEntropyLoss()
