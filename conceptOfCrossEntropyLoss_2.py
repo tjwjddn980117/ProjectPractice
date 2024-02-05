@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+# [batch_size, number_of_class, number_of_sequence]
+# [batch_size, number_of_sequence] (label is the number of class -1)
 output = torch.Tensor(
     [[
         [0, 1, 0, 0, 0],
