@@ -1,4 +1,4 @@
-echo start downloading environment.
+echo start downloading environment for Puzzle
 
 call conda install -y python=3.9
 call conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
