@@ -7,7 +7,7 @@ conda activate $ENV_NAME
 
 # 필수 패키지 설치
 conda install python==3.9
-conda install conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+conda install conda -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 conda install -y conda-forge::matplotlib conda-forge::seaborn conda-forge::tqdm anaconda::pandas
 
 # 가상 환경 비활성화
