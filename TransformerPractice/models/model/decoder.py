@@ -1,4 +1,3 @@
-import torch
 from torch import nn
 
 from models.blocks.decoder_layer import DecoderLayer
