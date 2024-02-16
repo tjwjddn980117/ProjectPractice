@@ -1,5 +1,5 @@
 from conf import *
-from util.data_loader import DataLoader
+from TransformerPractice.util.data_loader import DataLoader
 from util.tokenizer import Tokenizer
 
 tokenizer = Tokenizer()
