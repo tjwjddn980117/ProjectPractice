@@ -1,13 +1,9 @@
-# from torchtext.legacy.data import Field, BucketIterator
-# from torchtext.legacy.datasets.translation import Multi30k
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
-
-from torchtext.datasets.translation import Multi30k
+from torchtext.legacy.data import Field, BucketIterator
+from torchtext.legacy.datasets.translation import Multi30k
 
 class DataLoader:
-    source: get_tokenizer = None
-    target: get_tokenizer = None
+    source: Field = None
+    target: Field = None
 
     def __init__(self, ext, tokenize_en, tokenize_de, init_token, eos_token):
         self.ext = ext
@@ -21,14 +17,14 @@ class DataLoader:
         # Field defines how text data is processed. 
         # For example, specify whether to convert text to lowercase, how to tokenize, and what preprocessing to apply
         if self.ext == ('.de', '.en'):
-            self.source = get_tokenizer(tokenize=self.tokenize_de, init_token=self.init_token, eos_token=self.eos_token,
+            self.source = Field(tokenize=self.tokenize_de, init_token=self.init_token, eos_token=self.eos_token,
                                 lower=True, batch_first=True)
-            self.target = get_tokenizer(tokenize=self.tokenize_en, init_token=self.init_token, eos_token=self.eos_token,
+            self.target = Field(tokenize=self.tokenize_en, init_token=self.init_token, eos_token=self.eos_token,
                                 lower=True, batch_first=True)
         elif self.ext == ('.en', '.de'):
-            self.source = get_tokenizer(tokenize=self.tokenize_en, init_token=self.init_token, eos_token=self.eos_token,
+            self.source = Field(tokenize=self.tokenize_en, init_token=self.init_token, eos_token=self.eos_token,
                                 lower=True, batch_first=True)
-            self.target = get_tokenizer(tokenize=self.tokenize_de, init_token=self.init_token, eos_token=self.eos_token,
+            self.target = Field(tokenize=self.tokenize_de, init_token=self.init_token, eos_token=self.eos_token,
                                 lower=True, batch_first=True)
         # The Multi30k.splits function loads the dataset with the exs and fields factors. 
         # Each data is a list of examples with (original, translated) pairs as elements.
@@ -46,7 +42,7 @@ class DataLoader:
     # BucketIterator is a repeater for processing sequence data. 
     # BucketIterator creates a mini-batch that uses minimal padding by grouping examples of similar lengths.
     def make_iter(self, train, validate, test, batch_size, device):
-        train_iterator, valid_iterator, test_iterator = build_vocab_from_iterator.splits((train, validate, test),
+        train_iterator, valid_iterator, test_iterator = BucketIterator.splits((train, validate, test),
                                                                               batch_sizes=batch_size,
                                                                               device=device)
         print('dataset initializing done')
