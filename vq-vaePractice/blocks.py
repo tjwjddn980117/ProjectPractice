@@ -58,11 +58,11 @@ class Encoder(nn.Module):
         The block for Encoding. 
 
         Arguments:
-            in_channels(int): number of in_channels.
-            num_hiddens(int): number of out_channels.
-            num_downsampling_layers(int): depth of encoding layers.
-            num_residual_layers(int): num or final out_channles.
-            num_residual_hiddens(int): depth of residual_layers.
+            in_channels (int): number of in_channels.
+            num_hiddens (int): number of out_channels. (ResidualStack's input_channels).
+            num_downsampling_layers (int): depth of encoding layers.
+            num_residual_layers (int): depth of residual_layers. (ResidualStack's depth).
+            num_residual_hiddens (int): num or final out_channles. (ResidualStack's output_channels).
         
         Inputs:
             [B, in_channels, H, W].
@@ -118,6 +118,20 @@ class Decoder(nn.Module):
         super(Decoder, self).__init__()
         '''
         The block for Decoding.
+
+        Arguments:
+            embedding_dim (int): number of input channals.
+            num_hiddens (int): number of out_channels. (ResidualStack's input_channels).
+            num_upsampling_layers (int): depth of decoder layers.
+            num_residual_layers (int): depth of residual_layers. (ResidualStack's depth).
+            num_residual_hiddens (int): num or final out_channles. (ResidualStack's output_channels).
+        
+        Inputs:
+            [B, num_residual_hiddens, H/2^num_upsampling_layers, W/2^upsampling_layers].
+
+        Ouputs:
+            [B, embedding_dim, H, W]
+
         '''
         self.conv = nn.Conv2d(
             in_channels=embedding_dim,
@@ -153,3 +167,9 @@ class Decoder(nn.Module):
                 upconv.add_module(f"relu{upsampling_layer}", nn.ReLU())
 
         self.upconv = upconv
+
+    def forward(self, x):
+        h = self.conv(x)
+        h = self.residual_stack(h)
+        x_recon = self.upconv(h)
+        return x_recon
