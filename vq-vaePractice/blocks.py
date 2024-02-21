@@ -1,7 +1,6 @@
 import torch
 
 from torch import nn
-from torch.nn import functional as F
 
 class ResidualStack(nn.Module):
     def __init__(self, num_hiddens, num_residual_layers, num_residual_hiddens):
@@ -56,6 +55,8 @@ class Encoder(nn.Module):
     def __init__(self, in_channels, num_hiddens, num_downsampling_layers, num_residual_layers, num_residual_hiddens):
         '''
         The block for Encoding. 
+            1. Encoding.
+            2. ResidualStack.
 
         Arguments:
             in_channels (int): number of in_channels.
@@ -65,7 +66,7 @@ class Encoder(nn.Module):
             num_residual_hiddens (int): num or final out_channles. (ResidualStack's output_channels).
         
         Inputs:
-            [B, in_channels, H, W].
+            [B, 3, H, W].
 
         Outputs:
             [B, num_residual_hiddens, H/2^num_downsampling_layers, W/2^downsampling_layers].
@@ -73,8 +74,10 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         conv = nn.Sequential()
         for downsampling_layer in range(num_downsampling_layers):
-            if downsampling_layer == 0:
+            # if down_sampling with fist layer, just 1/2 the channel number.
+            if downsampling_layer == 0: 
                 out_channels = num_hiddens // 2
+            # if down_sampling with sescond layer, resize the channel number.
             elif downsampling_layer == 1:
                 (in_channels, out_channels) = (num_hiddens // 2, num_hiddens)
 
@@ -83,7 +86,7 @@ class Encoder(nn.Module):
 
             conv.add_module(
                 f"down{downsampling_layer}",
-                # resize to 1/2 the size of input image.
+                # resize to 1/2 the size of input image. 
                 nn.Conv2d(
                     in_channels=in_channels,
                     out_channels=out_channels,
@@ -118,19 +121,22 @@ class Decoder(nn.Module):
         super(Decoder, self).__init__()
         '''
         The block for Decoding.
+            1. Convolutian.
+            2. ResidualStack.
+            3. up sampling.
 
         Arguments:
-            embedding_dim (int): number of input channals.
+            embedding_dim (int): number of input embedding.
             num_hiddens (int): number of out_channels. (ResidualStack's input_channels).
             num_upsampling_layers (int): depth of decoder layers.
             num_residual_layers (int): depth of residual_layers. (ResidualStack's depth).
             num_residual_hiddens (int): num or final out_channles. (ResidualStack's output_channels).
         
         Inputs:
-            [B, num_residual_hiddens, H/2^num_upsampling_layers, W/2^upsampling_layers].
+            [B, embedding_dim, H/2^num_upsampling_layers, W/2^upsampling_layers].
 
         Ouputs:
-            [B, embedding_dim, H, W]
+            [B, 3, H, W].
 
         '''
         self.conv = nn.Conv2d(
@@ -146,10 +152,10 @@ class Decoder(nn.Module):
         for upsampling_layer in range(num_upsampling_layers):
             if upsampling_layer < num_upsampling_layers - 2:
                 (in_channels, out_channels) = (num_hiddens, num_hiddens)
-
+            # if up_sampling with sescond layer from the end, resize the channel number.
             elif upsampling_layer == num_upsampling_layers - 2:
                 (in_channels, out_channels) = (num_hiddens, num_hiddens // 2)
-
+            # if up_sampling with last layer, resize the channel for 3 (color). 
             else:
                 (in_channels, out_channels) = (num_hiddens // 2, 3)
 
