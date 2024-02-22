@@ -23,8 +23,8 @@ class SonnetExponentialMovingAverage(nn.Module):
         This 
 
         Arguments:
-            decay 
-            shape :
+            decay(float) : Weight for the exponential moving average.
+            shape(Tensor) : shape of input.
         '''
         super(SonnetExponentialMovingAverage, self).__init__()
         self.decay = decay
@@ -68,13 +68,17 @@ class VectorQuantizer(nn.Module):
         self.epsilon = epsilon
 
         # Dictionary embeddings.
+        # it is for init the embedding.
         limit = 3 ** 0.5
         e_i_ts = torch.FloatTensor(embedding_dim, num_embeddings).uniform_(
             -limit, limit
-        )
-        if use_ema:
+        ) # (-limit, limit)
+        if use_ema: 
+            # it dosen't update with back-propagation.
+            # because, embedding dictionary will update until EMA(Exponential Moving Average).
             self.register_buffer("e_i_ts", e_i_ts)
-        else:
+        else: 
+            # it do update with back-propagation.
             self.register_parameter("e_i_ts", nn.Parameter(e_i_ts))
 
         # Exponential moving average of the cluster counts.
