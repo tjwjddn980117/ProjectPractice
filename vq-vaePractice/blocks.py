@@ -16,7 +16,7 @@ class ResidualStack(nn.Module):
             [B, num_hiddens, H, W].
         
         Ouputs:
-            [B, num_residual_hiddens, H, W].
+            [B, num_hiddens, H, W].
         '''
         super(ResidualStack, self).__init__()
         # See Section 4.1 of "Neural Discrete Representation Learning".
@@ -69,7 +69,7 @@ class Encoder(nn.Module):
             [B, 3, H, W].
 
         Outputs:
-            [B, num_residual_hiddens, H/2^num_downsampling_layers, W/2^downsampling_layers].
+            [B, num_hiddens, H/2^num_downsampling_layers, W/2^downsampling_layers].
         '''
         super(Encoder, self).__init__()
         conv = nn.Sequential()
