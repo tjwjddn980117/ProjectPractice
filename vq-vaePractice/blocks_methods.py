@@ -49,13 +49,14 @@ class VectorQuantizer(nn.Module):
         This is VectorQuantizer
 
         Arguments:
-            embedding_dim
+            embedding_dim(int): dimention of each embedding.
+            num_embeddings(int): number of embeddings. you can think it to the number of words in dictionary.
         
         Inputs:
-            [B, num_residual_hiddens, H', W'].
+            [B, num_embeddings, H', W'].
 
         '''
-        super().__init__()
+        super(VectorQuantizer,self).__init__()
         # See Section 3 of "Neural Discrete Representation Learning" and:
         # https://github.com/deepmind/sonnet/blob/v2/sonnet/src/nets/vqvae.py#L142.
 
@@ -70,9 +71,7 @@ class VectorQuantizer(nn.Module):
         # Dictionary embeddings.
         # it is for init the embedding.
         limit = 3 ** 0.5
-        e_i_ts = torch.FloatTensor(embedding_dim, num_embeddings).uniform_(
-            -limit, limit
-        ) # (-limit, limit)
+        e_i_ts = torch.FloatTensor(embedding_dim, num_embeddings).uniform_(-limit, limit) # (-limit, limit)
         if use_ema: 
             # it dosen't update with back-propagation.
             # because, embedding dictionary will update until EMA(Exponential Moving Average).
@@ -87,12 +86,16 @@ class VectorQuantizer(nn.Module):
         self.m_i_ts = SonnetExponentialMovingAverage(decay, e_i_ts.shape)
 
     def forward(self, x):
+        # flat_x => [B*H'*W', embedding_dim]
         flat_x = x.permute(0, 2, 3, 1).reshape(-1, self.embedding_dim)
         distances = (
-            (flat_x ** 2).sum(1, keepdim=True)
-            - 2 * flat_x @ self.e_i_ts
-            + (self.e_i_ts ** 2).sum(0, keepdim=True)
-        )
+            (flat_x ** 2).sum(1, keepdim=True) # [pixels, 1]
+            - 2 * flat_x @ self.e_i_ts # [pixels, embedding_dim] @ [embedding_dim, num_embedding] = [pixels, num_embedding]
+            + (self.e_i_ts ** 2).sum(0, keepdim=True) # [1, num_embedding]
+        ) # >> [pixels, num_embedding]
+
+        # encoding_indices >> the index of minimum distance
+        # encoding_indices >> [pixels, ]
         encoding_indices = distances.argmin(1)
         quantized_x = F.embedding(
             encoding_indices.view(x.shape[0], *x.shape[2:]), self.e_i_ts.transpose(0, 1)
