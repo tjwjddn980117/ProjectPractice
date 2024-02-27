@@ -101,7 +101,7 @@ class VectorQuantizer(nn.Module):
             encoding_indices.view(x.shape[0], *x.shape[2:]), self.e_i_ts.transpose(0, 1)
         ).permute(0, 3, 1, 2)
 
-        # See second term of Equation (3).
+        # See second term of Equation (3). 
         if not self.use_ema:
             dictionary_loss = ((x.detach() - quantized_x) ** 2).mean()
         else:
