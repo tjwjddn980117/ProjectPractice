@@ -99,7 +99,7 @@ class VectorQuantizer(nn.Module):
         encoding_indices = distances.argmin(1)
         quantized_x = F.embedding(
             encoding_indices.view(x.shape[0], *x.shape[2:]), self.e_i_ts.transpose(0, 1)
-        ).permute(0, 3, 1, 2)
+        ).permute(0, 3, 1, 2) # >> [B, embedding_dim, H', W']
 
         # See second term of Equation (3). 
         if not self.use_ema:
