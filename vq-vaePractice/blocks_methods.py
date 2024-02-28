@@ -86,16 +86,17 @@ class VectorQuantizer(nn.Module):
         self.m_i_ts = SonnetExponentialMovingAverage(decay, e_i_ts.shape)
 
     def forward(self, x):
-        # flat_x => [B*H'*W', embedding_dim]
+        # x => [B, num_embedding, H', W']
+        # flat_x => [B*H'*W'*8, embedding_dim]
         flat_x = x.permute(0, 2, 3, 1).reshape(-1, self.embedding_dim)
         distances = (
-            (flat_x ** 2).sum(1, keepdim=True) # [pixels, 1]
-            - 2 * flat_x @ self.e_i_ts # [pixels, embedding_dim] @ [embedding_dim, num_embedding] = [pixels, num_embedding]
+            (flat_x ** 2).sum(1, keepdim=True) # [pixels*channels, 1]
+            - 2 * flat_x @ self.e_i_ts # [pixels*channels, embedding_dim] @ [embedding_dim, num_embedding] = [pixels*channels, num_embedding]
             + (self.e_i_ts ** 2).sum(0, keepdim=True) # [1, num_embedding]
-        ) # >> [pixels, num_embedding]
+        ) # >> [pixels*channels, num_embedding]
 
         # encoding_indices >> the index of minimum distance
-        # encoding_indices >> [pixels, ]
+        # encoding_indices >> [pixels*channles, ]
         encoding_indices = distances.argmin(1)
         quantized_x = F.embedding(
             encoding_indices.view(x.shape[0], *x.shape[2:]), self.e_i_ts.transpose(0, 1)
@@ -104,6 +105,7 @@ class VectorQuantizer(nn.Module):
         # See second term of Equation (3). 
         if not self.use_ema:
             dictionary_loss = ((x.detach() - quantized_x) ** 2).mean()
+            # >> dictionary_loss = [B, embedding_dim, H', W']
         else:
             dictionary_loss = None
 
