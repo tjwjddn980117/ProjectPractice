@@ -23,8 +23,11 @@ class SonnetExponentialMovingAverage(nn.Module):
         This 
 
         Arguments:
-            decay(float) : Weight for the exponential moving average.
-            shape(Tensor) : shape of input.
+            decay(float): Weight for the exponential moving average. 
+            shape(Tensor): shape of input.
+        
+        Inputs:
+            values(Tensor): [num_embedding]
         '''
         super(SonnetExponentialMovingAverage, self).__init__()
         self.decay = decay
@@ -53,7 +56,13 @@ class VectorQuantizer(nn.Module):
             num_embeddings(int): number of embeddings. you can think it to the number of words in dictionary.
         
         Inputs:
-            [B, num_embeddings, H', W'].
+            x(Tensor): [B, embedding_dim, H', W'].
+
+        Outputs:
+            quantized_x(Tensor): ]]
+            dictionary_loss(item.float): 
+            commitment_loss(item.float): 
+            encoding_indices.view(x.shape[0], -1),
 
         '''
         super(VectorQuantizer,self).__init__()
@@ -86,17 +95,17 @@ class VectorQuantizer(nn.Module):
         self.m_i_ts = SonnetExponentialMovingAverage(decay, e_i_ts.shape)
 
     def forward(self, x):
-        # x => [B, num_embedding, H', W']
-        # flat_x => [B*H'*W'*8, embedding_dim]
+        # x => [B, embedding_dim, H', W']
+        # flat_x => [B*H'*W', embedding_dim]
         flat_x = x.permute(0, 2, 3, 1).reshape(-1, self.embedding_dim)
         distances = (
-            (flat_x ** 2).sum(1, keepdim=True) # [pixels*channels, 1]
-            - 2 * flat_x @ self.e_i_ts # [pixels*channels, embedding_dim] @ [embedding_dim, num_embedding] = [pixels*channels, num_embedding]
+            (flat_x ** 2).sum(1, keepdim=True) # [B*H'*W', 1]
+            - 2 * flat_x @ self.e_i_ts # [B*H'*W', embedding_dim] @ [embedding_dim, num_embedding] = [B*H'*W', num_embedding]
             + (self.e_i_ts ** 2).sum(0, keepdim=True) # [1, num_embedding]
-        ) # >> [pixels*channels, num_embedding]
+        ) # >> [B*H'*W', num_embedding]
 
         # encoding_indices >> the index of minimum distance
-        # encoding_indices >> [pixels*channles, ]
+        # encoding_indices >> [B*H'*W', ]
         encoding_indices = distances.argmin(1)
         quantized_x = F.embedding(
             encoding_indices.view(x.shape[0], *x.shape[2:]), self.e_i_ts.transpose(0, 1)
@@ -105,13 +114,16 @@ class VectorQuantizer(nn.Module):
         # See second term of Equation (3). 
         if not self.use_ema:
             dictionary_loss = ((x.detach() - quantized_x) ** 2).mean()
-            # >> dictionary_loss = [B, embedding_dim, H', W']
+            # dictionary_loss.item() >> float
         else:
             dictionary_loss = None
 
         # See third term of Equation (3).
         commitment_loss = ((x - quantized_x.detach()) ** 2).mean()
+        # commitment_loss.item() >> float
+
         # Straight-through gradient. See Section 3.2.
+        # I don't know what's the reason of this.
         quantized_x = x + (quantized_x - x).detach()
 
         if self.use_ema and self.training:
@@ -121,15 +133,16 @@ class VectorQuantizer(nn.Module):
                 # Cluster counts.
                 encoding_one_hots = F.one_hot(
                     encoding_indices, self.num_embeddings
-                ).type(flat_x.dtype)
-                n_i_ts = encoding_one_hots.sum(0)
+                ).type(flat_x.dtype) # encoding_one_hots >> [B*H'*W', num_embeddings]
+                n_i_ts = encoding_one_hots.sum(0) # n_i_ts = [num_embeddings]
                 # Updated exponential moving average of the cluster counts.
                 # See Equation (6).
-                self.N_i_ts(n_i_ts)
+                self.N_i_ts(n_i_ts) # return also [num_embeddings]
 
                 # Exponential moving average of the embeddings. See Equation (7).
+                # embed_sums = [embedding_dim, num_embeddings]
                 embed_sums = flat_x.transpose(0, 1) @ encoding_one_hots
-                self.m_i_ts(embed_sums)
+                self.m_i_ts(embed_sums) # return also [embedding_dim, num_embeddings]
 
                 # This is kind of weird.
                 # Compare: https://github.com/deepmind/sonnet/blob/v2/sonnet/src/nets/vqvae.py#L270
