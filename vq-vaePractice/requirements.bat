@@ -13,7 +13,6 @@ call conda activate %ENV_NAME%
 
 echo start downloading environment for %ENV_NAME%.
 call conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
-rem call conda install -y conda-forge::torchfile conda-forge::easydict conda-forge::python-dateutil conda-forge::tensorboard anaconda::pandas
 
 call conda deactivate
 
