@@ -3,6 +3,17 @@ from torch import nn
 
 class ScaleDotProductAttention(nn.Module):
     def __init__(self):
+        '''
+        Computing the Scale-Dot-Product with attention.
+
+        Inputs:
+            q(Tensor): [Batch_size, head, lenght, d_tensor].
+            k(Tensor): [Batch_size, head, lenght, d_tensor].
+            v(Tensor): [Batch_size, head, lenght, d_tensor].
+            mask(Bool): Decoder should have a mask.
+            e(float): not to be zero.
+
+        '''
         super(ScaleDotProductAttention, self).__init__()
         self.softmax = nn.Softmax(dim=-1)
 
