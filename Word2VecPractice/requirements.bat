@@ -13,6 +13,8 @@ call conda activate %ENV_NAME%
 
 echo start downloading environment for %ENV_NAME%.
 call conda install -y pytorch==1.9.0 torchvision==0.10.0 torchaudio==0.9.0 cudatoolkit=10.2 -c pytorch
+call conda install -y pytorch::numpy
+call pip install -y nb-black
 
 call conda deactivate
 
