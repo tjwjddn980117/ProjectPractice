@@ -6,13 +6,13 @@ set ENV_NAME=Word2Vec
 call %root%\Scripts\activate.bat %root%
 
 echo make the virtual environment '%ENV_NAME%'
-call conda create -y -n %ENV_NAME% python=3.10
+call conda create -y -n %ENV_NAME% python=3.8
 
 echo enter the virtual environment.
 call conda activate %ENV_NAME%
 
 echo start downloading environment for %ENV_NAME%.
-call conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+call conda install -y pytorch==1.9.0 torchvision==0.10.0 torchaudio==0.9.0 cudatoolkit=10.2 -c pytorch
 
 call conda deactivate
 
