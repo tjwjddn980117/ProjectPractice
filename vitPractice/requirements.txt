@@ -3,3 +3,7 @@ pytorch==2.1.2
 torchvision==0.17.1
 torchaudio==2.2.1
 cudatoolkit=11.8
+ml_collections
+tqdm
+numpy
+tensorboard
