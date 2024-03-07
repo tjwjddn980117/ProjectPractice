@@ -17,4 +17,4 @@ call conda install -y conda-forge::ml-collections conda-forge::tqdm conda-forge:
 
 call conda deactivate
 
-echo complete.
+echo complete. 
