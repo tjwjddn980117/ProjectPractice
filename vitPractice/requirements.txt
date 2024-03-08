@@ -7,3 +7,4 @@ ml_collections
 tqdm
 numpy
 tensorboard
+scipy
