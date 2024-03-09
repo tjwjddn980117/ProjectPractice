@@ -56,6 +56,14 @@ class PreActBottleneck(nn.Module):
         conv2_weight = np2th(weights[pjoin(n_block, n_unit, "conv2/kernel")], conv=True)
         conv3_weight = np2th(weights[pjoin(n_block, n_unit, "conv3/kernel")], conv=True)
 
+        gn1_weight = np2th(weights[pjoin(n_block, n_unit, "gn1/scale")])
+        gn1_bias = np2th(weights[pjoin(n_block, n_unit, "gn1/bias")])
+
+        gn2_weight = np2th(weights[pjoin(n_block, n_unit, "gn2/scale")])
+        gn2_bias = np2th(weights[pjoin(n_block, n_unit, "gn2/bias")])
+
+        gn3_weight = np2th(weights[pjoin(n_block, n_unit, "gn3/scale")])
+        gn3_bias = np2th(weights[pjoin(n_block, n_unit, "gn3/bias")])
 
     def forward(self, x):
 
