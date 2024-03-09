@@ -69,6 +69,9 @@ class PreActBottleneck(nn.Module):
         self.conv2.weight.copy_(conv2_weight)
         self.conv3.weight.copy_(conv3_weight)
 
+        self.gn1.weight.copy_(gn1_weight.view(-1))
+        self.gn1.bias.copy_(gn1_bias.view(-1))
+
     def forward(self, x):
 
         # Residual branch
