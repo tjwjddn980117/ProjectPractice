@@ -58,3 +58,7 @@ class PreActBottleneck(nn.Module):
         if hasattr(self, 'downsample'):
             residual = self.downsample(x)
             residual = self.gn_proj(residual)
+            
+        if hasattr(self, 'downsample'):
+            residual = self.downsample(x)
+            residual = self.gn_proj(residual)
