@@ -8,6 +8,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from modeling import np2th
+
 class StdConv2d(nn.Conv2d):
 
     def forward(self, x):
