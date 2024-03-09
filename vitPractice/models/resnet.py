@@ -65,6 +65,10 @@ class PreActBottleneck(nn.Module):
         gn3_weight = np2th(weights[pjoin(n_block, n_unit, "gn3/scale")])
         gn3_bias = np2th(weights[pjoin(n_block, n_unit, "gn3/bias")])
 
+        self.conv1.weight.copy_(conv1_weight)
+        self.conv2.weight.copy_(conv2_weight)
+        self.conv3.weight.copy_(conv3_weight)
+
     def forward(self, x):
 
         # Residual branch
