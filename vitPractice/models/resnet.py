@@ -50,6 +50,12 @@ class PreActBottleneck(nn.Module):
             # Projection also with pre-activation according to paper.
             self.downsample = conv1x1(cin, cout, stride, bias=False)
             self.gn_proj = nn.GroupNorm(cout, cout)
+    
+    def load_from(self, weights, n_block, n_unit):
+        conv1_weight = np2th(weights[pjoin(n_block, n_unit, "conv1/kernel")], conv=True)
+        conv2_weight = np2th(weights[pjoin(n_block, n_unit, "conv2/kernel")], conv=True)
+        conv3_weight = np2th(weights[pjoin(n_block, n_unit, "conv3/kernel")], conv=True)
+
 
     def forward(self, x):
 
@@ -58,7 +64,7 @@ class PreActBottleneck(nn.Module):
         if hasattr(self, 'downsample'):
             residual = self.downsample(x)
             residual = self.gn_proj(residual)
-            
+
         if hasattr(self, 'downsample'):
             residual = self.downsample(x)
             residual = self.gn_proj(residual)
