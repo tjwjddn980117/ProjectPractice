@@ -55,3 +55,6 @@ class PreActBottleneck(nn.Module):
 
         # Residual branch
         residual = x
+        if hasattr(self, 'downsample'):
+            residual = self.downsample(x)
+            residual = self.gn_proj(residual)
