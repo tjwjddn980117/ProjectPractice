@@ -37,3 +37,21 @@ class PreActBottleneck(nn.Module):
         super().__init__()
         cout = cout or cin
         cmid = cmid or cout//4
+
+        self.gn1 = nn.GroupNorm(32, cmid, eps=1e-6)
+        self.conv1 = conv1x1(cin, cmid, bias=False)
+        self.gn2 = nn.GroupNorm(32, cmid, eps=1e-6)
+        self.conv2 = conv3x3(cmid, cmid, stride, bias=False)  # Original code has it on conv1!!
+        self.gn3 = nn.GroupNorm(32, cout, eps=1e-6)
+        self.conv3 = conv1x1(cmid, cout, bias=False)
+        self.relu = nn.ReLU(inplace=True)
+
+        if (stride != 1 or cin != cout):
+            # Projection also with pre-activation according to paper.
+            self.downsample = conv1x1(cin, cout, stride, bias=False)
+            self.gn_proj = nn.GroupNorm(cout, cout)
+
+    def forward(self, x):
+
+        # Residual branch
+        residual = x
