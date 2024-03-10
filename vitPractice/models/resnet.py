@@ -28,3 +28,12 @@ def conv3x3(cin, cout, stride=1, groups=1, bias=False):
 def conv1x1(cin, cout, stride=1, bias=False):
     return StdConv2d(cin, cout, kernel_size=1, stride=stride,
                      padding=0, bias=bias)
+
+class PreActBottleneck(nn.Module):
+    """Pre-activation (v2) bottleneck block.
+    """
+
+    def __init__(self, cin, cout=None, cmid=None, stride=1):
+        super().__init__()
+        cout = cout or cin
+        cmid = cmid or cout//4
