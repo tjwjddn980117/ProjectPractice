@@ -165,7 +165,7 @@ class INIT_STAGE_G(nn.Module):
          
         Inputs:
             z_code (nparray): [B, z_code]
-            c_code (nparray): [B, c_code]
+            c_code (nparray): [B, c_code] 
         
         Outputs:
             out_code (nparray): [B, ngf, 64, 64]
