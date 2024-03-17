@@ -34,3 +34,8 @@ def num_to_groups(num, divisor):
     if remainder > 0:
         arr.append(remainder)
     return arr
+
+def convert_image_to_fn(img_type, image):
+    if image.mode != img_type:
+        return image.convert(img_type)
+    return image
