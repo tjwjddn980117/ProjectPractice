@@ -53,6 +53,9 @@ class FIDEvaluation:
         self.sampler = sampler
         self.stats_dir = stats_dir
         self.print_fn = print if accelerator is None else accelerator.print
+        # Use the nceptionV3.BLOCK_INDEX_BY_DIM dictionary to get the index of the desired block. 
+        # The dictionary maps the key used to identify each block in the model and the index of that block. 
+        # Users can get the index of the desired block by providing a key that represents a specific dimension or characteristic.
         assert inception_block_idx in InceptionV3.BLOCK_INDEX_BY_DIM
         block_idx = InceptionV3.BLOCK_INDEX_BY_DIM[inception_block_idx]
         self.inception_v3 = InceptionV3([block_idx]).to(device)
@@ -63,7 +66,10 @@ class FIDEvaluation:
         calcuate inception's features.
 
         Inputs:
-            samples (tensor): 
+            samples (tensor): [B, C, size, size]
+        
+        Outputs:
+            features (tensor): [B, C]
         '''
         if self.channels == 1:
             # if channels are 1, it might be Gray-scale. so, we have to change for 3.
@@ -72,13 +78,26 @@ class FIDEvaluation:
 
         self.inception_v3.eval()
         features = self.inception_v3(samples)[0] # generaly feature vector.
+        # features are [B, C, size, size]
 
         if features.size(2) != 1 or features.size(3) != 1:
+            # if the feature size isn't (1, 1), then resize to [B, C, 1, 1]
             features = adaptive_avg_pool2d(features, output_size=(1, 1))
         features = rearrange(features, "... 1 1 -> ...")
         return features
 
     def load_or_precalc_dataset_stats(self):
+        '''
+        load datasets and calculate the features, then calculate (mean, cov) of the features.
+        
+        
+        Inputs:
+            _ 
+        
+        Outputs:
+            _ (npz): save with m1, m2. this is the real_samples.
+
+        '''
         path = os.path.join(self.stats_dir, "dataset_stats")
         try:
             ckpt = np.load(path + ".npz")
@@ -111,6 +130,10 @@ class FIDEvaluation:
 
     @torch.inference_mode()
     def fid_score(self):
+        '''
+        Outputs:
+            calculate_frechet_distance(m1, s1, self.m2, self.s2) : m1, s2 >> fake_features, m2, s2 >> real_features.
+        '''
         if not self.dataset_stats_loaded:
             self.load_or_precalc_dataset_stats()
         self.sampler.eval()
