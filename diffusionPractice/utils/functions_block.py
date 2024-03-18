@@ -7,6 +7,11 @@ from functions import *
 
 # small helper modules
 def Upsample(dim, dim_out = None):
+    '''
+    Inputs:
+        dim (int): input dimmension.
+        dim_out (bool): choose to out with same dim, or different dim.
+    '''
     return nn.Sequential(
         nn.Upsample(scale_factor = 2, mode = 'nearest'),
         nn.Conv2d(dim, default(dim_out, dim), 3, padding = 1)
