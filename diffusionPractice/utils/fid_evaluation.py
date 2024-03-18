@@ -12,6 +12,18 @@ from tqdm.auto import tqdm
 # This code if for Evaluation.
 
 def num_to_groups(num, divisor):
+    '''
+    Example:
+        Input: num = 10, divisor = 3.
+        Ouputs: [3, 3, 3, 1].
+
+    Inputs:
+        num (int): total nums.
+        divisor (int): each num for group.
+    
+    Outputs:
+        arr (arr): devided arr.
+    '''
     groups = num // divisor
     remainder = num % divisor
     arr = [divisor] * groups
@@ -47,11 +59,19 @@ class FIDEvaluation:
         self.dataset_stats_loaded = False
 
     def calculate_inception_features(self, samples):
+        '''
+        calcuate inception's features.
+
+        Inputs:
+            samples (tensor): 
+        '''
         if self.channels == 1:
+            # if channels are 1, it might be Gray-scale. so, we have to change for 3.
+            # because, inception_v3 only can handle the channle 3.
             samples = repeat(samples, "b 1 ... -> b c ...", c=3)
 
         self.inception_v3.eval()
-        features = self.inception_v3(samples)[0]
+        features = self.inception_v3(samples)[0] # generaly feature vector.
 
         if features.size(2) != 1 or features.size(3) != 1:
             features = adaptive_avg_pool2d(features, output_size=(1, 1))
