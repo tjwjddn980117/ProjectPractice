@@ -1,6 +1,15 @@
 import math
 
 def exists(x):
+    '''
+    the function that check the parameter is exist.
+
+    Inputs:
+        x ( ): input.
+    
+    Outputs:
+        x ( ): True / False
+    '''
     return x is not None
 
 def default(val, d):
