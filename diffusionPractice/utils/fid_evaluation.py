@@ -9,28 +9,7 @@ from pytorch_fid.inception import InceptionV3
 from torch.nn.functional import adaptive_avg_pool2d
 from tqdm.auto import tqdm
 
-# This code if for Evaluation.
-
-def num_to_groups(num, divisor):
-    '''
-    Example:
-        Input: num = 10, divisor = 3.
-        Ouputs: [3, 3, 3, 1].
-
-    Inputs:
-        num (int): total nums.
-        divisor (int): each num for group.
-    
-    Outputs:
-        arr (arr): devided arr.
-    '''
-    groups = num // divisor
-    remainder = num % divisor
-    arr = [divisor] * groups
-    if remainder > 0:
-        arr.append(remainder)
-    return arr
-
+from functions import num_to_groups
 
 class FIDEvaluation:
     def __init__(
