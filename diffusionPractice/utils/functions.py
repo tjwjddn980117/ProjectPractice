@@ -13,11 +13,24 @@ def exists(x):
     return x is not None
 
 def default(val, d):
+    '''
+    choose the default function.
+
+    Inputs:
+        val ( ):
+        d ( ): 
+    
+    Outputs:
+        val / d
+    '''
     if exists(val):
         return val
     return d() if callable(d) else d
 
 def cast_tuple(t, length = 1):
+    '''
+    
+    '''
     if isinstance(t, tuple):
         return t
     return ((t,) * length)
