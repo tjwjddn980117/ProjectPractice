@@ -4,6 +4,19 @@ from einops import rearrange
 
 # building block modules
 class Block(nn.Module):
+    '''
+    Arguments:
+        dim (int): number of dimmension.
+        dim_out (bool): choose to out with same dim, or different dim. 
+        groups (int): standard with grouping channels.
+    
+    Inputs:
+        x (tensor): [b, c, h, w]
+        scale_shift (a, b): x(tensor)*(a+1) + b
+    
+    Outputs:
+        x (tensor): [b, c, h, w]
+    '''
     def __init__(self, dim, dim_out, groups = 8):
         super().__init__()
         self.proj = nn.Conv2d(dim, dim_out, 3, padding = 1)
@@ -22,6 +35,13 @@ class Block(nn.Module):
         return x
 
 class ResnetBlock(nn.Module):
+    '''
+    Arguments:
+        dim (int): number of dimmension.
+        dim_out (bool): choose to out with same dim, or different dim. 
+        time_emb_dim (int): if time_emb_dim is exists, mlp is 'SiLU -> Linear(time_emb_dim -> dim_out*2)
+        groups (int): standard with grouping channels.
+    '''
     def __init__(self, dim, dim_out, *, time_emb_dim = None, groups = 8):
         super().__init__()
         self.mlp = nn.Sequential(
