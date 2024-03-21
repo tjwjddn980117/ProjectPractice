@@ -3,6 +3,7 @@ from torch import nn, einsum
 from torch.cuda.amp import autocast
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
+from functools import partial
 
 from torch.optim import Adam
 
@@ -19,6 +20,7 @@ from accelerate import Accelerator
 
 from ..blocks.attend import Attend
 from ..utils.fid_evaluation import FIDEvaluation
+from ..utils.functions import default
 
 from ..utils.version import __version__
 
