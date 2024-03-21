@@ -17,12 +17,7 @@ class Upsample(nn.Module):
     Outputs:
         x (tensor): [B, C, factor*H, factor*W]
     '''
-    def __init__(
-        self,
-        dim,
-        dim_out = None,
-        factor = 2
-    ):
+    def __init__(self, dim, dim_out = None,factor = 2):
         super().__init__()
         self.factor = factor
         self.factor_squared = factor ** 2
@@ -54,25 +49,15 @@ class Upsample(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-def Downsample(
-    dim,
-    dim_out = None,
-    factor = 2
-):
-    return nn.Sequential(
-        Rearrange('b c (h p1) (w p2) -> b (c p1 p2) h w', p1 = factor, p2 = factor),
-        nn.Conv2d(dim * (factor ** 2), default(dim_out, dim), 1)
-    )
-
-class RMSNorm(nn.Module):
-    def __init__(self, dim, scale = True, normalize_dim = 2):
-        super().__init__()
-        self.g = nn.Parameter(torch.ones(dim)) if scale else 1
-
-        self.scale = scale
-        self.normalize_dim = normalize_dim
-
-    def forward(self, x):
-        normalize_dim = self.normalize_dim
-        scale = append_dims(self.g, x.ndim - self.normalize_dim - 1) if self.scale else 1
-        return F.normalize(x, dim = normalize_dim) * scale * (x.shape[normalize_dim] ** 0.5)
+def Downsample(dim, dim_out = None, factor = 2):
+    '''
+    Inputs:
+        dim (int): input dimmension.
+        dim_out (bool): choose to out with same dim, or different dim. 
+        factor (int): upsampling size. you can think about the size.
+    
+    Outputs:
+        nn.Sequential(Rearrange[b,c,2h,2w]->[b,4c,h,w] -> nn.Conv2d)
+        input: [b,c,2h,2w]
+        output:[b,4c,h,w]
+    '''
