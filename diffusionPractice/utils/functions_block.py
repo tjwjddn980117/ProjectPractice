@@ -39,16 +39,16 @@ def Downsample(dim, dim_out = None):
     )
 
 class RMSNorm(nn.Module):
-    '''
-    It's the kind of Layer Norm. It's more efficient with calculate.
-
-    Arguments:
-        dim (int): input dimmension.
-    
-    Inputs:
-        x (tensor): 
-    '''
     def __init__(self, dim):
+        '''
+        It's the kind of Layer Norm. It's more efficient with calculate.
+    
+        Arguments:
+            dim (int): input dimmension.
+        
+        Inputs:
+            x (tensor): 
+        '''
         super().__init__()
         self.g = nn.Parameter(torch.ones(1, dim, 1, 1))
 
