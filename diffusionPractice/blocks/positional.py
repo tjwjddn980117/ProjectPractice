@@ -6,20 +6,20 @@ from ..utils.functions import divisible_by
 
 # sinusoidal positional embeds
 class SinusoidalPosEmb(nn.Module):
-    '''
-    for sinusoidal positional embedding.
-
-    Arguments:
-        dim (int): number of dimmension.
-        theta (int): number of theta.
-
-    Inputs:
-        x (tensor): [L]. the length of tensor.
-    
-    Outputs:
-        emb (tensor): [L, emb]
-    '''
     def __init__(self, dim, theta = 10000):
+        '''
+        for sinusoidal positional embedding.
+
+        Arguments:
+            dim (int): number of dimmension.
+            theta (int): number of theta.
+
+        Inputs:
+            x (tensor): [L]. the length of tensor.
+
+        Outputs:
+            emb (tensor): [L, emb]
+        '''
         super().__init__()
         self.dim = dim
         self.theta = theta
@@ -34,22 +34,21 @@ class SinusoidalPosEmb(nn.Module):
         return emb
 
 class RandomOrLearnedSinusoidalPosEmb(nn.Module):
-    """ following @crowsonkb 's lead with random (learned optional) sinusoidal pos emb 
-    
-    Aguments:
-        dim (int): number of dimmension.
-        is_random (bool): select the random.
-    
-    Inputs:
-        x (tensor): [L]. the lenght of tensor.
-    
-    Outputs:
-        fouriered (tensor): [L, dim].
-
-    """
-    """ https://github.com/crowsonkb/v-diffusion-jax/blob/master/diffusion/models/danbooru_128.py#L8 """
-
     def __init__(self, dim, is_random = False):
+        """ following @crowsonkb 's lead with random (learned optional) sinusoidal pos emb 
+    
+        Aguments:
+            dim (int): number of dimmension.
+            is_random (bool): select the random.
+        
+        Inputs:
+            x (tensor): [L]. the lenght of tensor.
+        
+        Outputs:
+            fouriered (tensor): [L, dim].
+    
+        """
+        """ https://github.com/crowsonkb/v-diffusion-jax/blob/master/diffusion/models/danbooru_128.py#L8 """
         super().__init__()
         assert divisible_by(dim, 2)
         half_dim = dim // 2
