@@ -8,7 +8,7 @@ class Block(nn.Module):
         '''
         Arguments:
             dim (int): number of dimmension.
-            dim_out (bool): choose to out with same dim, or different dim. 
+            dim_out (int): number of out dimmension. 
             groups (int): standard with grouping channels.
 
         Inputs:
@@ -39,7 +39,7 @@ class ResnetBlock(nn.Module):
         '''
         Arguments:
             dim (int): number of dimmension.
-            dim_out (bool): choose to out with same dim, or different dim. 
+            dim_out (int): number of out dimmension. 
             time_emb_dim (int): if time_emb_dim is exists, mlp is 'SiLU -> Linear(time_emb_dim -> dim_out*2)
             groups (int): standard with grouping channels.
         '''
