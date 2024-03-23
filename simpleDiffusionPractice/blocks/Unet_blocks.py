@@ -1,23 +1,25 @@
 import torch
 from torch import nn
+import torch.nn.functional as F
+
 from einops import repeat
 from ..utils.helpers import *
 from einops.layers.torch import Rearrange
 
 class Upsample(nn.Module):
-    '''
-    Arguments:
-        dim (int): input dimmension.
-        dim_out (bool): choose to out with same dim, or different dim.
-        factor (int): upsampling size. you can think about the size.
-
-    Inputs:
-        x (tensor): [B, C, H, W]
-    
-    Outputs:
-        x (tensor): [B, C, factor*H, factor*W]
-    '''
     def __init__(self, dim, dim_out = None,factor = 2):
+        '''
+        Arguments:
+            dim (int): input dimension.
+            dim_out (bool): choose to out with same dim, or different dim.
+            factor (int): upsampling size. you can think about the size.
+
+        Inputs:
+            x (tensor): [B, C, H, W]
+
+        Outputs:
+            x (tensor): [B, C, factor*H, factor*W]
+        '''
         super().__init__()
         self.factor = factor
         self.factor_squared = factor ** 2
@@ -52,7 +54,7 @@ class Upsample(nn.Module):
 def Downsample(dim, dim_out = None, factor = 2):
     '''
     Inputs:
-        dim (int): input dimmension.
+        dim (int): input dimension.
         dim_out (bool): choose to out with same dim, or different dim. 
         factor (int): upsampling size. you can think about the size.
     
@@ -61,3 +63,39 @@ def Downsample(dim, dim_out = None, factor = 2):
         input: [b,c,2h,2w]
         output:[b,4c,h,w]
     '''
+    return nn.Sequential(
+        Rearrange('b c (h p1) (w p2) -> b (c p1 p2) h w', p1 = factor, p2 = factor),
+        nn.Conv2d(dim * (factor ** 2), default(dim_out, dim), 1)
+    )
+
+class RMSNorm(nn.Module):
+    def __init__(self, dim, scale = True, normalize_dim = 2):
+        '''
+        It's the kind of Layer Norm. It's more efficient with calculate.
+    
+        Arguments:
+            dim (int): input dimension.
+            scale (bool): 
+            normalize_dim (int): the dimension that you want to normalize.
+        
+        Inputs:
+           x (tensor): [B, C, H, W]
+        
+        Outputs:
+            if scale=True, x (tensor): [B, C, H, W]
+            if scale=False, x (tensor): [B, C, H, W]
+        '''
+        super().__init__()
+        self.g = nn.Parameter(torch.ones(dim)) if scale else 1
+
+        self.scale = scale
+        self.normalize_dim = normalize_dim
+
+    def forward(self, x):
+        normalize_dim = self.normalize_dim
+        # x.ndim -> the dimension of x 
+        # if self.scale: scale = [dim, 1], else: scale = 1
+        scale = append_dims(self.g, x.ndim - self.normalize_dim - 1) if self.scale else 1
+        # standard is 'normalize_dim'.
+        # (x.shape[normalize_dim] ** 0.5) is √(H)
+        return F.normalize(x, dim = normalize_dim) * scale * (x.shape[normalize_dim] ** 0.5)
