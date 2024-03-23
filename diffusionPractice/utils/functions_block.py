@@ -9,7 +9,7 @@ from functions import *
 def Upsample(dim, dim_out = None):
     '''
     Inputs:
-        dim (int): input dimmension.
+        dim (int): input dimension.
         dim_out (bool): choose to out with same dim, or different dim.
     
     Outputs:
@@ -25,7 +25,7 @@ def Upsample(dim, dim_out = None):
 def Downsample(dim, dim_out = None):
     '''
     Inputs:
-        dim (int): input dimmension.
+        dim (int): input dimension.
         dim_out (bool): choose to out with same dim, or different dim. 
     
     Outputs:
@@ -44,7 +44,7 @@ class RMSNorm(nn.Module):
         It's the kind of Layer Norm. It's more efficient with calculate.
     
         Arguments:
-            dim (int): input dimmension.
+            dim (int): input dimension.
         
         Inputs:
             x (tensor): 
