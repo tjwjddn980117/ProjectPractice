@@ -11,7 +11,7 @@ class SinusoidalPosEmb(nn.Module):
         for sinusoidal positional embedding.
 
         Arguments:
-            dim (int): number of dimmension.
+            dim (int): number of dimension.
             theta (int): number of theta.
 
         Inputs:
@@ -38,7 +38,7 @@ class RandomOrLearnedSinusoidalPosEmb(nn.Module):
         """ following @crowsonkb 's lead with random (learned optional) sinusoidal pos emb 
     
         Aguments:
-            dim (int): number of dimmension.
+            dim (int): number of dimension.
             is_random (bool): select the random.
         
         Inputs:
