@@ -7,8 +7,8 @@ class Block(nn.Module):
     def __init__(self, dim, dim_out, groups = 8):
         '''
         Arguments:
-            dim (int): number of dimmension.
-            dim_out (int): number of out dimmension. 
+            dim (int): number of dimension.
+            dim_out (int): number of out dimension. 
             groups (int): standard with grouping channels.
 
         Inputs:
@@ -38,8 +38,8 @@ class ResnetBlock(nn.Module):
     def __init__(self, dim, dim_out, *, time_emb_dim = None, groups = 8):
         '''
         Arguments:
-            dim (int): number of dimmension.
-            dim_out (int): number of out dimmension. 
+            dim (int): number of dimension.
+            dim_out (int): number of out dimension. 
             time_emb_dim (int): if time_emb_dim is exists, mlp is 'SiLU -> Linear(time_emb_dim -> dim_out*2)
             groups (int): standard with grouping channels.
         '''
