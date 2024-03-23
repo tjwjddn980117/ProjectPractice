@@ -5,22 +5,22 @@ import math
 from einops import rearrange
 
 class LearnedSinusoidalPosEmb(nn.Module):
-    """ following @crowsonkb 's lead with random (learned optional) sinusoidal pos emb 
-    This is for Transformer positioning embedding.
-
-    Aguments:
-        dim (int): number of dimmension.
-        is_random (bool): select the random.
-    
-    Inputs:
-        x (tensor): [L]. the lenght of tensor.
-    
-    Outputs:
-        fouriered (tensor): [L, dim].
-
-    """
-    """ https://github.com/crowsonkb/v-diffusion-jax/blob/master/diffusion/models/danbooru_128.py#L8 """
     def __init__(self, dim):
+        """ following @crowsonkb 's lead with random (learned optional) sinusoidal pos emb 
+        This is for Transformer positioning embedding.
+    
+        Aguments:
+            dim (int): number of dimension.
+            is_random (bool): select the random.
+        
+        Inputs:
+            x (tensor): [L]. the lenght of tensor.
+        
+        Outputs:
+            fouriered (tensor): [L, dim].
+    
+        """
+        """ https://github.com/crowsonkb/v-diffusion-jax/blob/master/diffusion/models/danbooru_128.py#L8 """
         super().__init__()
         assert (dim % 2) == 0
         half_dim = dim // 2
