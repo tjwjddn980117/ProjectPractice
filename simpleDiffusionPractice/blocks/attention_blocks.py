@@ -65,8 +65,15 @@ class LinearAttention(nn.Module):
 class Attention(nn.Module):
     def __init__(self, dim, heads = 4, dim_head = 32, scale = 8, dropout = 0.):
         '''
-
         Arguments:
+            dim (int): the number of dimension.
+            heads (int): the number of heads.
+            dim_head (int): the number of dimensions of each head. 
+        
+        Inputs:
+            x (tensor): [B, dim, H, W]
+        
+            
         '''
         super(Attention).__init__()
         self.scale = scale
