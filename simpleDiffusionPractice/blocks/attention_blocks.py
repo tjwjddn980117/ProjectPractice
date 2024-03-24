@@ -72,7 +72,6 @@ class Attention(nn.Module):
         
         Inputs:
             x (tensor): [B, dim, H, W]
-        
             
         '''
         super(Attention).__init__()
