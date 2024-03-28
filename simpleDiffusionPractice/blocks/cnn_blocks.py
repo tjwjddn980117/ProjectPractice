@@ -8,7 +8,7 @@ class Block(nn.Module):
         Arguments:
             dim (int): number of dimension.
             dim_out (int): number of out dimension. 
-            groups (int): standard with grouping channels.
+            groups (int): standard with grouping channels for group normalize. 
 
         Inputs:
             x (tensor): [b, dim, h, w]
@@ -17,7 +17,7 @@ class Block(nn.Module):
         Outputs:
             x (tensor): [b, c, h, w]
         '''
-        super().__init__()
+        super(Block).__init__()
         self.proj = nn.Conv2d(dim, dim_out, 3, padding = 1)
         self.norm = nn.GroupNorm(groups, dim_out)
         self.act = nn.SiLU()
@@ -40,7 +40,7 @@ class ResnetBlock(nn.Module):
             dim (int): number of dimension.
             dim_out (int): number of out dimension. ss
             time_emb_dim (int): if time_emb_dim is exists, mlp is 'SiLU -> Linear(time_emb_dim -> dim_out*2)
-            groups (int): standard with grouping channels.
+            groups (int): standard with grouping channels for group normalize. 
 
         Inputs:
             x (tensor): [B, dim, H, W]
@@ -49,7 +49,7 @@ class ResnetBlock(nn.Module):
         Outputs:
             x (tensor): [B, out_dim, H, W]
         '''
-        super().__init__()
+        super(ResnetBlock).__init__()
         self.mlp = nn.Sequential(
             nn.SiLU(),
             nn.Linear(time_emb_dim, dim_out * 2)
