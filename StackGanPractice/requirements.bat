@@ -5,6 +5,12 @@ set ENV_NAME=StackGan
 
 call %root%\Scripts\activate.bat %root%
 
+if not exist "%root%" (
+    echo check the root please: %root%
+    pause
+    exit
+)
+
 echo make the virtual environment '%ENV_NAME%'
 call conda create -y -n %ENV_NAME% python=3.9
 
