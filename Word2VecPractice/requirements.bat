@@ -3,6 +3,12 @@ rem and you could change the ENV_NAME with your one vitual environment.
 set root=C:\Users\qowor\anaconda3
 set ENV_NAME=Word2Vec
 
+if not exist "%root%" (
+    echo check the root please: %root%
+    pause
+    exit
+)
+
 call %root%\Scripts\activate.bat %root%
 
 echo make the virtual environment '%ENV_NAME%'
