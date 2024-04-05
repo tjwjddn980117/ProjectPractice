@@ -9,16 +9,16 @@ class Block(nn.Module):
         Arguments:
             dim (int): number of dimension.
             dim_out (int): number of out dimension. 
-            groups (int): standard with grouping channels.
+            groups (int): standard with grouping channels for group normalize. 
 
         Inputs:
-            x (tensor): [b, c, h, w]
-            scale_shift (a, b): x(tensor)*(a+1) + b
+            x (tensor): [b, c, h, w]. 
+            scale_shift (a, b): x(tensor)*(a+1) + b. 
 
         Outputs:
-            x (tensor): [b, c, h, w]
+            x (tensor): [b, c, h, w]. 
         '''
-        super().__init__()
+        super(Block).__init__()
         self.proj = nn.Conv2d(dim, dim_out, 3, padding = 1)
         self.norm = nn.GroupNorm(groups, dim_out)
         self.act = nn.SiLU()
@@ -38,12 +38,19 @@ class ResnetBlock(nn.Module):
     def __init__(self, dim, dim_out, *, time_emb_dim = None, groups = 8):
         '''
         Arguments:
-            dim (int): number of dimension.
+            dim (int): number of dimension. 
             dim_out (int): number of out dimension. 
-            time_emb_dim (int): if time_emb_dim is exists, mlp is 'SiLU -> Linear(time_emb_dim -> dim_out*2)
-            groups (int): standard with grouping channels.
+            time_emb_dim (int): if time_emb_dim is exists, mlp is 'SiLU -> Linear(time_emb_dim -> dim_out*2). 
+            groups (int): standard with grouping channels. 
+        
+        Inputs:
+            x (tensor): [B, dim, H, W]. 
+            time_emb (tensor): [B, time_emb_dim]. 
+        
+        Outputs:
+            x (tensor): [B, out_dim, H, W]. 
         '''
-        super().__init__()
+        super(ResnetBlock).__init__()
         self.mlp = nn.Sequential(
             nn.SiLU(),
             nn.Linear(time_emb_dim, dim_out * 2)
@@ -57,8 +64,11 @@ class ResnetBlock(nn.Module):
 
         scale_shift = None
         if exists(self.mlp) and exists(time_emb):
+            # time_emb = [B, dim_out * 2]
             time_emb = self.mlp(time_emb)
+            # time_emb = [B, dim_out * 2, 1, 1]
             time_emb = rearrange(time_emb, 'b c -> b c 1 1')
+            # scale_shift = ([B, dim_out, 1, 1], [B, dim_out, 1, 1])
             scale_shift = time_emb.chunk(2, dim = 1)
 
         h = self.block1(x, scale_shift = scale_shift)

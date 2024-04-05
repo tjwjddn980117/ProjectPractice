@@ -31,13 +31,24 @@ print_once = once(print)
 
 # main class
 class Attend(nn.Module):
-    def __init__(
-        self,
-        dropout = 0.,
-        flash = False,
-        scale = None
-    ):
-        super().__init__()
+    def __init__(self, dropout = 0., flash = False, scale = None):
+        '''
+        calculate Attention. 
+
+        Arguments:
+            dropout (float): 0. the rate of dropout. 
+            flash (bool): decide to use 'flash'. 
+            scale (bool): decide to use 'scale'. 
+        
+        Inputs:
+            q (tensor): [B, C, H, W]. 
+            k (tensor): [B, C, H, W]. 
+            v (tensor): [B, C, H, W]. 
+        
+        Outputs:
+            out (tensor): [B, C, H, W]. 
+        '''
+        super(Attend).__init__()
         self.dropout = dropout
         self.scale = scale
         self.attn_dropout = nn.Dropout(dropout)
@@ -65,9 +76,12 @@ class Attend(nn.Module):
     def flash_attn(self, q, k, v):
         '''
         Inputs:
-            q (tensor): [batch, head, seq_len, embedding_dim] 
-            k (tensor): [batch, head, seq_len, embedding_dim] 
-            v (tensor): [batch, head, seq_len, embedding_dim] 
+            q (tensor): [batch, head, seq_len, embedding_dim]. 
+            k (tensor): [batch, head, seq_len, embedding_dim]. 
+            v (tensor): [batch, head, seq_len, embedding_dim]. 
+        
+        Returns:
+            out (tensor): [batch, head, seq_len, embedding_dim]. 
         '''
         _, heads, q_len, _, k_len, is_cuda, device = *q.shape, k.shape[-2], q.is_cuda, q.device
 
@@ -111,16 +125,16 @@ class Attend(nn.Module):
         scale = default(self.scale, q.shape[-1] ** -0.5)
 
         # similarity
-
+        # sim = [B, heads, seq_len, seq_len]. 
         sim = einsum(f"b h i d, b h j d -> b h i j", q, k) * scale
 
         # attention
-
+        # attention for seq_len <-> seq_len. 
         attn = sim.softmax(dim = -1)
         attn = self.attn_dropout(attn)
 
         # aggregate values
-
+        # out = [B, heads, seq_len, emb_dim]. 
         out = einsum(f"b h i j, b h j d -> b h i d", attn, v)
 
         return out

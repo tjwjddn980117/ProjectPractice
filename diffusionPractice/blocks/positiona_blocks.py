@@ -18,7 +18,7 @@ class SinusoidalPosEmb(nn.Module):
             x (tensor): [L]. the length of tensor.
 
         Outputs:
-            emb (tensor): [L, emb]
+            emb (tensor): [L, emb]. 
         '''
         super().__init__()
         self.dim = dim
