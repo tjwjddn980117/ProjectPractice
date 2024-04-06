@@ -234,6 +234,8 @@ class GaussianDiffusion(nn.Module):
             x (tensor): input noise in 't' sequence. (x_t). 
             t (int): time sequence. 
             x_self_cond (bool): choose to input the self_condition. 
+        
+        
         '''
         b, *_, device = *x.shape, self.device
         # batched_times = [B]. fill the same 't' with all batches. 
