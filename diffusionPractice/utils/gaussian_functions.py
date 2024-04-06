@@ -4,11 +4,21 @@ import math
 # gaussian diffusion trainer class
 def extract(a, t, x_shape):
     '''
-    extract function. 
+    extracting a. the information is 't'. and resize for x_shape. 
+    for example, 
+        a = tensor([0.327, 0.445, 0.121, 0.311, 0.902]). \n
+        t = tensor([1,0,3]). \n
+        x_shape.shape = [3, 2]. \n
+
+        then return should be [[0.445], [0.327], [0.311]]. (output.shape = [3, 1]). 
 
     Arguments:
-        a (tensor)
-        t (tensor): [B, ]. 
+        a (tensor): [timesteps]. the information of each timesteps. 
+        t (tensor): [B]. time for each batch. 
+        x_shape (tensor): [B, C, H, W]. 
+    
+    Returns:
+        _ (tensor): [B, 1, 1, 1]. 
     '''
     b, *_ = t.shape
     out = a.gather(-1, t)
