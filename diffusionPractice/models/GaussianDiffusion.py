@@ -38,16 +38,16 @@ class GaussianDiffusion(nn.Module):
         The model of Gaussian Diffusion. 
 
         Arguments:
-            model,
+            model (nn.Module): the based with Unet. 
             *,
-            image_size,
+            image_size (int): the size of 
             timesteps = 1000,
             sampling_timesteps = None,
             objective = 'pred_v',
             beta_schedule = 'sigmoid',
             schedule_fn_kwargs (dict): the more arguments (parameters) of scheduling function. 
             ddim_sampling_eta = 0.,
-            auto_normalize = True,
+            auto_normalize (bool): auto-normalization of data [0, 1] -> [-1, 1] - can turn off by setting it to be False. 
             offset_noise_strength = 0.,  # https://www.crosslabs.org/blog/diffusion-with-offset-noise
             min_snr_loss_weight = False, # https://arxiv.org/abs/2303.09556
             min_snr_gamma = 5
@@ -79,8 +79,11 @@ class GaussianDiffusion(nn.Module):
         # betas = [timesteps]. 
         betas = beta_schedule_fn(timesteps, **schedule_fn_kwargs)
 
+        # alphas = [timesteps]. 
         alphas = 1. - betas
+        # stacking multiple. 누적곱. alphas_cumprod = [timesteps]. 
         alphas_cumprod = torch.cumprod(alphas, dim=0)
+        # stacking multiple with the first number is '1'. alphas_cumprod_prev = [timesteps]. 
         alphas_cumprod_prev = F.pad(alphas_cumprod[:-1], (1, 0), value = 1.)
 
         timesteps, = betas.shape
@@ -89,6 +92,7 @@ class GaussianDiffusion(nn.Module):
         # sampling related parameters
         self.sampling_timesteps = default(sampling_timesteps, timesteps) # default num sampling timesteps to number of timesteps at training
 
+        # sampling_timesteps should smaller then timesteps. 
         assert self.sampling_timesteps <= timesteps
         self.is_ddim_sampling = self.sampling_timesteps < timesteps
         self.ddim_sampling_eta = ddim_sampling_eta
@@ -127,7 +131,7 @@ class GaussianDiffusion(nn.Module):
         snr = alphas_cumprod / (1 - alphas_cumprod)
 
         # https://arxiv.org/abs/2303.09556
-
+        # maybe_clipped_snr = [timesteps]. 
         maybe_clipped_snr = snr.clone()
         if min_snr_loss_weight:
             maybe_clipped_snr.clamp_(max = min_snr_gamma)
@@ -148,6 +152,12 @@ class GaussianDiffusion(nn.Module):
         return self.betas.device
 
     def predict_start_from_noise(self, x_t, t, noise):
+        '''
+        the function for predict start. (p distribution). 
+
+        Arguments:
+            x_t (tensor): 
+        '''
         return (
             extract(self.sqrt_recip_alphas_cumprod, t, x_t.shape) * x_t -
             extract(self.sqrt_recipm1_alphas_cumprod, t, x_t.shape) * noise
@@ -217,7 +227,16 @@ class GaussianDiffusion(nn.Module):
 
     @torch.inference_mode()
     def p_sample(self, x, t: int, x_self_cond = None):
+        '''
+        put x and t and predict(output) the t-1 states. 
+
+        Arguments:
+            x (tensor): input noise in 't' sequence. (x_t). 
+            t (int): time sequence. 
+            x_self_cond (bool): choose to input the self_condition. 
+        '''
         b, *_, device = *x.shape, self.device
+        # batched_times = [B]. fill the same 't' with all batches. 
         batched_times = torch.full((b,), t, device = device, dtype = torch.long)
         model_mean, _, model_log_variance, x_start = self.p_mean_variance(x = x, t = batched_times, x_self_cond = x_self_cond, clip_denoised = True)
         noise = torch.randn_like(x) if t > 0 else 0. # no noise if t == 0
@@ -226,16 +245,26 @@ class GaussianDiffusion(nn.Module):
 
     @torch.inference_mode()
     def p_sample_loop(self, shape, return_all_timesteps = False):
+        '''
+        P sampling for num_timesteps -> 0. denoising process. 
+        Imgs are denoising images with [img(t=timesteps) -> img(t=0)]. 
+
+
+        '''
         batch, device = shape[0], self.device
 
+        # random gaussian noise. 
         img = torch.randn(shape, device = device)
         imgs = [img]
 
         x_start = None
 
         for t in tqdm(reversed(range(0, self.num_timesteps)), desc = 'sampling loop time step', total = self.num_timesteps):
+            # if not self_condition, x_start will gather with p_sample. 
             self_cond = x_start if self.self_condition else None
+            # img_t, t, self_cond_t has input. 
             img, x_start = self.p_sample(img, t, self_cond)
+            # img_(t-1) has prediced. 
             imgs.append(img)
 
         ret = img if not return_all_timesteps else torch.stack(imgs, dim = 1)
