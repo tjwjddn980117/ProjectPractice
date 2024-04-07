@@ -5,7 +5,7 @@ from functools import partial
 from ..blocks.attention_blocks import Attention, LinearAttention
 from ..blocks.CNN_blocks import ResnetBlock
 from ..blocks.Unet_blocks import Upsample, Downsample
-from ..blocks.positiona_blocks import RandomOrLearnedSinusoidalPosEmb, SinusoidalPosEmb
+from ..blocks.positional_blocks import RandomOrLearnedSinusoidalPosEmb, SinusoidalPosEmb
 from ..utils.functions import default, cast_tuple, divisible_by
 
 from ..utils.version import __version__
