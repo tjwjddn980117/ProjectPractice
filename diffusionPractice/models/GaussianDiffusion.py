@@ -251,7 +251,6 @@ class GaussianDiffusion(nn.Module):
         P sampling for num_timesteps -> 0. denoising process. 
         Imgs are denoising images with [img(t=timesteps) -> img(t=0)]. 
 
-
         '''
         batch, device = shape[0], self.device
 
