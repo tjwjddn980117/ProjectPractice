@@ -40,18 +40,23 @@ class GaussianDiffusion(nn.Module):
         Arguments:
             model (nn.Module): the based with Unet. 
             *,
-            image_size (int): the size of 
-            timesteps = 1000,
-            sampling_timesteps = None,
-            objective = 'pred_v',
-            beta_schedule = 'sigmoid',
+            image_size (int): the size of image. 
+            timesteps (int): the full timesteps. 
+            sampling_timesteps (int): the sampling timesteps. 
+            objective (str): the object you want to diffusion. 
+            beta_schedule (str): scheduling methods. 
             schedule_fn_kwargs (dict): the more arguments (parameters) of scheduling function. 
-            ddim_sampling_eta = 0.,
+            ddim_sampling_eta (float): using from ddim_sampling. 
             auto_normalize (bool): auto-normalization of data [0, 1] -> [-1, 1] - can turn off by setting it to be False. 
             offset_noise_strength = 0.,  # https://www.crosslabs.org/blog/diffusion-with-offset-noise
             min_snr_loss_weight = False, # https://arxiv.org/abs/2303.09556
             min_snr_gamma = 5
         
+        Inputs: 
+            img (tensor): [B, C, H, W]. 
+        
+        Ouputs:
+            loss (float): value of loss. 
         '''
         assert not (type(self) == GaussianDiffusion and model.channels != model.out_dim)
         assert not hasattr(model, 'random_or_learned_sinusoidal_cond') or not model.random_or_learned_sinusoidal_cond
@@ -156,7 +161,12 @@ class GaussianDiffusion(nn.Module):
         the function for predict start. (p distribution). 
 
         Arguments:
-            x_t (tensor): 
+            t (tensor): [B] time sequence. 
+            x_t (tensor): [B, C, H, W]. x_t noise. 
+            noise (tensor): [B, C, H, W]. x_(t-1) noise. 
+        
+        Returns:
+            _ (tensor): [B, C, H, W]. predict the start(x_0), from noise (x_(t-1)). 
         '''
         return (
             extract(self.sqrt_recip_alphas_cumprod, t, x_t.shape) * x_t -
@@ -164,24 +174,70 @@ class GaussianDiffusion(nn.Module):
         )
 
     def predict_noise_from_start(self, x_t, t, x0):
+        '''
+        the function for predict noise. (q distribution). 
+
+        Arguments:
+            t (tensor): [B] time sequence. 
+            x_t (tensor): [B, C, H, W]. x_t noise. 
+            x0 (tensor): [B, C, H, W]. x_0 noise. 
+        
+        Returns:
+            _ (tensor): [B, C, H, W]. predict the noise(x_(t-1)), from start (x_0). 
+        '''
         return (
             (extract(self.sqrt_recip_alphas_cumprod, t, x_t.shape) * x_t - x0) / \
             extract(self.sqrt_recipm1_alphas_cumprod, t, x_t.shape)
         )
 
     def predict_v(self, x_start, t, noise):
+        '''
+        the function for predict v from real x_start. (p distribution). 
+
+        Arguments:
+            t (tensor): [B] time sequence. 
+            x_start (tensor): [B, C, H, W]. x_0 img. 
+            noise (tensor): [B, C, H, W]. x_(t-1) noise. 
+        
+        Returns:
+            _ (tensor): [B, C, H, W]. predict the v, from start (x_0). 
+        '''
         return (
             extract(self.sqrt_alphas_cumprod, t, x_start.shape) * noise -
             extract(self.sqrt_one_minus_alphas_cumprod, t, x_start.shape) * x_start
         )
 
     def predict_start_from_v(self, x_t, t, v):
+        '''
+        the function for predict start. (p distribution). 
+
+        Arguments:
+            t (tensor): [B] time sequence. 
+            x_t (tensor): [B, C, H, W]. x_t noise. 
+            v (tensor): [B, C, H, W]. x_(t-1) v. 
+        
+        Returns:
+            _ (tensor): [B, C, H, W]. predict the start(x_0), from v (x_(t-1)). 
+        '''
         return (
             extract(self.sqrt_alphas_cumprod, t, x_t.shape) * x_t -
             extract(self.sqrt_one_minus_alphas_cumprod, t, x_t.shape) * v
         )
 
     def q_posterior(self, x_start, x_t, t):
+        '''
+        the function for predict x_t's parameters. (q distribution). 
+
+        Arguments:
+            t (tensor): [B] time sequence. 
+            x_start (tensor): [B, C, H, W]. x_0 start. 
+            x_t (tensor): [B, C, H, W]. x_t noise. 
+        
+        Returns:
+            model_mean (tensor): [B, C, H, W]. parameter of x_t mean. 
+            posterior_variance (tensor): [B, C, H, W]. parameter of x_t variance. 
+            posterior_log_variance (tensor): [B, C, H, W]. parameter of x_t log_variance. 
+        '''
         posterior_mean = (
             extract(self.posterior_mean_coef1, t, x_t.shape) * x_start +
             extract(self.posterior_mean_coef2, t, x_t.shape) * x_t
@@ -191,11 +247,39 @@ class GaussianDiffusion(nn.Module):
         return posterior_mean, posterior_variance, posterior_log_variance_clipped
 
     def model_predictions(self, x, t, x_self_cond = None, clip_x_start = False, rederive_pred_noise = False):
+        '''
+        the model predictions for 'pred_noise and x_start'. 
+        there are few objective with this function. 
+        'pred_noise', 'pred_x0', 'pred_v'. 
+
+        Arguments:
+            t (tensor): [B] time sequence. 
+            x (tensor): [B, C, H, W]. input noise in 't' sequence. (x_t). 
+            x_self_cond (bool): choose to input the self_condition. 
+        
+        Returns:
+            if objective == 'pred_noise': 
+                1. input x_t and Unet to x_(t-1). (pred noise). 
+                2. prediction x_start from x_(t-1). (x_start). 
+            
+            if objective == 'pred_x0': 
+                1. input x_t and Unet to x_0. (pred x_0). 
+                2. prediction x_t from x_0. (pred x_t). 
+            
+            if objective == 'pred_v':
+                1. input x_t and Unet to v (x_(t-1)). (pred v). 
+                2. prediction x_start from v. (x_start). 
+                3. prediction x_t from x_0 (pred x_t). 
+            
+            ModelPrediction(pred_noise [B, C, H, W], pred_x_start [B, C, H, W])
+        '''
+        # model_output = prediction of x_(t-1). 
         model_output = self.model(x, t, x_self_cond)
         maybe_clip = partial(torch.clamp, min = -1., max = 1.) if clip_x_start else identity
 
         if self.objective == 'pred_noise':
             pred_noise = model_output
+            # x_start is x_0. 
             x_start = self.predict_start_from_noise(x, t, pred_noise)
             x_start = maybe_clip(x_start)
 
@@ -205,6 +289,7 @@ class GaussianDiffusion(nn.Module):
         elif self.objective == 'pred_x0':
             x_start = model_output
             x_start = maybe_clip(x_start)
+            # pred_noise = x_(t-1). 
             pred_noise = self.predict_noise_from_start(x, t, x_start)
 
         elif self.objective == 'pred_v':
@@ -216,7 +301,23 @@ class GaussianDiffusion(nn.Module):
         return ModelPrediction(pred_noise, x_start)
 
     def p_mean_variance(self, x, t, x_self_cond = None, clip_denoised = True):
+        '''
+        predict the mean and variance of P.
+
+        Arguments:
+            x (tensor): [B, C, H, W]. input noise in 't' sequence. (x_t). 
+            t (int): time sequence. 
+            x_self_cond (bool): choose to input the self_condition. 
+            clip_denoised (bool): choose to denoising. 
+        
+        Returns:
+            model_mean (tensor): [B, 1, 1, 1]. parameter of x_t mean. 
+            posterior_variance (tensor): [B, 1, 1, 1]. parameter of x_t variance. 
+            posterior_log_variance (tensor): [B, 1, 1, 1]. parameter of x_t log_variance. 
+            x_start (tensor): [B, C, H, W]. prediction of x_0. 
+        '''
         preds = self.model_predictions(x, t, x_self_cond)
+        # x_start = prediction of x_0. 
         x_start = preds.pred_x_start
 
         if clip_denoised:
@@ -229,13 +330,15 @@ class GaussianDiffusion(nn.Module):
     def p_sample(self, x, t: int, x_self_cond = None):
         '''
         put x and t and predict(output) the t-1 states. 
-
+        
         Arguments:
-            x (tensor): input noise in 't' sequence. (x_t). 
+            x (tensor): [B, C, H, W]. input noise in 't' sequence. (x_t). 
             t (int): time sequence. 
             x_self_cond (bool): choose to input the self_condition. 
         
-        
+        Returns:
+            pred_img (tensor): [B, C, H, W]. prediction of image. (x_(t-1)). 
+            x_start (tensor): [B, C, H, W]. prediction of x_0. 
         '''
         b, *_, device = *x.shape, self.device
         # batched_times = [B]. fill the same 't' with all batches. 
@@ -251,6 +354,12 @@ class GaussianDiffusion(nn.Module):
         P sampling for num_timesteps -> 0. denoising process. 
         Imgs are denoising images with [img(t=timesteps) -> img(t=0)]. 
 
+        Arguments:
+            shape (tensor): [B, C, H, W]. 
+            return_all_timesteps (bool): choose return all images, or juct last image. 
+
+        Returns:
+            ret (tensor/[tensor for timesteps]): [B, C, H, W]. / [[B, C, H, W] ... [B, C, H, W]]. 
         '''
         batch, device = shape[0], self.device
 
@@ -264,6 +373,7 @@ class GaussianDiffusion(nn.Module):
             # if not self_condition, x_start will gather with p_sample. 
             self_cond = x_start if self.self_condition else None
             # img_t, t, self_cond_t has input. 
+            # x_start is the prediction of x_0. 
             img, x_start = self.p_sample(img, t, self_cond)
             # img_(t-1) has prediced. 
             imgs.append(img)
@@ -275,6 +385,17 @@ class GaussianDiffusion(nn.Module):
 
     @torch.inference_mode()
     def ddim_sample(self, shape, return_all_timesteps = False):
+        '''
+        P sampling for num_timesteps -> 0. denoising process. 
+        Imgs are denoising images with [img(t=T-1) -> img(t=0)]. 
+
+        Arguments:
+            shape (tensor): [B, C, H, W]. 
+            return_all_timesteps (bool): choose return all images, or juct last image. 
+
+        Returns:
+            ret (tensor/[tensor for T-1]): [B, C, H, W]. / [[B, C, H, W] ... [B, C, H, W]]. 
+        '''
         batch, device, total_timesteps, sampling_timesteps, eta, objective = shape[0], self.device, self.num_timesteps, self.sampling_timesteps, self.ddim_sampling_eta, self.objective
 
         times = torch.linspace(-1, total_timesteps - 1, steps = sampling_timesteps + 1)   # [-1, 0, 1, 2, ..., T-1] when sampling_timesteps == total_timesteps
@@ -317,12 +438,31 @@ class GaussianDiffusion(nn.Module):
 
     @torch.inference_mode()
     def sample(self, batch_size = 16, return_all_timesteps = False):
+        '''
+        sampling for denoising from random noise to real image. 
+
+        Arguments:
+            batch_size (int): batch size. 
+            return_all_timesteps (bool): choose return all images, or juct last image. 
+        
+        Returns:
+            ret (tensor/[tensor for T-1]): [B, C, H, W]. / [[B, C, H, W] ... [B, C, H, W]]. 
+        '''
         image_size, channels = self.image_size, self.channels
+        # self.sampling_timesteps < timesteps, then ddim_sample. 
         sample_fn = self.p_sample_loop if not self.is_ddim_sampling else self.ddim_sample
         return sample_fn((batch_size, channels, image_size, image_size), return_all_timesteps = return_all_timesteps)
 
     @torch.inference_mode()
     def interpolate(self, x1, x2, t = None, lam = 0.5):
+        '''
+        the function for interpolate. 
+
+        Arguments:
+            x1 (tensor): [B, C, H, W]. 
+            x2 (tensor): [B, C, H, W]. 
+        
+        '''
         b, *_, device = *x1.shape, x1.device
         t = default(t, self.num_timesteps - 1)
 
@@ -343,6 +483,17 @@ class GaussianDiffusion(nn.Module):
 
     @autocast(enabled = False)
     def q_sample(self, x_start, t, noise = None):
+        '''
+        noising sampling with random gaussian sampling. 
+
+        Arguments:
+            t (tensor): [B]. 
+            x_start (tensor): [B, C, H, W]. 
+            noise (tensor): [B, C, H, W]. 
+        
+        Returns:
+            _ (tensor): [B, C, H, W]. 
+        '''
         noise = default(noise, lambda: torch.randn_like(x_start))
 
         return (
@@ -351,6 +502,13 @@ class GaussianDiffusion(nn.Module):
         )
 
     def p_losses(self, x_start, t, noise = None, offset_noise_strength = None):
+        '''
+        calculate p_losses for time is random time simpling 'q_sampling'. 
+
+        Arguments:
+            x_start (tensor): [B, C, H, W]. the input image. it will start with 't'. 
+            t (tensor): [B]. 
+        '''
         b, c, h, w = x_start.shape
 
         noise = default(noise, lambda: torch.randn_like(x_start))
@@ -364,13 +522,11 @@ class GaussianDiffusion(nn.Module):
             noise += offset_noise_strength * rearrange(offset_noise, 'b c -> b c 1 1')
 
         # noise sample
-
         x = self.q_sample(x_start = x_start, t = t, noise = noise)
 
         # if doing self-conditioning, 50% of the time, predict x_start from current set of times
         # and condition with unet with that
         # this technique will slow down training by 25%, but seems to lower FID significantly
-
         x_self_cond = None
         if self.self_condition and random() < 0.5:
             with torch.no_grad():
