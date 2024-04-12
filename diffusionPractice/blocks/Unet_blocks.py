@@ -50,7 +50,7 @@ class RMSNorm(nn.Module):
         Outputs:
             x (tensor): [B, C, H, W]. 
         '''
-        super().__init__()
+        super(RMSNorm).__init__()
         self.g = nn.Parameter(torch.ones(1, dim, 1, 1))
 
     def forward(self, x):
