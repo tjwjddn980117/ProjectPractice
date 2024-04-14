@@ -41,3 +41,4 @@ class JIGSAW_NET(nn.Module):
 
     def forward(self, x):
         x = x(self.conv1)
+        
