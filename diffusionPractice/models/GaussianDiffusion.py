@@ -508,6 +508,11 @@ class GaussianDiffusion(nn.Module):
         Arguments:
             x_start (tensor): [B, C, H, W]. the input image. it will start with 't'. 
             t (tensor): [B]. 
+            noise (tensor): [B, C, H, W]. the noise input. 
+            offset_noise_strength (float): offset of noise. 
+        
+        Returns:
+            loss.mean() (float). mean of all losses for all batches. 
         '''
         b, c, h, w = x_start.shape
 
