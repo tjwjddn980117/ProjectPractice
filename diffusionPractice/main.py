@@ -1,7 +1,7 @@
-from models import UViT, GaussianDiffusion
+from models import Unet, GaussianDiffusion
 from train import Trainer
 
-model = UViT(
+model = Unet(
     dim = 64,
     dim_mults = (1, 2, 4, 8),
 )
