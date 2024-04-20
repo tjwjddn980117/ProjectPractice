@@ -17,17 +17,19 @@ model_args = {
 class SonnetExponentialMovingAverage(nn.Module):
     # See: https://github.com/deepmind/sonnet/blob/5cbfdc356962d9b6198d5b63f0826a80acfdf35b/sonnet/src/moving_averages.py#L25.
     # They do *not* use the exponential moving average updates described in Appendix A.1
-    # of "Neural Discrete Representation Learning".
+    # of "Neural Discrete Representation Learning". 
     def __init__(self, decay, shape):
         '''
-        This 
+        This code block implements a variant of the Exponential Moving Average (EMA), 
+        which computes the moving average of weights during the learning process to adjust the weights in the model to be unbiased.
 
-        Arguments:
+        Arguments:  
             decay(float): Weight for the exponential moving average. 
-            shape(Tensor): shape of input.
+                Higher decay rates retain more historical information, and lower decay rates give greater weight to recent values. 
+            shape(Tensor): shape of input. 
         
         Inputs:
-            values(Tensor): [num_embedding]
+            values(Tensor): [shape]. 
         '''
         super(SonnetExponentialMovingAverage, self).__init__()
         self.decay = decay
