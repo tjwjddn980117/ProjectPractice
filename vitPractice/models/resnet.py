@@ -17,6 +17,7 @@ class StdConv2d(nn.Conv2d):
 
     Inputs:
         x (tensor): 
+        
     '''
     def forward(self, x):
         w = self.weight
