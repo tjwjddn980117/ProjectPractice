@@ -10,6 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.optim import Adam
 from torchvision import transforms as utils
 
+from data.datasets import Dataset
 from utils.functions import *
 from utils.version import __version__
 from utils.fid_evaluation import FIDEvaluation
@@ -77,7 +78,7 @@ class Trainer(object):
         # step counter state
         self.step = 0
 
-        # prepare model, dataloader, optimizer with accelerator
+        # prepare model, dataloader, optimizer with acceleratorx1
         self.model, self.opt = self.accelerator.prepare(self.model, self.opt)
 
         # FID-score computation

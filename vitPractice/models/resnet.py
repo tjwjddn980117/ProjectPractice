@@ -11,7 +11,14 @@ import torch.nn.functional as F
 from modeling import np2th
 
 class StdConv2d(nn.Conv2d):
+    '''
+    the for sampling with gaussian. 
+    We can help you update your weights more reliably.
 
+    Inputs:
+        x (tensor): 
+        
+    '''
     def forward(self, x):
         w = self.weight
         v, m = torch.var_mean(w, dim=[1, 2, 3], keepdim=True, unbiased=False)
@@ -30,7 +37,8 @@ def conv1x1(cin, cout, stride=1, bias=False):
                      padding=0, bias=bias)
 
 class PreActBottleneck(nn.Module):
-    """Pre-activation (v2) bottleneck block.
+    """
+    Pre-activation (v2) bottleneck block.
     """
 
     def __init__(self, cin, cout=None, cmid=None, stride=1):
