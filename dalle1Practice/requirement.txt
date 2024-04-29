@@ -6,3 +6,4 @@ pytest
 requests
 torch
 torchvision
+attr_utils
