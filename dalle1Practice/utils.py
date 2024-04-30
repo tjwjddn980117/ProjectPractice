@@ -17,4 +17,27 @@ class Conv2d(nn.Module):
 	device:        torch.device = attr.ib(defa2ult=torch.device('cpu'))
 	requires_grad: bool         = attr.ib(default=False)
 	
-    
+	def __attrs_post_init__(self) -> None:
+		super().__init__()
+
+		w = torch.empty((self.n_out, self.n_in, self.kw, self.kw), dtype=torch.float32,
+			device=self.device, requires_grad=self.requires_grad)
+		w.normal_(std=1 / math.sqrt(self.n_in * self.kw ** 2))
+
+		b = torch.zeros((self.n_out,), dtype=torch.float32, device=self.device,
+			requires_grad=self.requires_grad)
+		self.w, self.b = nn.Parameter(w), nn.Parameter(b)
+
+	def forward(self, x: torch.Tensor) -> torch.Tensor:
+		if self.use_float16 and 'cuda' in self.w.device.type:
+			if x.dtype != torch.float16:
+				x = x.half()
+
+			w, b = self.w.half(), self.b.half()
+		else:
+			if x.dtype != torch.float32:
+				x = x.float()
+
+			w, b = self.w, self.b
+
+		return F.conv2d(x, w, b, padding=(self.kw - 1) // 2)
