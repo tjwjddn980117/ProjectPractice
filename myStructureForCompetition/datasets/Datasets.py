@@ -13,9 +13,6 @@ class CustomDataset(Dataset):
             df (pd.csv): dataframe of csv. 
             path_col (str): the name of column about the information about data paths. 
             mode (str): the mode of dataset. 
-
-        Inputs:
-        
         '''
         self.df = df
         self.path_col = path_col
