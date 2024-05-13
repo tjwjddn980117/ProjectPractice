@@ -3,6 +3,13 @@ from torchvision.transforms import v2 as  transforms
 from torchvision.transforms import RandomAffine, RandomHorizontalFlip, RandomVerticalFlip, ColorJitter
 
 class CustomCollateFn:
+    '''
+    The calss for Collate Function. 
+
+    Arguments:
+        transform (transforms.Compose): Transform functions.
+        mode (str): the mode of datasets. 
+    '''
     def __init__(self, transform, mode):
         self.mode = mode
         self.transform = transform
