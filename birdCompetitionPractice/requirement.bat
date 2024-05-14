@@ -21,6 +21,7 @@ echo start downloading environment for %ENV_NAME%.
 call conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 call conda install -y anaconda::pandas anaconda::scikit-learn anaconda::scipy conda-forge::torchinfo
 pip install --quiet timm pytorch_lightning==1.7.7 torchmetrics==0.11.1
+pip install opencv-python
 pip install transformers
 pip install wandb
 
