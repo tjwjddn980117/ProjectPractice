@@ -2,6 +2,7 @@ pip install pytorch-lightning==1.7.7
 pip install transformers
 pip install timm
 pip install torchmetrics==0.11.1
+pip install opencv-python
 conda install -y anaconda::pandas
 anaconda::scikit-learn
 conda install anaconda::scipy
