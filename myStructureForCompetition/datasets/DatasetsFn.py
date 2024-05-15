@@ -51,3 +51,13 @@ val_transform = transforms.Compose([
 
 train_collate_fn = CustomCollateFn(train_transform, 'train')
 val_collate_fn = CustomCollateFn(val_transform, 'val')
+
+def get_collate_fn():
+    '''
+    The function to get collate function for training and validation. 
+
+    Returns:
+        train_collate_fn (CollateFn): CollateFn for training set.
+        val_collate_fn (CollateFn): CollateFn for validation set. 
+    '''
+    return train_collate_fn, val_collate_fn
