@@ -49,8 +49,14 @@ val_transform = transforms.Compose([
     transforms.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)),
 ])
 
+test_transform = transforms.Compose([
+    transforms.Resize(size=(256,256), interpolation=transforms.InterpolationMode.BICUBIC),
+    transforms.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)),
+])
+
 train_collate_fn = CustomCollateFn(train_transform, 'train')
 val_collate_fn = CustomCollateFn(val_transform, 'val')
+test_collate_fn = CustomCollateFn(test_transform, 'inference')
 
 def get_collate_fn():
     '''
