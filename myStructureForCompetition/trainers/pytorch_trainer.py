@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np
+import os
 from tqdm import tqdm
 import wandb
 
@@ -55,43 +55,18 @@ def valid(val_loader):
         val_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
     wandb.log({"Valid Accuracy": 100. * correct / len(val_loader.dataset), "Valid Loss": val_loss})
+
+    return val_loss
             
-
-# 테스트 함수
-def test():
-    model.eval()
-    test_loss = 0
-    correct = 0
-    with torch.no_grad():
-        for data, target in test_loader:
-            output = model(data)
-            test_loss += criterion(output, target).item() # sum up batch loss
-            pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
-            correct += pred.eq(target.data.view_as(pred)).cpu().sum()
-
-    test_loss /= len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
-    wandb.log({"Test Accuracy": 100. * correct / len(test_loader.dataset), "Test Loss": test_loss})
-
 # 데이터셋을 5개로 분할
 skf = StratifiedKFold(n_splits=CFG.N_SPLIT, random_state=CFG.SEED, shuffle=True)
-
-# MNIST 데이터셋 불러오기
-#full_train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
-#test_dataset = datasets.MNIST('./data', train=False, transform=transform)
-
-# 데이터와 레이블 분리
-#train_data = [data for data, _ in full_train_dataset]
-#train_labels = [label for _, label in full_train_dataset]
 
 train_df = pd.read_csv('./train.csv')
 le = LabelEncoder()
 # just mapping the str to int index. 
 train_df['class'] = le.fit_transform(train_df['label'])
 
-
+# K-fold (StratifiedKFold) method. 
 for fold_idx, (train_index, val_index) in enumerate(skf.split(train_df, train_df['class'])):
     train_fold_df = train_df.loc[train_index,:]
     val_fold_df = train_df.loc[val_index,:]
@@ -113,7 +88,20 @@ for fold_idx, (train_index, val_index) in enumerate(skf.split(train_df, train_df
 
     for epoch in range(CFG.EPOCHS):
         train(epoch, CFG.EPOCHS, train_dataloader, criterion, optimizer)
-        valid(val_dataloader)
+        val_loss = valid(val_dataloader)
+
+        checkpoint_dir = './checkpoints'
+        os.makedirs(checkpoint_dir, exist_ok=True)
+
+        # 모델 가중치 저장
+        checkpoint_path = os.path.join(checkpoint_dir, f'fold{fold_idx}_epoch{epoch}.pt')
+        torch.save(model.state_dict(), checkpoint_path)
+
+        # Validation 성능이 향상될 때마다 가장 좋은 모델 가중치 저장
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            best_checkpoint_path = os.path.join(checkpoint_dir, 'best_model.pt')
+            torch.save(model.state_dict(), best_checkpoint_path)
 
 #test_loader = DataLoader(test_dataset, batch_size=CFG.BATCH_SIZE, shuffle=True)
 #test()
