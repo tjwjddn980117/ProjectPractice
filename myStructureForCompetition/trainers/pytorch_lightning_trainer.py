@@ -1,16 +1,20 @@
 import gc
 import pandas as pd
+import  os
+
 import torch
-import pytorch_lightning as L
+from torch.utils.data import DataLoader
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import StratifiedKFold
-from torch.utils.data import DataLoader
+
+import pytorch_lightning as L
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import timm
 
 from ..utils.config import CFG
+from ..utils.functions import wrap_loader_with_tqdm
 from ..datasets.Datasets import CustomDataset
 from ..datasets.DatasetsFn import train_collate_fn, val_collate_fn
 from ..models.pytorch_lightning_model import LitCustomModel
@@ -22,6 +26,7 @@ train_df['class'] = le.fit_transform(train_df['label'])
 
 skf = StratifiedKFold(n_splits=CFG.N_SPLIT, random_state=CFG.SEED, shuffle=True)
 
+# K-fold (StratifiedKFold) method. 
 for fold_idx, (train_index, val_index) in enumerate(skf.split(train_df, train_df['class'])):
         train_fold_df = train_df.loc[train_index,:]
         val_fold_df = train_df.loc[val_index,:]
@@ -32,8 +37,15 @@ for fold_idx, (train_index, val_index) in enumerate(skf.split(train_df, train_df
         train_dataloader = DataLoader(train_dataset, collate_fn=train_collate_fn, batch_size=CFG.BATCH_SIZE)
         val_dataloader = DataLoader(val_dataset, collate_fn=val_collate_fn, batch_size=CFG.BATCH_SIZE*2)
 
+        train_dataloader = wrap_loader_with_tqdm(train_dataloader)
+        val_dataloader = wrap_loader_with_tqdm(val_dataloader)
+
+        # you should modify this part. 
         model = timm.create_model('eva_large_patch14_196.in22k_ft_in22k_in1k', pretrained=True)
         lit_model = LitCustomModel(model)
+
+        checkpoint_dir = './checkpoints'
+        os.makedirs(checkpoint_dir, exist_ok=True)
 
         checkpoint_callback = ModelCheckpoint(
             monitor='val_score',
