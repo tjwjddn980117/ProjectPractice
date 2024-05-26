@@ -32,7 +32,7 @@ def init_label_encoder(csv_file_path, file_name):
 
 def load_label_encoder(file_name):
     '''
-    this function works for loading encoder of label. 
+    this function works for loading encoder of label.    b   
 
     Inputs:
         file_name (str): the name of saving file. ('2024_bird.pkl')
