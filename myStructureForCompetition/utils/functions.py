@@ -2,6 +2,7 @@ from config import CFG
 import random, os
 import numpy as np
 import torch
+from tqdm import tqdm
 
 def seed_everything(seed):
     '''
@@ -15,4 +16,7 @@ def seed_everything(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
 
-# seed_everything(CFG['SEED'])
+def wrap_loader_with_tqdm(loader):
+    return tqdm(loader, leave=True)
+
+#seed_everything(CFG.SEED)
