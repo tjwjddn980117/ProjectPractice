@@ -24,3 +24,6 @@ class CFG:
     #DATASET_PATH = "/content/drive/MyDrive/Colab Notebooks/dataset"
     #TRAIN_PATH = '/content/drive/MyDrive/Colab Notebooks/dataset/train/'
     #TEST_PATH = '/content/drive/MyDrive/Colab Notebooks/dataset/test'
+
+class WANDB:
+    PROJECT_NAME = 'Example_Wandb'
