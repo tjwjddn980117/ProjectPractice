@@ -20,10 +20,9 @@ class CFG:
     CHANNELS = 3
     IMAGE_SIZE = (224, 224, 3)
     
+    LABEL_ENCODER_NAME = 'test_encoder'
+    WANDB_ID_NAME = 'test_wandb'
     # Define paths
     #DATASET_PATH = "/content/drive/MyDrive/Colab Notebooks/dataset"
     #TRAIN_PATH = '/content/drive/MyDrive/Colab Notebooks/dataset/train/'
     #TEST_PATH = '/content/drive/MyDrive/Colab Notebooks/dataset/test'
-
-class WANDB:
-    PROJECT_NAME = 'Example_Wandb'
