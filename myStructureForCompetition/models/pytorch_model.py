@@ -1,7 +1,6 @@
 from torch import nn
-import pytorch_lightning as L
 
-from sklearn.metrics import f1_score
+from ..utils.config import CFG
 
 class CustomModel(nn.Module):
     def __init__(self, model):
@@ -9,7 +8,7 @@ class CustomModel(nn.Module):
         self.model = model
         self.clf = nn.Sequential(
             nn.SiLU(),
-            nn.LazyLinear(25),
+            nn.LazyLinear(CFG.NUM_CLASSES),
         )
 
     def forward(self, x, label=None):
