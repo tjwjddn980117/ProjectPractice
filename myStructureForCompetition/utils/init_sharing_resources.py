@@ -4,7 +4,7 @@ import wandb
 from sklearn.preprocessing import LabelEncoder
 import joblib
 
-from config import CFG
+from .config import CFG
 
 def init_label_encoder(csv_file_path, file_name):
     '''
@@ -24,6 +24,10 @@ def init_label_encoder(csv_file_path, file_name):
     my_dir = os.path.dirname(os.path.abspath(__file__))
     csv_path = os.path.join(my_dir, csv_file_path)
     save_path = os.path.join(my_dir, file_name)
+
+    if os.path.isfile(save_path+'.pkl'):
+        print(f"Already we have the file about {file_name}")
+        return
 
     csv_df = pd.read_csv(csv_path)
     le = LabelEncoder()
@@ -48,7 +52,7 @@ def load_label_encoder(file_name):
 
     if not os.path.isfile(load_path):
         print(f"There's no file name of {load_path}")
-        return
+        return 
     le = joblib.load(load_path)
 
     return le
@@ -63,14 +67,20 @@ def init_wandb(file_name):
     Returns:
         _ 
     '''
-    # WandB 실행 시작
-    wandb.init(project=CFG.WANDB_ID_NAME)
-    wandb_run_id = wandb.run.id
 
     my_dir = os.path.dirname(os.path.abspath(__file__))
     save_path = os.path.join(my_dir, file_name)
 
     save_path = save_path + '.txt'
+
+    if os.path.isfile(save_path):
+        print(f"Already we have the file about {file_name}")
+        return
+    
+    # WandB 실행 시작
+    wandb.init(project=CFG.WANDB_ID_NAME)
+    wandb_run_id = wandb.run.id
+    
     # 실행 ID를 파일에 저장
     with open(save_path, "w") as f:
         f.write(wandb_run_id)
@@ -110,3 +120,4 @@ def load_wandb_id(file_name):
 
 # init_wandb('test_wandb')
 # load_wandb_id('test_wandb')
+
