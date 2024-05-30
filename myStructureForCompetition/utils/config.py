@@ -22,6 +22,10 @@ class CFG:
     
     LABEL_ENCODER_NAME = 'test_encoder'
     WANDB_ID_NAME = 'test_wandb'
+    
+    PROJECT_PATH = 'C:\\Users\\Seo\\Desktop\\Gits\\ProjectPractice\\myStructureForCompetition\\'
+    CHECKPOINT_PATH = ''
+    
     # Define paths
     #DATASET_PATH = "/content/drive/MyDrive/Colab Notebooks/dataset"
     #TRAIN_PATH = '/content/drive/MyDrive/Colab Notebooks/dataset/train/'
