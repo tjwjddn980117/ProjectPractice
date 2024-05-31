@@ -1,6 +1,6 @@
 from torch import nn
 
-from ..utils.config import CFG
+from utils.config import CFG
 
 class CustomModel(nn.Module):
     def __init__(self, model):
