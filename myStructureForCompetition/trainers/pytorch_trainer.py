@@ -14,6 +14,7 @@ from utils.init_sharing_resources import load_label_encoder, load_wandb_id
 from datasets.Datasets import CustomDataset
 from datasets.DatasetsFn import train_collate_fn, val_collate_fn
 from models.pytorch_model import CustomModel
+from models.pytorch_model_torchvision_swin_transformer import Swin_B32, print_Swin_B32
 
 def train(model, epoch, total_epoch, train_dataloader, criterion, optimizer):
     model.train()
@@ -83,7 +84,8 @@ def trainer():
         val_dataloader = DataLoader(val_dataset, collate_fn=val_collate_fn, batch_size=CFG.BATCH_SIZE*2)
 
         # 모델, 손실함수, 최적화함수 설정
-        model = CustomModel()
+        model = Swin_B32()
+        print_Swin_B32(model)
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(params=model.parameters(), lr=1e-5, weight_decay=5e-4, eps=5e-9)
 
