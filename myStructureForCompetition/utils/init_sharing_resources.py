@@ -4,7 +4,7 @@ import wandb
 from sklearn.preprocessing import LabelEncoder
 import joblib
 
-from .config import CFG
+from utils.config import CFG
 
 def init_label_encoder(csv_file_path, file_name):
     '''
