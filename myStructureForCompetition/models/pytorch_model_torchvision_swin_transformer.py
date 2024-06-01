@@ -55,33 +55,30 @@ def get_swin_b32_model(
         
     return model
 
-# Get ViT model
-vit_backbone = get_swin_b32_model(CFG.DEVICE)
-
-vit_params = {
-    'backbone_model'    : vit_backbone,
-    'name'              : 'Swin-B32',
-    'device'            : CFG.DEVICE
-}
-
-# Generate Model
-vit_model = SwinTransformerModel(**vit_params)
-
-# If using GPU T4 x2 setup, use this:
-if CFG.NUM_DEVICES > 1:
-    vit_model = nn.DataParallel(vit_model)
-
-# View model summary
-summary(
-    model=vit_model, 
-    input_size=(CFG.BATCH_SIZE, CFG.CHANNELS, CFG.WIDTH, CFG.HEIGHT),
-    col_names=["input_size", "output_size", "num_params", "trainable"],
-    col_width=20,
-    row_settings=["var_names"]
-)
-
 def Swin_B32():
+    # Get ViT model
+    vit_backbone = get_swin_b32_model(CFG.DEVICE)
+    
+    vit_params = {
+        'backbone_model'    : vit_backbone,
+        'name'              : 'Swin-B32',
+        'device'            : CFG.DEVICE
+    }
+    
+    # Generate Model
+    vit_model = SwinTransformerModel(**vit_params)
+    
+    # If using GPU T4 x2 setup, use this:
+    if CFG.NUM_DEVICES > 1:
+        vit_model = nn.DataParallel(vit_model)
     return vit_model
 
-def print_Swin_B32():
-    return summary
+def print_Swin_B32(model):
+    # View model summary
+    summary(
+        model=model, 
+        input_size=(CFG.BATCH_SIZE, CFG.CHANNELS, CFG.WIDTH, CFG.HEIGHT),
+        col_names=["input_size", "output_size", "num_params", "trainable"],
+        col_width=20,
+        row_settings=["var_names"]
+    )
