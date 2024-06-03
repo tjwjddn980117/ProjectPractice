@@ -3,7 +3,7 @@ from torch import nn
 import torchvision
 from torchinfo import summary
 
-from ..utils.config import CFG
+from utils.config import CFG
 
 class SwinTransformerModel(nn.Module):
     def __init__(self, backbone_model, name='swin-transformer', 
