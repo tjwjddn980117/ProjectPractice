@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from utils.config import CFG
 from utils.init_sharing_resources import load_label_encoder, load_wandb_id
 from datasets.Datasets import CustomDataset
-from myStructureForCompetition.datasets.DatasetsFn import train_collate_fn, val_collate_fn
+from datasets.DatasetsFn import train_collate_fn, val_collate_fn
 from models.pytorch_model import CustomModel
 from models.pytorch_model_torchvision_swin_transformer import Swin_B32, print_Swin_B32
 
