@@ -18,23 +18,16 @@ class CustomCollateFn:
         if self.mode=='train':
             pixel_values = torch.stack([self.transform(data['image']) for data in batch])
             label = torch.LongTensor([data['label'] for data in batch])
-            return {
-                'pixel_values':pixel_values,
-                'label':label,
-            }
+            return pixel_values, label
         elif self.mode=='val':
             pixel_values = torch.stack([self.transform(data['image']) for data in batch])
             label = torch.LongTensor([data['label'] for data in batch])
-            return {
-                'pixel_values':pixel_values,
-                'label':label,
-            }
+            return pixel_values, label
         elif self.mode=='inference':
             pixel_values = torch.stack([self.transform(data['image']) for data in batch])
-            return {
-                'pixel_values':pixel_values,
-            }
+            return pixel_values
         
+
 train_transform = transforms.Compose([
     transforms.Resize(size=(196,196), interpolation=transforms.InterpolationMode.BICUBIC),
     RandomAffine(degrees=30, translate=(0.2, 0.2), scale=(0.8, 1.2)),
