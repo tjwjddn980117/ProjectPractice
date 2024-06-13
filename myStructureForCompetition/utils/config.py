@@ -15,10 +15,10 @@ class CFG:
     LR = 0.001
     APPLY_SHUFFLE = True
     SEED = 768
-    HEIGHT = 224
-    WIDTH = 224
+    HEIGHT = 256
+    WIDTH = 256
     CHANNELS = 3
-    IMAGE_SIZE = (224, 224, 3)
+    IMAGE_SIZE = (256, 256, 3)
     
     LABEL_ENCODER_NAME = 'test_encoder'
     WANDB_ID_NAME = 'test_wandb'
