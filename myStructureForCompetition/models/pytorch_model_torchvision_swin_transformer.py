@@ -52,7 +52,6 @@ def get_swin_b32_model(
     # Freeze Model Parameters
     for param in model.parameters():
         param.requires_grad = False
-        
     return model
 
 def Swin_B32():
@@ -71,6 +70,7 @@ def Swin_B32():
     # If using GPU T4 x2 setup, use this:
     if CFG.NUM_DEVICES > 1:
         vit_model = nn.DataParallel(vit_model)
+
     return vit_model
 
 def print_Swin_B32(model):
