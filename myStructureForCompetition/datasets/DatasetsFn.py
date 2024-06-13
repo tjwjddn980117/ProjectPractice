@@ -2,6 +2,8 @@ import torch
 from torchvision.transforms import v2 as  transforms
 from torchvision.transforms import RandomAffine, RandomHorizontalFlip, RandomVerticalFlip, ColorJitter
 
+from utils.config import CFG
+
 class CustomCollateFn:
     '''
     The calss for Collate Function. 
@@ -29,7 +31,7 @@ class CustomCollateFn:
         
 
 train_transform = transforms.Compose([
-    transforms.Resize(size=(196,196), interpolation=transforms.InterpolationMode.BICUBIC),
+    transforms.Resize(size=(CFG.WIDTH,CFG.HEIGHT), interpolation=transforms.InterpolationMode.BICUBIC),
     RandomAffine(degrees=30, translate=(0.2, 0.2), scale=(0.8, 1.2)),
     RandomHorizontalFlip(p=0.5),
     ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
@@ -38,12 +40,12 @@ train_transform = transforms.Compose([
 ])
 
 val_transform = transforms.Compose([
-    transforms.Resize(size=(196,196), interpolation=transforms.InterpolationMode.BICUBIC),
+    transforms.Resize(size=(CFG.WIDTH,CFG.HEIGHT), interpolation=transforms.InterpolationMode.BICUBIC),
     transforms.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)),
 ])
 
 test_transform = transforms.Compose([
-    transforms.Resize(size=(256,256), interpolation=transforms.InterpolationMode.BICUBIC),
+    transforms.Resize(size=(CFG.WIDTH,CFG.HEIGHT), interpolation=transforms.InterpolationMode.BICUBIC),
     transforms.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)),
 ])
 
