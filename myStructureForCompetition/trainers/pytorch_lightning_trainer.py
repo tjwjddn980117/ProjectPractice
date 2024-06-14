@@ -13,12 +13,12 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import timm
 
-from ..utils.config import CFG
-from ..utils.init_sharing_resources import load_label_encoder, load_wandb_id
-from ..utils.functions import wrap_loader_with_tqdm
-from ..datasets.Datasets import CustomDataset
-from ..datasets.DatasetsFn import train_collate_fn, val_collate_fn
-from ..models.pytorch_lightning_model import LitCustomModel
+from utils.config import CFG
+from utils.init_sharing_resources import load_label_encoder, load_wandb_id
+from utils.functions import wrap_loader_with_tqdm
+from datasets.Datasets import CustomDataset
+from datasets.DatasetsFn import train_collate_fn, val_collate_fn
+from models.pytorch_lightning_model import LitCustomModel
 
 def trainer():
     train_df = pd.read_csv('./train.csv')
