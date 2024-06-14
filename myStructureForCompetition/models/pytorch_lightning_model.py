@@ -4,7 +4,7 @@ import pytorch_lightning as L
 
 from sklearn.metrics import f1_score
 
-from ..utils.config import CFG
+from utils.config import CFG
 
 class CustomModel(nn.Module):
     def __init__(self, model):
@@ -16,7 +16,7 @@ class CustomModel(nn.Module):
         )
 
     def forward(self, x, label=None):
-        x = self.model(x)
+        x = self.model(x).pooler_output
         logits = self.clf(x)
         loss = None
         if label is not None:
