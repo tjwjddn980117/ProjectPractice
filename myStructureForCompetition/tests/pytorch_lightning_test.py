@@ -12,12 +12,12 @@ from tqdm.auto import tqdm
 from torch.utils.data import DataLoader
 from transformers import Swinv2Config, Swinv2Model, AutoImageProcessor, AutoModelForImageClassification
 
-from ..utils.config import CFG
-from ..utils.functions import wrap_loader_with_tqdm
-from ..datasets.Datasets import CustomDataset
-from ..datasets.DatasetsFn import test_collate_fn
-from ..models.pytorch_lightning_model import LitCustomModel
-from ..trainers.pytorch_lightning_trainer import le
+from utils.config import CFG
+from utils.functions import wrap_loader_with_tqdm
+from datasets.Datasets import CustomDataset
+from datasets.DatasetsFn import test_collate_fn
+from models.pytorch_lightning_model import LitCustomModel
+from trainers.pytorch_lightning_trainer import le
 
 test_df = pd.read_csv('./data/test.csv')
 test_df['img_path'] = test_df['img_path'].apply(lambda x: os.path.join('./data', x))
