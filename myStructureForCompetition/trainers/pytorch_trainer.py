@@ -15,6 +15,7 @@ from datasets.Datasets import CustomDataset
 from datasets.DatasetsFn import train_collate_fn, val_collate_fn
 from models.pytorch_model import CustomModel
 from models.pytorch_model_torchvision_swin_transformer import Swin_B32, print_Swin_B32
+import timm
 
 
 def train(model, epoch, total_epoch, train_dataloader, criterion, optimizer):
@@ -40,7 +41,7 @@ def train(model, epoch, total_epoch, train_dataloader, criterion, optimizer):
         # tqdm의 설명 부분을 업데이트
         progress_bar.set_postfix(loss=running_loss/(i+1), accuracy=100.*correct/total)
         # wandb에 손실 및 정확도 로깅
-        wandb.log({"Train Loss": running_loss/(i+1), "Train Accuracy": 100.*correct/total})
+        # wandb.log({"Train Loss": running_loss/(i+1), "Train Accuracy": 100.*correct/total})
     # 에포크 완료 후 출력
     print(f"Epoch {epoch}, Loss: {running_loss/len(train_dataloader):.4f}, Accuracy: {correct/total:.4f}")
     wandb.log({"Epoch": epoch, "Loss": running_loss/len(train_dataloader), "Accuracy": correct/total})
@@ -97,13 +98,17 @@ def trainer(load_file=False):
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(params=model.parameters(), lr=1e-5, weight_decay=5e-4, eps=5e-9)
 
+        # 더미 배치를 사용하여 파라미터 초기화
+        dummy_input = torch.randn(CFG.BATCH_SIZE, CFG.CHANNELS, CFG.WIDTH, CFG.HEIGHT).to(device=CFG.DEVICE)  # 입력 텐서 크기 조정 필요
+        model(dummy_input)  # forward 호출로 파라미터 초기화
+
         if load_file:
             model.load_state_dict(torch.load(''))
         # wandb에 모델, 최적화 함수 로그
         wandb.watch(model, log="all")
         wandb.config.update({"Optimizer": "ADAM", "Learning Rate": 0.01, "Momentum": 0.5})
 
-        best_val_loss = 0
+        best_val_loss = float('inf')
         for epoch in range(CFG.EPOCHS):
             train(model, epoch, CFG.EPOCHS, train_dataloader, criterion, optimizer)
             val_loss = valid(model, val_dataloader, criterion)
@@ -118,7 +123,7 @@ def trainer(load_file=False):
             # Validation 성능이 향상될 때마다 가장 좋은 모델 가중치 저장
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
-                best_checkpoint_path = os.path.join(checkpoint_dir, 'best_model.pt')
+                best_checkpoint_path = os.path.join(checkpoint_dir, 'best_epoch.pt')
                 torch.save(model.state_dict(), best_checkpoint_path)
 
     #test_loader = DataLoader(test_dataset, batch_size=CFG.BATCH_SIZE, shuffle=True)
