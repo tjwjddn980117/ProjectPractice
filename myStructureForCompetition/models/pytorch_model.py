@@ -1,6 +1,8 @@
+import torch
 from torch import nn
 
 from utils.config import CFG
+from utils.check_missing_value import zero_filtering
 
 class CustomModel(nn.Module):
     def __init__(self, model):
@@ -17,5 +19,8 @@ class CustomModel(nn.Module):
         loss = None
         if label is not None:
             loss = nn.CrossEntropyLoss()(logits, label)
-        probs = nn.LogSoftmax(dim=-1)(logits)
-        return probs, loss
+        
+        probs = nn.functional.softmax(logits, dim=-1)
+        probs = zero_filtering(probs)
+        log_probs = torch.log(probs)
+        return log_probs, loss
