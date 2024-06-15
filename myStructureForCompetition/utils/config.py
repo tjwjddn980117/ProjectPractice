@@ -9,16 +9,16 @@ class CFG:
     N_SPLIT = 5
     EPOCHS = 16
     BATCH_SIZE = (
-        32 if torch.cuda.device_count() < 2 
-        else (32 * torch.cuda.device_count())
+        18 if torch.cuda.device_count() < 2 
+        else (18 * torch.cuda.device_count())
     )
     LR = 0.001
     APPLY_SHUFFLE = True
     SEED = 768
-    HEIGHT = 256
-    WIDTH = 256
+    HEIGHT = 196
+    WIDTH = 196
     CHANNELS = 3
-    IMAGE_SIZE = (256, 256, 3)
+    IMAGE_SIZE = (196, 196, 3)
     
     LABEL_ENCODER_NAME = 'test_encoder'
     WANDB_ID_NAME = 'test_wandb'
