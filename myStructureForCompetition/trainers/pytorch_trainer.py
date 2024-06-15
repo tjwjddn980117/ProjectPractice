@@ -28,7 +28,7 @@ def train(model, epoch, total_epoch, train_dataloader, criterion, optimizer):
         data = data.to(CFG.DEVICE)
         target = target.to(CFG.DEVICE)
         optimizer.zero_grad()
-        output = model(data)
+        output, _ = model(data)
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
@@ -55,7 +55,7 @@ def valid(model, val_loader, criterion):
         for data, target in val_loader:
             data = data.to(CFG.DEVICE)
             target = target.to(CFG.DEVICE)
-            output = model(data)
+            output, _ = model(data)
             val_loss += criterion(output, target).item() # sum up batch loss
             pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
@@ -93,7 +93,7 @@ def trainer(load_file=False):
         val_dataloader = DataLoader(val_dataset, collate_fn=val_collate_fn, batch_size=CFG.BATCH_SIZE*2)
 
         # 모델, 손실함수, 최적화함수 설정
-        model = Swin_B32().to(CFG.DEVICE)
+        model = CustomModel(Swin_B32().to(CFG.DEVICE)).to(CFG.DEVICE)
         print_Swin_B32(model)
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(params=model.parameters(), lr=1e-5, weight_decay=5e-4, eps=5e-9)
