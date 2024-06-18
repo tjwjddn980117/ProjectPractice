@@ -17,4 +17,4 @@ init_wandb(CFG.WANDB_ID_NAME)
 
 torch.autograd.set_detect_anomaly(True)
 
-trainer()
+trainer(load_file='C:\\Users\\Seo\\Desktop\\Gits\\ProjectPractice\\myStructureForCompetition\\checkpoints\\fold0_epoch6.pt')
