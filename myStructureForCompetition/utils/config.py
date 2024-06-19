@@ -7,7 +7,7 @@ class CFG:
     NUM_WORKERS = os.cpu_count()
     NUM_CLASSES = 25
     N_SPLIT = 5
-    EPOCHS = 16
+    EPOCHS = 20
     BATCH_SIZE = (
         18 if torch.cuda.device_count() < 2 
         else (18 * torch.cuda.device_count())
