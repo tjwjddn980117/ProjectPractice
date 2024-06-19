@@ -23,14 +23,20 @@ def train(model, epoch, total_epoch, train_dataloader, criterion, optimizer):
     running_loss = 0.0
     correct = 0
     total = 0
+    clip_value = 1.0
     progress_bar = tqdm(enumerate(train_dataloader), total=len(train_dataloader), desc=f"Epoch {epoch}/{total_epoch}")
     for i, (data, target) in progress_bar:
         data = data.to(CFG.DEVICE)
         target = target.to(CFG.DEVICE)
         optimizer.zero_grad()
-        output, _ = model(data)
+        output, _, check= model(data)
+        #if check:
+        #    print(f'\n!!!there has a Nan!!\n{output} \n {target}')
         loss = criterion(output, target)
+        #if check:
+        #    print(f'\n!!!there has a Nan!!\n{loss}')
         loss.backward()
+        # torch.nn.utils.clip_grad_value_(model.parameters(), clip_value) 
         optimizer.step()
 
          # 손실 및 정확도 계산
@@ -55,7 +61,7 @@ def valid(model, val_loader, criterion):
         for data, target in val_loader:
             data = data.to(CFG.DEVICE)
             target = target.to(CFG.DEVICE)
-            output, _ = model(data)
+            output, _, _ = model(data)
             val_loss += criterion(output, target).item() # sum up batch loss
             pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
@@ -69,6 +75,10 @@ def valid(model, val_loader, criterion):
     return val_loss
 
 def trainer(load_file=False):
+    '''
+    Arguments:
+        load_file (str): 
+    '''
     # 데이터셋을 5개로 분할
     skf = StratifiedKFold(n_splits=CFG.N_SPLIT, random_state=CFG.SEED, shuffle=True)
 
@@ -103,7 +113,7 @@ def trainer(load_file=False):
         model(dummy_input)  # forward 호출로 파라미터 초기화
 
         if load_file:
-            model.load_state_dict(torch.load(''))
+            model.load_state_dict(torch.load(load_file))
         # wandb에 모델, 최적화 함수 로그
         wandb.watch(model, log="all")
         wandb.config.update({"Optimizer": "ADAM", "Learning Rate": 0.01, "Momentum": 0.5})
