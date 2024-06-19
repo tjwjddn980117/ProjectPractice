@@ -4,6 +4,7 @@ import torchvision
 from torchinfo import summary
 
 from utils.config import CFG
+from utils.check_missing_value import zero_filtering, check_nan, nan_filtering
 
 class SwinTransformerModel(nn.Module):
     def __init__(self, backbone_model, name='swin-transformer', 
@@ -25,8 +26,16 @@ class SwinTransformerModel(nn.Module):
         ).to(device)
         
     def forward(self, image):
+        if check_nan(image):
+            image = nan_filtering(image)
+            print('\n there has some Nan data in input image. ')
         vit_output = self.backbone_model(image)
-        return self.classifier(vit_output)
+        if check_nan(vit_output):
+            print('\n there has some Nan data in vit_output. ')
+        output = self.classifier(vit_output)
+        if check_nan(vit_output):
+            print('\n there has some Nan data in output. ')
+        return output
 
 def get_swin_b32_model(
     device: torch.device=CFG.NUM_CLASSES) -> nn.Module:
