@@ -105,7 +105,6 @@ def evaluation(model, iterator, criterion):
                     pass
             total_bleu = sum(total_bleu) / len(total_bleu)
             batch_bleu.append(total_bleu)
-
     batch_bleu = sum(batch_bleu) / len(batch_bleu)
     return epoch_loss / len(iterator), batch_bleu
 
