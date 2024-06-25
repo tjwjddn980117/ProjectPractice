@@ -49,7 +49,10 @@ def get_data_loader(file_name):
 
 def pad_or_truncate(tokenized_text):
     '''
-    m
+    make the tokenized_text with defined 'seq_len' for same input/output size.
+
+    Inputs:
+        tokenized_text (list): tokenized sequence. 
 
     '''
     if len(tokenized_text) < seq_len:
