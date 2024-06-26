@@ -54,7 +54,7 @@ def pad_or_truncate(tokenized_text):
     Inputs:
         tokenized_text (list): [B, unknown lenght]. only tokenized sequence. 
 
-    Outputs:
+    Returns:
         tokenized_text (list): [B, seq_len]. tokenized sequence with fixed length. 
     '''
     if len(tokenized_text) < seq_len:
@@ -67,6 +67,15 @@ def pad_or_truncate(tokenized_text):
     return tokenized_text
 
 def process_src(text_list):
+    '''
+    processing the src. put the 'eos_id' into tokenized src sequence.
+
+    Inputs:
+        text_list (list): unprocessed sequence. 
+    
+    Returns:
+        tokenized_list (list): sequence with tokenized + eos_id. 
+    '''
     tokenized_list = []
     for text in tqdm(text_list):
         tokenized = src_sp.EncodeAsIds(text.strip())
@@ -75,6 +84,16 @@ def process_src(text_list):
     return tokenized_list
 
 def process_trg(text_list):
+    '''
+    processing the trg. put the 'sos_id'/'eos_id' into tokenized trg sequence.
+
+    Inputs:
+        text_list (list): unprocessed sequence. 
+    
+    Returns:
+        input_tokenized_list (list): sequence with sos_id + tokenized. 
+        output_tokenized_list (list): sequence with tokenized + eos_id. 
+    '''
     input_tokenized_list = []
     output_tokenized_list = []
     for text in tqdm(text_list):
@@ -87,7 +106,18 @@ def process_trg(text_list):
     return input_tokenized_list, output_tokenized_list
 
 class CustomDataset(Dataset):
+    '''
+    CustomDataset for src_data / input_trg_data / output_trg_data. 
+    '''
     def __init__(self, src_list, input_trg_list, output_trg_list):
+        '''
+        CustomDataset for src_data / input_trg_data / output_trg_data. 
+
+        Outputs:
+            src_data (tensor): [B, seq_len]. src_tokenized + eos_id. 
+            input_trg_data (tensor): [B, seq_len]. sos_id + src_tokenized. 
+            output_trg_data (tensor): [B, seq_len]. src_tokenized + eos_id. 
+        '''
         super(CustomDataset).__init__()
         self.src_data = torch.LongTensor(src_list)
         self.input_trg_data = torch.LongTensor(input_trg_list)
@@ -97,6 +127,13 @@ class CustomDataset(Dataset):
         assert np.shape(input_trg_list) == np.shape(output_trg_list), "The shape of input_trg_list and output_trg_list are different."
 
     def make_mask(self):
+        '''
+        making mask for input data. 
+
+        Returns:
+            e_mask (tensor[bool]): [B, 1, L]. make pad_id to FALSE and just unsqueeze the tensor.
+            d_mask (tensor[bool]): [B, L, L]. make pad_id to FALSE and make each sequence a triangular matrix so that only the previous information is remembered for the input.
+        '''
         e_mask = (self.src_data != pad_id).unsqueeze(1) # (num_samples, 1, L)
         d_mask = (self.input_trg_data != pad_id).unsqueeze(1) # (num_samples, 1, L)
         nopeak_mask = torch.ones([1, seq_len, seq_len], dtype=torch.bool) # (1, L, L)
