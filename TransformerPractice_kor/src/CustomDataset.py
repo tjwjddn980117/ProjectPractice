@@ -52,8 +52,10 @@ def pad_or_truncate(tokenized_text):
     make the tokenized_text with defined 'seq_len' for same input/output size.
 
     Inputs:
-        tokenized_text (list): tokenized sequence. 
+        tokenized_text (list): [B, unknown lenght]. only tokenized sequence. 
 
+    Outputs:
+        tokenized_text (list): [B, seq_len]. tokenized sequence with fixed length. 
     '''
     if len(tokenized_text) < seq_len:
         left = seq_len - len(tokenized_text)
