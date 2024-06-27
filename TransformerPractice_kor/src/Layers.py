@@ -166,9 +166,18 @@ class MultiheadAttention(nn.Module):
 
 class FeedFowardLayer(nn.Module):
     '''
-    Layer 
+    Layer for Feed Forward. 
     '''
     def __init__(self):
+        '''
+        Layer for Feed Forward. 
+
+        Inputs:
+            x (tensor): [B, L, d_model]. 
+
+        Returns:
+            x (tensor): [B, L, d_model]. 
+        '''
         super().__init__()
         self.linear_1 = nn.Linear(d_model, d_ff, bias=True)
         self.relu = nn.ReLU()
@@ -184,7 +193,19 @@ class FeedFowardLayer(nn.Module):
 
 
 class LayerNormalization(nn.Module):
+    '''
+    Layer for Layer-Normalization. 
+    '''
     def __init__(self, eps=1e-6):
+        '''
+        Layer for Layer-Normalization. 
+
+        Inputs:
+            x (tensor): [B, L, d_model]. 
+
+        Returns:
+            x (tensor): [B, L, d_model]. 
+        '''
         super().__init__()
         self.eps = eps
         self.layer = nn.LayerNorm([d_model], elementwise_affine=True, eps=self.eps)
@@ -196,7 +217,19 @@ class LayerNormalization(nn.Module):
 
 
 class PositionalEncoder(nn.Module):
+    '''
+    Layer for Positional Encoder. 
+    '''
     def __init__(self):
+        '''
+        Layer for Positional Encoder. 
+
+        Inputs:
+            x (tensor): [B, L, d_model]. 
+
+        Returns:
+            x (tensor): [B, L, d_model]. 
+        '''
         super().__init__()
         # Make initial positional encoding matrix with 0
         pe_matrix= torch.zeros(seq_len, d_model) # (L, d_model)
