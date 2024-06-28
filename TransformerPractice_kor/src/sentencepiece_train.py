@@ -46,6 +46,9 @@ def train_sp(is_src=True):
     spm.SentencePieceTrainer.Train(config)
     
 def split_data(raw_data_name, data_dir):
+    '''
+    
+    '''
     with open(f"{DATA_DIR}/{raw_data_name}") as f:
         lines = f.readlines()    
     
