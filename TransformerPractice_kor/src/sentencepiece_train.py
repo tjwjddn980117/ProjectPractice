@@ -7,6 +7,9 @@ import sentencepiece as spm
 train_frac = 0.8
 
 def train_sp(is_src=True):
+    '''
+    
+    '''
     template = "--input={} \
                 --pad_id={} \
                 --bos_id={} \
