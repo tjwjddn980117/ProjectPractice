@@ -8,6 +8,10 @@ train_frac = 0.8
 
 def train_sp(is_src=True):
     '''
+    function for training the spm the sentences. 'this_model_prefix' will be the information about spm. 
+
+    Inputs:
+        is_src (bool): check the file with SRC/RAW. 
     
     '''
     template = "--input={} \
@@ -47,7 +51,11 @@ def train_sp(is_src=True):
     
 def split_data(raw_data_name, data_dir):
     '''
-    
+    split data with valid set and train set. 
+
+    Inputs:
+        raw_data_name (str): the name of raw_data file. ex) 'raw_data.src', 'raw_data.trg'
+        data_dir (str): the name of data dir that save the split data of valid sets and train sets. 
     '''
     with open(f"{DATA_DIR}/{raw_data_name}") as f:
         lines = f.readlines()    
