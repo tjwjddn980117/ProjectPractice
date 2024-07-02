@@ -18,6 +18,8 @@ class Manager():
     def __init__(self, is_train=True, ckpt_name=None):
         # Load vocabs
         print("Loading vocabs...")
+        # src_i2w : src vocabs dictionary. 
+        # trg_i2w : trg vocabs dictionary. 
         self.src_i2w = {}
         self.trg_i2w = {}
 
