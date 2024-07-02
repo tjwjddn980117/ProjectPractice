@@ -16,6 +16,9 @@ def get_data_loader(file_name):
     get the data with 'file_name', then return with DataLoader. 
     data will open with /DATA_DIR/SRC_DIR/file_name and /DATA_DIR/TRG_DIR/file_name. 
 
+    'src_sp.Load' and 'trg_sp.Load' get the pretrained SentencePieceProcessor. 
+    Load the pretrained model and get the tokenizers of datasets.
+
     Inputs:
         file_name (str): the name of input file name. 
     
