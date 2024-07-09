@@ -108,7 +108,7 @@ def process_trg(text_list):
 
     return input_tokenized_list, output_tokenized_list
 
-class CustomDataset(Dataset):
+class CustomDataset(Dataset): 
     '''
     CustomDataset for src_data / input_trg_data / output_trg_data. 
     '''
