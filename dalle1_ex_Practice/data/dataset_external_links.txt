@@ -1,0 +1,6 @@
+mnist_test.csv and mnist_train.csv come from kaggle. 
+these csv work for making mnist data with 'utils/extract_mnist_images.py'
+the mnist_test.csv and mnist_train.csv should location with 'data/mnist_test.csv' and 'data/mnist_train.csv'
+https://www.kaggle.com/datasets/oddrationale/mnist-in-csv?resource=download&select=mnist_train.csv
+https://drive.google.com/drive/folders/1BFvI2lrsE_-mH3GFvdr3dXw9YaqG2mio?usp=drive_link
+
