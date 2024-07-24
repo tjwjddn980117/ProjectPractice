@@ -107,6 +107,11 @@ class MnistVisualLanguageDataset(Dataset):
         digit_name (int/str): name of MNIST number. (0 ~ 9)
         digit_image (str): path of MNIST image. (train/images/'digit_name'/____.png)
         digit_color (str): color of MNIST number. 
+
+        Outputs:
+            image (tensor): [C, X, X]. the image tensor range with (-1 ~ 1). 
+            text_tokens (tensor[long]): the tensor about index of word. 
+            text (str): the sequence of word. 
         '''
         entry = self.visual_language_db[index]
         # background_type : solid / texture. 
@@ -133,9 +138,12 @@ class MnistVisualLanguageDataset(Dataset):
         else:
             text = self.generation_text_format_tokens_drop_color.format(entry['digit_name'])
         
+        # ex) text_tokens = [0, 6, 7, 9, 10, 1, 1, 1, 1, 1, 1, 1, 1, 2] 
         text_tokens = [self.vocab_word_to_idx[word] for word in text.split(' ')]
+        # ex) text_tokens = tensor([ 0,  6,  7,  9, 10,  1,  1,  1,  1,  1,  1,  1,  1,  2]) 
         text_tokens = torch.LongTensor(text_tokens)
         
+        # digit_im is MNIST img. 
         digit_im = cv2.imread(os.path.join(self.db_root, entry['digit_image']))
         digit_im = cv2.cvtColor(digit_im, cv2.COLOR_BGR2RGB)
         digit_im = cv2.resize(digit_im, (self.im_size, self.im_size))
@@ -161,6 +169,7 @@ class MnistVisualLanguageDataset(Dataset):
             im[:, :, 2] = 255*back_color_scale[2]
         out_im = mask_val * digit_im + (1 - mask_val) * im
         im_tensor = torch.from_numpy(out_im).permute((2, 0, 1))
+        # make im_tensor from (0 ~ 255) to (-1 ~ 1)
         im_tensor = 2 * (im_tensor / 255) - 1
         return {
             "image" : im_tensor,
