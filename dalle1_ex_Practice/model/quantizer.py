@@ -17,6 +17,10 @@ class Quantizer(nn.Module):
         #  and embedding it with N*N pictures as many as the number of embedding_dim 
         #  should be understood that this is the process of embedding itself to a picture.
         # 
+        # Let's say there are n (h*w) image channels.
+        #  If we proceed internally with these as (n*d) matrices,
+        #  each of the n embedding factors is multiplied by n (h*w) according to the d embedding vector.
+        #  That is, n (h*w) images are multiplied by n embedding factors, which are d. This results in d (h*w) images.
         sampled = einsum(one_hot, self.embedding.weight, 'b n h w, n d -> b d h w')
 
         # Compute kl loss
