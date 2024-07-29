@@ -11,7 +11,6 @@ class DiscreteVAE(nn.Module):
         self.quantizer = Quantizer(num_embeddings=num_embeddings, embedding_dim=embedding_dim)
         self.decoder = Decoder(embedding_dim=embedding_dim)
     
-    
     def get_codebook_indices(self, x):
         # x.shape = B,C,H,W
         enc_logits = self.encoder(x)
@@ -28,5 +27,3 @@ class DiscreteVAE(nn.Module):
         quant_output, kl, logits, log_qy = self.quantizer(enc)
         out = self.decoder(quant_output)
         return out, kl, log_qy
-
-    
