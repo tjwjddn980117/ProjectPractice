@@ -25,4 +25,4 @@ call pip install pytorch-fid
 
 call conda deactivate
 
-echo complete. 
+echo complete.
