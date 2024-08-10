@@ -28,10 +28,10 @@ def linear_beta_schedule(timesteps):
     """
     linear schedule, proposed in original ddpm paper.
 
-    Arguments:
+    Arguments: 
         timesteps (int): full time steps. 
     
-    Returns:
+    Returns: 
         _ (tensor): [timesteps]. 
     """
     scale = 1000 / timesteps
