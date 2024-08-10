@@ -518,7 +518,7 @@ class GaussianDiffusion(nn.Module):
 
         noise = default(noise, lambda: torch.randn_like(x_start))
 
-        # offset noise - https://www.crosslabs.org/blog/diffusion-with-offset-noise
+        # offset noise - https://www.crosslabs.org/blog/diffusion-with-offset-noise 
 
         offset_noise_strength = default(offset_noise_strength, self.offset_noise_strength)
 
@@ -526,7 +526,7 @@ class GaussianDiffusion(nn.Module):
             offset_noise = torch.randn(x_start.shape[:2], device = self.device)
             noise += offset_noise_strength * rearrange(offset_noise, 'b c -> b c 1 1')
 
-        # noise sample
+        # noise sample 
         x = self.q_sample(x_start = x_start, t = t, noise = noise)
 
         # if doing self-conditioning, 50% of the time, predict x_start from current set of times
