@@ -120,23 +120,23 @@ class Decoder(nn.Module):
     def __init__(self, embedding_dim, num_hiddens, num_upsampling_layers, num_residual_layers, num_residual_hiddens):
         super(Decoder, self).__init__()
         '''
-        The block for Decoding.
-            1. Convolutian.
-            2. ResidualStack.
-            3. up sampling.
+        The block for Decoding. 
+            1. Convolutian. 
+            2. ResidualStack. 
+            3. up sampling. 
 
         Arguments:
-            embedding_dim (int): number of input embedding.
-            num_hiddens (int): number of out_channels. (ResidualStack's input_channels).
-            num_upsampling_layers (int): depth of decoder layers.
-            num_residual_layers (int): depth of residual_layers. (ResidualStack's depth).
-            num_residual_hiddens (int): num or final out_channles. (ResidualStack's output_channels).
+            embedding_dim (int): number of input embedding. 
+            num_hiddens (int): number of out_channels. (ResidualStack's input_channels). 
+            num_upsampling_layers (int): depth of decoder layers. 
+            num_residual_layers (int): depth of residual_layers. (ResidualStack's depth). 
+            num_residual_hiddens (int): num or final out_channles. (ResidualStack's output_channels). 
         
         Inputs:
-            [B, embedding_dim, H/2^num_upsampling_layers, W/2^upsampling_layers].
+            [B, embedding_dim, H/2^num_upsampling_layers, W/2^upsampling_layers]. 
 
         Ouputs:
-            [B, 3, H, W].
+            [B, 3, H, W]. 
 
         '''
         self.conv = nn.Conv2d(
