@@ -5,12 +5,12 @@ from torch import nn
 class ResidualStack(nn.Module):
     def __init__(self, num_hiddens, num_residual_layers, num_residual_hiddens):
         '''
-        The block for residual Stack.
+        The block for residual Stack. 
         
         Arguments:
-            num_hiddens(int): number of input channels.
-            num_residual_layers(int): depth of residual_layers.
-            num_residual_hiddens(int): number or output chahnnels.
+            num_hiddens(int): number of input channels. 
+            num_residual_layers(int): depth of residual_layers. 
+            num_residual_hiddens(int): number or output chahnnels. 
 
         Inputs:
             [B, num_hiddens, H, W].
