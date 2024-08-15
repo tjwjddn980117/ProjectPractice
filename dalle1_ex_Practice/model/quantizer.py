@@ -13,6 +13,7 @@ class Quantizer(nn.Module):
 
         Arguments:
             num_embeddings (int): the number of embeddings (channels). 
+            embedding_dim (int): 
         '''
         super(Quantizer, self).__init__()
         
