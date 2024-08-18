@@ -55,7 +55,10 @@ class VectorQuantizer(nn.Module):
 
         Arguments:
             embedding_dim(int): dimention of each embedding.
-            num_embeddings(int): number of embeddings. you can think it to the number of words in dictionary.
+            num_embeddings(int): number of embeddings. you can think it to the number of words in dictionary. 
+            use_ema (bool): the bool type for checking use ema. 
+            decay ( ): the parammeter using with SonnetEMA.
+            epsilon ( ): the parammeter using in equation. 
         
         Inputs:
             x(Tensor): [B, embedding_dim, H', W'].
