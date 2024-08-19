@@ -51,13 +51,13 @@ class SonnetExponentialMovingAverage(nn.Module):
 class VectorQuantizer(nn.Module):
     def __init__(self, embedding_dim, num_embeddings, use_ema, decay, epsilon):
         '''
-        This is VectorQuantizer
+        This is VectorQuantizer. 
 
         Arguments:
-            embedding_dim(int): dimention of each embedding.
+            embedding_dim(int): dimention of each embedding. 
             num_embeddings(int): number of embeddings. you can think it to the number of words in dictionary. 
             use_ema (bool): the bool type for checking use ema. 
-            decay ( ): the parammeter using with SonnetEMA.
+            decay ( ): the parammeter using with SonnetEMA. 
             epsilon ( ): the parammeter using in equation. 
         
         Inputs:
