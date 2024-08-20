@@ -149,7 +149,7 @@ class VectorQuantizer(nn.Module):
                 embed_sums = flat_x.transpose(0, 1) @ encoding_one_hots
                 self.m_i_ts(embed_sums) # return also [embedding_dim, num_embeddings]
 
-                # This is kind of weird.
+                # This is kind of weird. 
                 # Compare: https://github.com/deepmind/sonnet/blob/v2/sonnet/src/nets/vqvae.py#L270
                 # and Equation (8).
                 N_i_ts_sum = self.N_i_ts.average.sum()
