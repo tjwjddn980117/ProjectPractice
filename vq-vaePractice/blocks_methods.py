@@ -142,16 +142,16 @@ class VectorQuantizer(nn.Module):
                 n_i_ts = encoding_one_hots.sum(0) # n_i_ts = [num_embeddings]
                 # Updated exponential moving average of the cluster counts.
                 # See Equation (6).
-                self.N_i_ts(n_i_ts) # return also [num_embeddings]
+                self.N_i_ts(n_i_ts) # return also [num_embeddings] 
 
-                # Exponential moving average of the embeddings. See Equation (7).
-                # embed_sums = [embedding_dim, num_embeddings]
+                # Exponential moving average of the embeddings. See Equation (7). 
+                # embed_sums = [embedding_dim, num_embeddings] 
                 embed_sums = flat_x.transpose(0, 1) @ encoding_one_hots
                 self.m_i_ts(embed_sums) # return also [embedding_dim, num_embeddings]
 
                 # This is kind of weird. 
                 # Compare: https://github.com/deepmind/sonnet/blob/v2/sonnet/src/nets/vqvae.py#L270
-                # and Equation (8).
+                # and Equation (8). 
                 N_i_ts_sum = self.N_i_ts.average.sum()
                 N_i_ts_stable = (
                     (self.N_i_ts.average + self.epsilon)
