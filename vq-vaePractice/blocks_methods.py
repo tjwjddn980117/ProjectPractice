@@ -123,7 +123,7 @@ class VectorQuantizer(nn.Module):
         else:
             dictionary_loss = None
 
-        # See third term of Equation (3).
+        # See third term of Equation (3). 
         commitment_loss = ((x - quantized_x.detach()) ** 2).mean()
         # commitment_loss.item() >> float
 
@@ -138,9 +138,9 @@ class VectorQuantizer(nn.Module):
                 # Cluster counts.
                 encoding_one_hots = F.one_hot(
                     encoding_indices, self.num_embeddings
-                ).type(flat_x.dtype) # encoding_one_hots >> [B*H'*W', num_embeddings]
-                n_i_ts = encoding_one_hots.sum(0) # n_i_ts = [num_embeddings]
-                # Updated exponential moving average of the cluster counts.
+                ).type(flat_x.dtype) # encoding_one_hots >> [B*H'*W', num_embeddings] 
+                n_i_ts = encoding_one_hots.sum(0) # n_i_ts = [num_embeddings] 
+                # Updated exponential moving average of the cluster counts. 
                 # See Equation (6).
                 self.N_i_ts(n_i_ts) # return also [num_embeddings] 
 
