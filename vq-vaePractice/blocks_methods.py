@@ -64,10 +64,10 @@ class VectorQuantizer(nn.Module):
             x(Tensor): [B, embedding_dim, H', W'].
 
         Outputs:
-            quantized_x(Tensor): 
-            dictionary_loss(item.float): 
-            commitment_loss(item.float): 
-            encoding_indices.view(x.shape[0], -1),
+            quantized_x (Tensor): 
+            dictionary_loss (item.float): 
+            commitment_loss (item.float): 
+            encoding_indices.view(x.shape[0], -1) (Tensor): 
 
         '''
         super(VectorQuantizer,self).__init__()
