@@ -23,7 +23,7 @@ class SonnetExponentialMovingAverage(nn.Module):
         This code block implements a variant of the Exponential Moving Average (EMA), 
         which computes the moving average of weights during the learning process to adjust the weights in the model to be unbiased.
 
-        Arguments:  
+        Arguments: 
             decay(float): Weight for the exponential moving average. 
                 Higher decay rates retain more historical information, and lower decay rates give greater weight to recent values. 
             shape(Tensor): shape of input. 
