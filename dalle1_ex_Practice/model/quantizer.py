@@ -17,6 +17,9 @@ class Quantizer(nn.Module):
 
         Inputs:
             x (tensor): [B, C, H, W]. 
+        
+        Outputs:
+            sampled (tensor): [B, D, H, W]. einsum with the dimension. 
         '''
         super(Quantizer, self).__init__()
         
