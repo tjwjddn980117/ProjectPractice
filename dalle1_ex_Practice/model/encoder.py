@@ -37,12 +37,12 @@ class Encoder(nn.Module):
         ])
         self.residuals = nn.ModuleList([
             nn.Sequential(
-                nn.Conv2d(64, 64, 3, padding = 1),
+                nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU(),
-                nn.Conv2d(64, 64, 3, padding = 1),
+                nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU()),
             nn.Sequential(
-                nn.Conv2d(64, 64, 3, padding = 1),
+                nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU())
