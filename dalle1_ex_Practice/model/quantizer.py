@@ -13,7 +13,9 @@ class Quantizer(nn.Module):
 
         Arguments:
             num_embeddings (int): the number of embeddings (channels). 
-            embedding_dim (int): 
+            embedding_dim (int): the number of dimension. 
+
+            
         '''
         super(Quantizer, self).__init__()
         
@@ -53,4 +55,9 @@ class Quantizer(nn.Module):
         return sampled, kl_div, logits, log_qy
     
     def quantize_indices(self, indices):
+        '''
+        The function for quantize. 
+
+
+        '''
         return einsum(indices, self.embedding.weight, 'b n h w, n d -> b d h w')
