@@ -15,7 +15,8 @@ class Quantizer(nn.Module):
             num_embeddings (int): the number of embeddings (channels). 
             embedding_dim (int): the number of dimension. 
 
-            
+        Inputs:
+            x (tensor): [B, C, H, W]. 
         '''
         super(Quantizer, self).__init__()
         
