@@ -20,6 +20,7 @@ class Quantizer(nn.Module):
         
         Outputs:
             sampled (tensor): [B, D, H, W]. einsum with the dimension. 
+            kl_div (float): 
         '''
         super(Quantizer, self).__init__()
         
@@ -41,18 +42,18 @@ class Quantizer(nn.Module):
 
         # Compute kl loss
         logits = rearrange(x, 'b n h w -> b (h w) n')
-        # log_qy는 픽셀단위로 해당 픽셀이 어떤 channel에서부터 나온 것인지에 대한 확률분포로 표현한다. 
-        # log_qy is expressed in pixel units as a probability distribution for which channel the corresponding pixel comes from. 
+        # log_qy는 픽셀단위로 해당 픽셀이 어떤 channel을 가르킬 것인지에 대한 확률변수가 될 것이다. 
+        # log_qy will be a random variable for which channel the pixel will teach in pixel units.
         log_qy = torch.nn.functional.log_softmax(logits, dim=-1)
-        # log_uniform은 픽셀단위로 해상 픽셀어 어떤 channel에서 나오는지에 대해 확률은 모두 동일하다는 것을 보이는 타겟으로 균등분포이다. 
-        # log_uniform is a pixel-by-pixel target that shows that the probabilities are all the same for which channel it comes from.
+        # log_uniform은 픽셀단위로 해상 픽셀어 어떤 channel을 가르킬 것인지 대해 확률은 모두 동일하다는 것을 보이는 타겟으로 균등분포이다. 
+        # Log_uniform is a target that shows that the probabilities are all the same for which channel to teach the maritime pixel word in pixel units. 
         log_uniform = torch.log(torch.tensor([1. / self.num_embeddings], device=torch.device(x.device)))
         # 이렇게 목적함수가 균등분포인 이유는, 결국 code book을 거쳐서 나온 embedding 들은 이진적인 성격을 가지고 있으며,
         #  특정 image에 관해 특징을 encoding한 channel들을 code book을 거친 것이기에, 
         #  결국 embedding을 한 후 나오는 결과 또한 동일한 code book index를 가져야 함에, 
         #  픽셀이 sampling 되어져 나올 channel들은 모두 균등할 수 밖에 없다. 
         # The reason why the objective function is uniformly distributed is that after all, the embeddedings that come out through the code book have a binary character,
-        # Channels that encode features for a specific image have gone through code books,
+        # Channels that encode features for a specific image have gone through code books, 
         # In the end, the result that comes out after embedding must also have the same code book index,
         # All the channels through which the pixels are sampled are bound to be equal.
         kl_div = torch.nn.functional.kl_div(log_uniform, log_qy, None, None, 'batchmean', log_target=True)
