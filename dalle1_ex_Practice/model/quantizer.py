@@ -63,6 +63,6 @@ class Quantizer(nn.Module):
         '''
         The function for quantize. 
 
-
+        
         '''
         return einsum(indices, self.embedding.weight, 'b n h w, n d -> b d h w')
