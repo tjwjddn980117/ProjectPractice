@@ -49,9 +49,9 @@ class Quantizer(nn.Module):
         # Log_uniform is a target that shows that the probabilities are all the same for which channel to teach the maritime pixel word in pixel units. 
         log_uniform = torch.log(torch.tensor([1. / self.num_embeddings], device=torch.device(x.device)))
         # 이렇게 목적함수가 균등분포인 이유는, 결국 code book을 거쳐서 나온 embedding 들은 이진적인 성격을 가지고 있으며,
-        #  특정 image에 관해 특징을 encoding한 channel들을 code book을 거친 것이기에, 
-        #  결국 embedding을 한 후 나오는 결과 또한 동일한 code book index를 가져야 함에, 
-        #  픽셀이 sampling 되어져 나올 channel들은 모두 균등할 수 밖에 없다. 
+        #  특정 image에 관해 특징을 encoding한 channel들을 code book을 거친 것이기에,
+        #  결국 embedding을 한 후 나오는 결과 또한 동일한 code book index를 가져야 함에,
+        #  픽셀이 sampling 되어져 나올 channel들은 모두 균등할 수 밖에 없다.
         # The reason why the objective function is uniformly distributed is that after all, the embeddedings that come out through the code book have a binary character,
         # Channels that encode features for a specific image have gone through code books, 
         # In the end, the result that comes out after embedding must also have the same code book index,
