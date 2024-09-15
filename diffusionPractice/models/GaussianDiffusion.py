@@ -214,7 +214,7 @@ class GaussianDiffusion(nn.Module):
         Arguments:
             t (tensor): [B] time sequence. 
             x_t (tensor): [B, C, H, W]. x_t noise. 
-            v (tensor): [B, C, H, W]. x_(t-1) v. 
+            v (tensor): [B, C, H, W]. x_(t-1) v.
         
         Returns:
             _ (tensor): [B, C, H, W]. predict the start(x_0), from v (x_(t-1)). 
