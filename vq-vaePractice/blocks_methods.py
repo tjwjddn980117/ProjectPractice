@@ -67,7 +67,7 @@ class VectorQuantizer(nn.Module):
             quantized_x (Tensor): the tensor with qunatized. 
             dictionary_loss (item.float): the loss about dictionary. 
             commitment_loss (item.float): the loss about commitment. 
-            encoding_indices.view(x.shape[0], -1) (Tensor): 
+            encoding_indices.view(x.shape[0], -1) (Tensor): the indices
 
         '''
         super(VectorQuantizer,self).__init__()
