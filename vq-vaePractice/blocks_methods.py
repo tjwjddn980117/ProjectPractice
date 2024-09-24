@@ -77,6 +77,7 @@ class VectorQuantizer(nn.Module):
         self.embedding_dim = embedding_dim
         self.num_embeddings = num_embeddings
         self.use_ema = use_ema
+        
         # Weight for the exponential moving average.
         self.decay = decay
         # Small constant to avoid numerical instability in embedding updates.
