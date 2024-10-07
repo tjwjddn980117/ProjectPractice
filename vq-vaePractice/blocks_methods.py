@@ -128,8 +128,8 @@ class VectorQuantizer(nn.Module):
         commitment_loss = ((x - quantized_x.detach()) ** 2).mean()
         # commitment_loss.item() >> float
 
-        # Straight-through gradient. See Section 3.2.
-        # I don't know what's the reason of this.
+        # Straight-through gradient. See Section 3.2. 
+        # I don't know what's the reason of this. 
         quantized_x = x + (quantized_x - x).detach()
 
         if self.use_ema and self.training:
