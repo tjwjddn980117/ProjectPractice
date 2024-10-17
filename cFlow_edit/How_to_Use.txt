@@ -1,0 +1,10 @@
+training:
+
+python train_model.py --glow
+python train_ms_mri_model.py --glow
+
+
+sampling:
+
+python test_model.py --glow
+python test_ms_mri_model.py --glow
