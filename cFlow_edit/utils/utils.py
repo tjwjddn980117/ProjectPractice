@@ -5,6 +5,10 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import pdb
 import numpy as np
+import os
+import torch
+from torchvision.utils import save_image
+
 
 EPS = 1e-6
 
@@ -140,3 +144,40 @@ def save_mask_prediction_example(mask, pred, iter):
 	plt.savefig('images/'+str(iter)+"_prediction.png")
 	plt.imshow(mask[0,:,:],cmap='Greys')
 	plt.savefig('images/'+str(iter)+"_mask.png")
+
+def save_results(samples, paths, output_dir='/data/Result/'):
+    """
+    Save the sampled segmentation results as images and tensors.
+
+    Args:
+        samples (torch.Tensor): Sampled outputs of shape [B, 16, 2, H, W].
+        paths (list of str): Original image paths, one per batch element.
+        output_dir (str): Base directory where results will be saved.
+    """
+    # Iterate over each sample in the batch.
+    batch_size, num_samples, _, _, _ = samples.shape
+    for i in range(batch_size):
+        # Extract the case name from the path.
+        case_name = os.path.basename(os.path.dirname(paths[i]))
+
+        # Create directories for saving images and tensors.
+        image_save_dir = os.path.join(output_dir, 'image', case_name)
+        tensor_save_dir = os.path.join(output_dir, 'tensor', case_name)
+        os.makedirs(image_save_dir, exist_ok=True)
+        os.makedirs(tensor_save_dir, exist_ok=True)
+
+        # Iterate over each sampled output for this case.
+        for j in range(num_samples):
+            # Extract the j-th sampled output of shape [2, H, W].
+            output_tensor = samples[i, j]
+
+            # Save as a .pt tensor file.
+            tensor_save_path = os.path.join(tensor_save_dir, f'output{j}.pt')
+            torch.save(output_tensor, tensor_save_path)
+
+            # Save the first channel (segmentation mask) as an image.
+            image_save_path = os.path.join(image_save_dir, f'output{j}.png')
+            # Normalize to [0, 1] if necessary and save as PNG.
+            save_image(output_tensor[0], image_save_path)
+
+            print(f'Saved tensor to {tensor_save_path} and image to {image_save_path}')
