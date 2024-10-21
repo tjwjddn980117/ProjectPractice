@@ -20,14 +20,14 @@ def save_results(samples, paths, output_dir='/data/Result/'):
     os.makedirs(output_dir, exist_ok=True)
     paths = list(chain.from_iterable(paths))
     for i in tqdm(range(batch_size), desc='Saving results for each case'):
-        # Extract the case name from the path.
+        # Extract the case name from the path. 
         case_name = os.path.basename(os.path.dirname(paths[i]))
 
         # Create directories for saving images and tensors.
         image_save_dir = os.path.join(output_dir, 'image', case_name)
         tensor_save_dir = os.path.join(output_dir, 'tensor', case_name)
         tensor_sig_save_dir = os.path.join(output_dir, 'sig', case_name)
-        #tensor_sig_th_save_dir = os.path.join(output_dir, 'sig5', case_name)
+        #tensor_sig_th_save_dir = os.path.join(output_dir, 'sig5', case_name) 
         os.makedirs(image_save_dir, exist_ok=True)
         os.makedirs(tensor_save_dir, exist_ok=True)
         os.makedirs(tensor_sig_save_dir, exist_ok=True)
