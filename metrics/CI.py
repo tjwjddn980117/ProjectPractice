@@ -51,6 +51,10 @@ def diversity_agreement(ground_truths, predictions):
     for i in range(len(predictions)-1):
         for j in range(i+1, len(predictions)):
             V_hat.append(cal_variance(predictions[i], predictions[j]))
+
+    # V_Y와 V_hat이 비어 있는지 확인하고 기본값 설정
+    if not V_Y or not V_hat:
+        return 0  # 기본값으로 0 반환 (필요에 따라 다른 값으로 설정 가능)
     
     ΔV_min = abs(np.min(V_Y) - np.min(V_hat))
     ΔV_max = abs(np.max(V_Y) - np.max(V_hat))
