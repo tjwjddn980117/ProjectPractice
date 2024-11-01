@@ -194,34 +194,34 @@ def calc_matric_with_var(labels_path: str, preds_paths: str, reverse: bool=False
     print(f"CPI: {total_CPI} ± {np.sqrt(var_CPI)}")
 
 
-label_path = 'C:/Users/Seo/Downloads/our_LIDC-IDRI_dataset/testing'
+label_path = 'C:/Users/Seo/Downloads/our_MS-MRI_dataset_split/testing'
 
-# pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/cFlow_MSMRI_tensor'
-# print()
-# print("cFlow_MSMRI")
-# #print(calc_matric(label_path, pred_path, reverse=False))
-# calc_matric_with_var(label_path, pred_path, reverse=False)
-# 
-# pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/MoSE_MSMRI_tensor'
-# print()
-# print("MoSE_MSMRI")
-# #print(calc_matric(label_path, pred_path, reverse=False))
-# calc_matric_with_var(label_path, pred_path, reverse=False)
-# 
-# pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/CCDM_MSMRI_tensor'
-# print()
-# print("CCDM_MSMRI")
-# calc_matric_with_var(label_path, pred_path, reverse=False)
-# 
-# pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/CIMD_MSMRI_tensor'
-# print()
-# print("CIMD_MSMRI")
-# calc_matric_with_var(label_path, pred_path, reverse=False)
-# 
-# pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/MoDiff_MSMRI_tensor'
-# print()
-# print("MoDiff_MSMRI")
-# calc_matric_with_var(label_path, pred_path, reverse=False)
+#pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/cFlow_MSMRI_tensor'
+#print()
+#print("cFlow_MSMRI")
+##print(calc_matric(label_path, pred_path, reverse=False))
+#calc_matric_with_var(label_path, pred_path, reverse=False)
+#
+#pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/MoSE_MSMRI_tensor'
+#print()
+#print("MoSE_MSMRI")
+##print(calc_matric(label_path, pred_path, reverse=False))
+#calc_matric_with_var(label_path, pred_path, reverse=False)
+#
+#pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/CCDM_MSMRI_tensor'
+#print()
+#print("CCDM_MSMRI")
+#calc_matric_with_var(label_path, pred_path, reverse=False)
+#
+#pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/CIMD_MSMRI_tensor'
+#print()
+#print("CIMD_MSMRI")
+#calc_matric_with_var(label_path, pred_path, reverse=False)
+#
+#pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/MoDiff_MSMRI_tensor'
+#print()
+#print("MoDiff_MSMRI")
+#calc_matric_with_var(label_path, pred_path, reverse=False)
 # 
 # pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/ProbUnet_MSMRI_tensor'
 # print()
@@ -243,7 +243,7 @@ label_path = 'C:/Users/Seo/Downloads/our_LIDC-IDRI_dataset/testing'
 # print("MoSE LIDC 32 sample")
 # calc_matric_with_var(label_path, pred_path, reverse=False)
 
-pred_path = 'C:/Users/Seo/Downloads/CCDM_LIDC_tensor'
+pred_path = 'C:/Users/Seo/Downloads/CIMD_MSMRI_tensor'
 print()
-print("CCDM LIDC")
+print("CIMD MSMRI final")
 calc_matric_with_var(label_path, pred_path, reverse=False)
