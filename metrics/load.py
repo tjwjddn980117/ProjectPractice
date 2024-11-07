@@ -246,4 +246,4 @@ label_path = 'C:/Users/Seo/Downloads/our_MS-MRI_dataset_split/testing'
 pred_path = 'CIMD_MSMRI_tensor'
 print()
 print("CIMD MSMRI final")
-calc_matric_with_var(label_path, pred_path, reverse=False)
+calc_matric_with_var(label_path, pred_path, reverse=False)  
