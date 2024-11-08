@@ -13,3 +13,5 @@ import logging
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+
+logger = logging.getLogger(__name__)
