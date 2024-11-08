@@ -194,7 +194,7 @@ def calc_matric_with_var(labels_path: str, preds_paths: str, reverse: bool=False
     print(f"CPI: {total_CPI} ± {np.sqrt(var_CPI)}")
 
 
-label_path = 'C:/Users/Seo/Downloads/our_MS-MRI_dataset_split/testing'
+label_path = 'Downloads/our_MS-MRI_dataset_split/testing'
 
 #pred_path = 'C:/Users/Seo/Downloads/MS_MRI_tensors/cFlow_MSMRI_tensor'
 #print()
