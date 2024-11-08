@@ -63,6 +63,10 @@ class Quantizer(nn.Module):
         '''
         The function for quantize. 
 
+        Inputs:
+            indices (tensor): [B, N, H, W]. 
         
+        Returns:
+            _ (tensor): [B, D, H, W]. 'D' is embedding_dim. 
         '''
         return einsum(indices, self.embedding.weight, 'b n h w, n d -> b d h w')
