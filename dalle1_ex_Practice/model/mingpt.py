@@ -24,6 +24,9 @@ class DallEGPTConfig:
     def __init__(self, text_vocab_size,
                  image_vocab_size,
                  max_sequence_len, im_size, **kwargs):
+        '''
+        
+        '''
         self.text_vocab_size = text_vocab_size
         self.image_vocab_size = image_vocab_size
         # Fixing block size to maximum sequence length we have seen
