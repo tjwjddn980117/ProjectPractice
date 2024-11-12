@@ -11,14 +11,14 @@ class Decoder(nn.Module):
         Decoder with couple of residual blocks followed by conv transpose relu layers. 
 
         Arguments:
-            num_embeddings (int): the number of embedding/channel. 
+            num_embeddings ((int) the number of embedding/channel.):
             
         Inputs:
             [B, num_embeddings, X, X]. 
         
         Outputs:
-            [B, C, X*8, X*8]. 
-        '''
+            [B, C, X\*8, X\*8]. 
+        ''' 
         super(Decoder, self).__init__()
         
         self.decoder_layers = nn.ModuleList([
