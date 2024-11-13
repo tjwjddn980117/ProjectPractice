@@ -19,13 +19,16 @@ logger = logging.getLogger(__name__)
 class DallEGPTConfig:
     r"""
     Minimal DallE config holding all fields requored for
-    training gpt for both text and iamge tokens
+    training gpt for both text and image tokens. 
     """
     def __init__(self, text_vocab_size,
                  image_vocab_size,
                  max_sequence_len, im_size, **kwargs):
         '''
-        
+        Minimal DallE config holding all fields requored for training GPT for both text and image tokens. 
+
+        Arguments:
+            
         '''
         self.text_vocab_size = text_vocab_size
         self.image_vocab_size = image_vocab_size
