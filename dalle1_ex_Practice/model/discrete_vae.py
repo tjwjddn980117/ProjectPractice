@@ -6,6 +6,13 @@ from model.quantizer import Quantizer
 
 class DiscreteVAE(nn.Module):
     def __init__(self, num_embeddings=1024, embedding_dim=512):
+        '''
+        The class of DiscreteVAE. 
+
+        Arguments:
+            num_embeddings (int): the number of embeddings. 
+            embedding_dim (int): the number of dimension of embedding. 
+        '''
         super(DiscreteVAE, self).__init__()
         self.encoder = Encoder(num_embeddings=num_embeddings)
         self.quantizer = Quantizer(num_embeddings=num_embeddings, embedding_dim=embedding_dim)
