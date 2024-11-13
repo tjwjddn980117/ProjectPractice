@@ -28,7 +28,33 @@ class DallEGPTConfig:
         Minimal DallE config holding all fields requored for training GPT for both text and image tokens. 
 
         Arguments:
-            
+            text_vocab_size (int): the lenght of text description. 
+            image_vocab_size (int): the lenght of image description. 
+            max_sequence_len (int): the block size. 
+            im_size (int): the size of image. 
+            **kwargs (additional parameters): additional parameters. 
+        
+        HowToUse:
+            config = DallEGPTConfig(
+            text_vocab_size=1000,
+            image_vocab_size=500,
+            max_sequence_len=128,
+            im_size=14,
+            embd_pdrop=0.1,
+            resid_pdrop=0.1,
+            attn_pdrop=0.1,
+            n_layer=4,
+            n_head=8,
+            n_embd=512
+            )
+
+            config = DallEGPTConfig(
+            text_vocab_size=1000,
+            image_vocab_size=500,
+            max_sequence_len=128,
+            im_size=14,
+            **config.model_params
+            )
         '''
         self.text_vocab_size = text_vocab_size
         self.image_vocab_size = image_vocab_size
