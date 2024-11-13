@@ -16,10 +16,10 @@ class Encoder(nn.Module):
             num_embeddings (int): the number of embedding/channel. 
             
         Inputs:
-            [B, C, X, X]. 
+            _ (tensor): [B, C, X, X]. 
         
         Outputs:
-            [B, num_embeddings, X/8, X/8]. 
+            _ (tensor): [B, num_embeddings, X/8, X/8]. 
         '''
         super(Encoder, self).__init__()
         # Encoder is just Conv relu blocks
