@@ -68,6 +68,7 @@ class MnistVisualLanguageDataset(Dataset):
 
         Returns:
             vocab_word_to_idx (dict): dictionary about the all (test/train) vocab word. key: word, value: idx. 
+            
             vocab_idx_to_word (dict): dictionary about the all (test/train) vocab word. key: idx, value: word. 
         """
         # ex) ['<bos>', 'generate', 'image', 'of', 'in', 'and', 'a', 'background', 'of', '<sep>']
