@@ -11,7 +11,7 @@ class Decoder(nn.Module):
         Decoder with couple of residual blocks followed by conv transpose relu layers. 
 
         Arguments:
-            num_embeddings (int) : the number of embedding/channel.
+            num_embeddings (int) : the number of embedding/channel. 
             
         Parameters:
             _ (tensor) : [B, num_embeddings, X, X]. 
