@@ -38,7 +38,7 @@ class Quantizer(nn.Module):
         #  If we proceed internally with these as (n*d) matrices,
         #  each of the n embedding factors is multiplied by n (h*w) according to the d embedding vector.
         #  That is, n (h*w) images are multiplied by n embedding factors, which are d. This results in d (h*w) images.
-        sampled = einsum(one_hot, self.embedding.weight, 'b n h w, n d -> b d h w')
+        sampled = einsum(one_hot, self.embedding.weight, 'b n h w, n d -> b d h w') 
 
         # Compute kl loss
         logits = rearrange(x, 'b n h w -> b (h w) n')
