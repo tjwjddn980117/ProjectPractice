@@ -29,6 +29,7 @@ class Quantizer(nn.Module):
     
     def forward(self, x):
         B, C, H, W = x.shape
+        # one_hot = [B, C, H, W]. 
         one_hot = torch.nn.functional.gumbel_softmax(x, tau=0.9, dim=1, hard=False)
         # Changing the channel to the number of embedding_dim 
         #  and embedding it with N*N pictures as many as the number of embedding_dim 
