@@ -22,7 +22,7 @@ class Quantizer(nn.Module):
             sampled (tensor): [B, D, H, W]. einsum with the dimension. 
             kl_div (float): the difference between log_uniform and log_qy (KLD(P||Q)). 
             logits (tensor): [B, Pixel(H*W), C]. 
-            
+            log_qy (tensor): [B, Pixel(H*W), C]. log_softmax with logits. 
         '''
         super(Quantizer, self).__init__()
         
