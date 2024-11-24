@@ -36,19 +36,25 @@ class Encoder(nn.Module):
             # [B, 64, X/8, X/8] 
         ])
         self.residuals = nn.ModuleList([
+            # [B, 64, X, X]
             nn.Sequential(
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU()),
+            # [B, 64, X, X]
             nn.Sequential(
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU())
+            # [B, 64, X, X]
         ])
+
+        # [B, 64, X, X]
         self.encoder_quant_conv = nn.Sequential(
             nn.Conv2d(64, num_embeddings, 1))
+        # [B, num_embeddings, X, X]
         
     
     def forward(self, x):
