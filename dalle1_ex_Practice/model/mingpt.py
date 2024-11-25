@@ -76,6 +76,9 @@ class CausalSelfAttention(nn.Module):
 
     Inputs:
         x (tensor): [B, T, C]. B is batch size, T is sequence lenght, C is embedding dimensionality (n_embd). 
+    
+    Outputs:
+        
     """
 
     def __init__(self, config):
