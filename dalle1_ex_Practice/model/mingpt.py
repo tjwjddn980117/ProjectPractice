@@ -76,10 +76,10 @@ class CausalSelfAttention(nn.Module):
 
     Inputs:
         x (tensor): [B, T, C]. B is batch size, T is sequence lenght, C is embedding dimensionality (n_embd). 
-        layer_past (bool): 
+        layer_past (bool): not used. I guess that it might preven   
     
     Outputs:
-
+        
     """
 
     def __init__(self, config):
@@ -110,7 +110,7 @@ class CausalSelfAttention(nn.Module):
         # causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
         att = att.masked_fill(self.mask[:,:,:T,:T] == 0, float('-inf'))
-
+    
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
         y = att @ v # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
