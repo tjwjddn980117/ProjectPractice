@@ -79,7 +79,7 @@ class CausalSelfAttention(nn.Module):
         layer_past (bool): not used. I guess that it might prevent pre-trained model. 
     
     Outputs:
-        
+        y (tensor): [B, T, C]. B is batch size, T is sequence lenght, C is embedding dimensionality (n_embd). 
     """
 
     def __init__(self, config):
