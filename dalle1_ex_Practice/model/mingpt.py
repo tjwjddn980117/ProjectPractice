@@ -119,3 +119,33 @@ class CausalSelfAttention(nn.Module):
         # output projection
         y = self.resid_drop(self.proj(y))
         return y
+    
+class Block(nn.Module):
+    """ an unassuming Transformer block """
+
+    def __init__(self, config):
+        '''
+        The class of Block. 
+
+        Arguments:
+            config (dict): the dictionary of configs. 
+        
+        Inputs:
+            x (tensor): [B, T, C]. 
+        '''
+        super().__init__()
+        self.ln1 = nn.LayerNorm(config.n_embd)
+        self.ln2 = nn.LayerNorm(config.n_embd)
+        self.attn = CausalSelfAttention(config)
+        self.mlp = nn.Sequential(
+            nn.Linear(config.n_embd, 4 * config.n_embd),
+            nn.GELU(),
+            nn.Linear(4 * config.n_embd, config.n_embd),
+            nn.Dropout(config.resid_pdrop),
+        )
+
+    def forward(self, x):
+        y = self.attn(self.ln1(x))
+        x = x + y
+        x = x + self.mlp(self.ln2(x))
+        return x
