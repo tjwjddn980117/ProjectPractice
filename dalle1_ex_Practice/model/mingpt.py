@@ -133,7 +133,8 @@ class Block(nn.Module):
         Inputs:
             x (tensor): [B, T, C]. 
         
-        
+        Outputs:
+            x (tensor): [B, T, C]. 
         '''
         super().__init__()
         self.ln1 = nn.LayerNorm(config.n_embd)
