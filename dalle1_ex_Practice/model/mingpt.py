@@ -76,7 +76,7 @@ class CausalSelfAttention(nn.Module):
 
     Inputs:
         x (tensor): [B, T, C]. B is batch size, T is sequence lenght, C is embedding dimensionality (n_embd). 
-        layer_past (bool): not used. I guess that it might prevent
+        layer_past (bool): not used. I guess that it might prevent pre-trained model. 
     
     Outputs:
         
