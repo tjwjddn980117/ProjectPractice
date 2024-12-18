@@ -38,19 +38,24 @@ class Decoder(nn.Module):
         ])
         
         self.residuals = nn.ModuleList([
+            # [B, 64, X, X]
             nn.Sequential(
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU()),
+            # [B, 64, X, X]
             nn.Sequential(
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(64, 64, 3, padding=1),
                 nn.ReLU())
+            # [B, 64, X, X]
         ])
-        
+
+        # [B, embedding_dim, X, X]
         self.decoder_quant_conv = nn.Conv2d(embedding_dim, 64, 1)
+        # [B, 64, X, X]
         
     
     def forward(self, x):
