@@ -4,7 +4,7 @@ import torch.nn as nn
 
 class Encoder(nn.Module):
     """
-    Encoder is conv relu blocks followed by couple of residual blocks. 
+    Encoder is concat of conv relu blocks followed by couple of residual blocks. 
     Last 1x1 conv converts to logits with num_embeddings as output size. 
     """
     def __init__(self, num_embeddings):
