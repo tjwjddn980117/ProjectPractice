@@ -170,9 +170,9 @@ class GPT(nn.Module):
             targets (tensor): [b, text_t]. the tensor of targets. if you validate the target, the targets should be None. 
 
         Inputs:
-            image_tokens (tensor): [B, im_t].
-            tensor_tokens (tensor): [B, text_t]
-            targets (tensor): [B, T]
+            image_tokens (tensor): [B, im_t]. 
+            tensor_tokens (tensor): [B, text_t]. 
+            targets (tensor): [B, T]. 
         
         Outputs:
             logits (tensor):
