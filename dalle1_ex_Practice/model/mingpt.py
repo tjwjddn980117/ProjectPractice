@@ -148,7 +148,147 @@ class Block(nn.Module):
         )
 
     def forward(self, x):
+        # x = [B, T, C]. 
         y = self.attn(self.ln1(x))
+        # y = [B, T, C]. 
         x = x + y
+        # x = [B, T, C]. 
         x = x + self.mlp(self.ln2(x))
+        # x = [B, T, c]. 
         return x
+
+class GPT(nn.Module):
+    """  the full GPT language model, with a context size of block_size """
+
+    def __init__(self, config):
+        '''
+        the full GPT language model, with a context size of block_size 
+
+        Arguments: 
+            image_tokens (tensor): [b, im_t]. the token of image. 
+            text_tokens (tensor): [b, text_t]. the token of text. 
+            targets (tensor): [b, text_t]. the tensor of targets. if you validate the target, the targets should be None. 
+
+        Inputs:
+            image_tokens (tensor): [B, im_t].
+            tensor_tokens (tensor): [B, text_t]
+            targets (tensor): [B, T]
+        
+        Outputs:
+            logits (tensor):
+            loss_text (float): 
+            loss_image (float): 
+        '''
+        super().__init__()
+
+        # input embedding stem
+        self.text_tok_emb = nn.Embedding(config.text_vocab_size, config.n_embd)
+        self.image_tok_emb = nn.Embedding(config.image_vocab_size, config.n_embd)
+        
+        self.text_pos_emb = nn.Parameter(torch.zeros(1, config.num_text_tokens, config.n_embd))
+        self.image_pos_emb = nn.Parameter(torch.zeros(1, config.im_size ** 2, config.n_embd))
+        self.drop = nn.Dropout(config.embd_pdrop)
+        # transformer
+        self.blocks = nn.Sequential(*[Block(config) for _ in range(config.n_layer)])
+        # decoder head
+        self.ln_f = nn.LayerNorm(config.n_embd)
+        self.head = nn.Linear(config.n_embd, config.text_vocab_size + config.image_vocab_size, bias=False)
+        self.config = config
+        self.block_size = config.block_size
+        self.apply(self._init_weights)
+
+        logger.info("number of parameters: %e", sum(p.numel() for p in self.parameters()))
+
+    def get_block_size(self):
+        '''
+        the function get config block size. 
+
+        Inputs:
+            _ (): _
+        
+        Outputs:
+            self.block_size (int): the size of config block size. 
+        '''
+        return self.block_size
+
+    def _init_weights(self, module):
+        '''
+        the function for init the weight. 
+        
+        Inputs:
+            module (nn.model): the model for init weights. 
+        '''
+        if isinstance(module, (nn.Linear, nn.Embedding)):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if isinstance(module, nn.Linear) and module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.LayerNorm):
+            torch.nn.init.zeros_(module.bias)
+            torch.nn.init.ones_(module.weight)
+        elif isinstance(module, GPT):
+            torch.nn.init.normal_(module.text_pos_emb, mean=0.0, std=0.02)
+            # Simply do the same thing for image as for text
+            torch.nn.init.normal_(module.image_pos_emb, mean=0.0, std=0.02)
+  
+
+    def forward(self, image_tokens, text_tokens, targets=None,):
+        b, im_t = image_tokens.size()
+        b, text_t = text_tokens.size()
+        assert im_t + text_t <= self.block_size, "Cannot forward, model block size is exhausted."
+
+        # self.text_tok_emb = nn.Embedding(config.text_vocab_size, config.n_embd)
+        # text_tok_emb =  (text_vocab_size, n_embd) of table size. 
+        # text_emb.shape = [b, text_t, n_embd].     
+        text_emb = self.text_tok_emb(text_tokens)
+        # self.text_pos_emb = nn.Parameter(torch.zeros(1, config.num_text_tokens, config.n_embd))
+        # text_pos_emb.shape = [1, num_text_tokens, n_embd]. 
+        # text_pos.shape = [1, text_t, n_embd]. 
+        text_pos = self.text_pos_emb[:, :text_t, :]
+        # text_token_embeddings.shape = [b, text_t, n_embd]. 
+        text_token_embeddings = self.drop(text_emb + text_pos)
+        x = text_token_embeddings
+        
+        # Add image tokens for input sequence if needed.
+        # Won't be needed for first pixel generation
+        if im_t > 0:
+            # self.image_tok_emb = nn.Embedding(config.image_vocab_size, config.n_embd)
+            # image_tok_emb = (image_vocab_size, n_embd) of table size. 
+            # image_emb = [b, im_t, n_embc]. 
+            image_emb = self.image_tok_emb(image_tokens)
+            # self.image_pos_emb = nn.Parameter(torch.zeros(1, config.im_size**2, config.n_embd))
+            # image_pos_emb.shape = [1, im_size**2, n_embd]. 
+            # image_pos.shape = [1, im_t, n_embd]. 
+            image_pos = self.image_pos_emb[:, :im_t, :]
+            # image_token_embeddings.shape = [b, im_t, n_embd]. 
+            image_token_embeddings = self.drop(image_emb + image_pos)
+            # x = [b, text_t+im_t, n_embd]. 
+            x = torch.cat([x, image_token_embeddings], dim=1)
+
+        x = self.blocks(x)
+        x = self.ln_f(x)
+        logits = self.head(x)
+        
+        # if we are given some desired targets also calculate the loss
+        # Separate text and image loss
+        loss_text = None
+        loss_image = None
+        if targets is not None:
+            # logits.shape = [b, (seq_lenght - 1), (text_vocab_size + image_vocab_size)]. 
+            logits = logits[:, :-1, :]
+            
+            # Separate text and image token loss computation
+            # text_t 까지만 체크를 해야함. 
+            # text_logits.shape = [b, text_vocab_size + image_vocab_size, text_t - 1]. 
+            # image_logits.shape = [b, text_vocab_size + image_vocab_size, seq_length - text_t].    
+            text_logits = logits[:, :text_t - 1, :].permute((0, 2, 1))
+            image_logits = logits[:, text_t - 1:, :].permute((0, 2, 1))
+            
+            # For now just mask logits of image tokens for text targets
+            # And mask out text tokens logits for iamge targets
+            # Dont want gpt to gain points by simply decreasing scores for indexes of the other type
+            # And anyway at inference you would always sample image token when generating image
+            text_logits[:, self.config.text_vocab_size:, :] = -torch.finfo(logits.dtype).max
+            image_logits[:, :self.config.text_vocab_size, :] = -torch.finfo(logits.dtype).max
+            loss_text = F.cross_entropy(text_logits, targets[:, :text_t-1])
+            loss_image = F.cross_entropy(image_logits, targets[:, text_t-1:])
+        return logits, loss_text, loss_image
