@@ -175,7 +175,7 @@ class GPT(nn.Module):
             targets (tensor): [B, T]. 
         
         Outputs:
-            logits (tensor):
+            logits (tensor): [B, T, config.text_vocab_size + config.image_vocab_size]. 
             loss_text (float): 
             loss_image (float): 
         '''
