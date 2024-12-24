@@ -21,6 +21,9 @@ class DallE(nn.Module):
             max_text_len (int): the max lenght of text. 
             gpt_config (dict): the config of gpt. 
         
+        Inputs:
+            im (tensor):
+            text (tensor): 
         '''
         super(DallE, self).__init__()
         self.vae = vae
@@ -39,7 +42,7 @@ class DallE(nn.Module):
         # to have that as the context size
         max_sequence_len = max_text_len + image_size*image_size
         config = DallEGPTConfig(text_vocab_size=num_words,
-                           image_vocab_size=image_vocab_size,
+                           image_vocab_size=image_vocab_size, 
                            max_sequence_len=max_sequence_len,
                            im_size=image_size,
                            **gpt_config)
@@ -48,3 +51,17 @@ class DallE(nn.Module):
     def forward(self, im, text):
         # Call Discrete vae
         image_tokens = self.vae.get_codebook_indices(im).reshape(im.size(0), -1)
+
+        # Shift the target image tokens as image tokens + text vocab size
+        # Last fc layer will predict 0 to (num_words + num_embeddings) output probabilities
+        # We will formulate the target such first num_words-1 are text token probabilities
+        # and num_words to num_words+num_embeddings are image token probabilities
+        target_image_tokens = image_tokens + self.num_words
+        labels = None
+        
+        if self.training:
+            # Pass one position shifted tokens as targets only in training
+            labels = torch.cat((text[:, 1:], target_image_tokens), dim=1)
+        # Loss of text and Loss image separately so that we can get better images
+        logits, loss_text, loss_image = self.gpt(image_tokens, text, targets=labels)
+        return logits, loss_text, loss_image
