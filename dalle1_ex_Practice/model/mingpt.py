@@ -165,14 +165,15 @@ class GPT(nn.Module):
         the full GPT language model, with a context size of block_size 
 
         Arguments: 
+            
             image_tokens (tensor): [b, im_t]. the token of image. 
             text_tokens (tensor): [b, text_t]. the token of text. 
             targets (tensor): [b, text_t]. the tensor of targets. if you validate the target, the targets should be None. 
 
         Inputs:
-            image_tokens (tensor): [B, im_t]. 
-            tensor_tokens (tensor): [B, text_t]. 
-            targets (tensor): [B, T]. 
+            image_tokens (tensor): [B, im_t]. the token of image. 
+            tensor_tokens (tensor): [B, text_t]. the token of text. 
+            targets (tensor): [B, T]. the tensor of targets. if you validate the target, the targets sould be None. 
         
         Outputs:
             logits (tensor): [B, T, config.text_vocab_size + config.image_vocab_size]. 
