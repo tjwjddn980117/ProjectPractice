@@ -18,7 +18,7 @@ class DiscreteVAE(nn.Module):
         
         Outputs:
             out (tensor): [B, C, H, W]. 
-            kl (float): the difference between log_uniform and log_qy (KLD(P||Q)).
+            kl (float): the difference between log_uniform and log_qy (KLD(P||Q)). 
             log_qy (tensor): [B, Pixel(HW), C]. log_softmax with logits. 
         '''
         super(DiscreteVAE, self).__init__()
@@ -51,7 +51,7 @@ class DiscreteVAE(nn.Module):
             indices (tensor): [B, N, H, W]. 
         
         Outputs:
-            decoder (tensor): [B, C, X*8, X*8].
+            decoder (tensor): [B, C, X*8, X*8]. 
         '''
         quantized_indices = self.quantizer.quantize_indices(indices)
         return self.decoder(quantized_indices)
