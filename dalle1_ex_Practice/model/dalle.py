@@ -24,6 +24,7 @@ class DallE(nn.Module):
         Inputs:
             im (tensor): the tensor of image. 
             text (tensor): the tensor of text. 
+        
         '''
         super(DallE, self).__init__()
         self.vae = vae
@@ -41,10 +42,10 @@ class DallE(nn.Module):
         # Length of largest sequence so that we tell gpt
         # to have that as the context size
         max_sequence_len = max_text_len + image_size*image_size
-        config = DallEGPTConfig(text_vocab_size=num_words,
+        config = DallEGPTConfig(text_vocab_size=num_words, 
                            image_vocab_size=image_vocab_size, 
-                           max_sequence_len=max_sequence_len,
-                           im_size=image_size,
+                           max_sequence_len=max_sequence_len, 
+                           im_size=image_size, 
                            **gpt_config)
         self.gpt = GPT(config)
 
