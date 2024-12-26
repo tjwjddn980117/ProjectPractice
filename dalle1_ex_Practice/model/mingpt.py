@@ -165,10 +165,15 @@ class GPT(nn.Module):
         the full GPT language model, with a context size of block_size 
 
         Arguments: 
-            
-            image_tokens (tensor): [b, im_t]. the token of image. 
-            text_tokens (tensor): [b, text_t]. the token of text. 
-            targets (tensor): [b, text_t]. the tensor of targets. if you validate the target, the targets should be None. 
+            config (dict): the config of gpt model. 
+            config.text_vocab_size (int): the number of all text vocab. 
+            config.image_vocab_size (int): the number of all image vocab. 
+            config.n_embd (int): the embedding size that the researcher define. 
+            config.embd_pdrop (int): the probability for nn.Dropout in embd. 
+            config.num_text_tokens (int): the max lenght of full sentence. 
+            config.im_size (int): the max size of image. 
+            config.n_layer (int): the depth of blocks. 
+            config.block_size (int): the max size of each block. 
 
         Inputs:
             image_tokens (tensor): [B, im_t]. the token of image. 
