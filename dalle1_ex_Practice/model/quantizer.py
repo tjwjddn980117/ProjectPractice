@@ -19,9 +19,9 @@ class Quantizer(nn.Module):
             x (tensor): [B, C, H, W]. 
         
         Outputs:
-            sampled (tensor): [B, D, H, W]. einsum with the dimension. 
+            sampled (tensor): [B, D, H, W]. Newly sampled existing encoded x [B, C, H, wW through nn.Embedding's codebook. 
             kl_div (float): the difference between log_uniform and log_qy (KLD(P||Q)). 
-            logits (tensor): [B, Pixel(H*W), C]. 
+            logits (tensor): [B, Pixel(H*W), C]. a rearrangement of the original existing x [B, C, H, W]. 
             log_qy (tensor): [B, Pixel(H*W), C]. log_softmax with logits. 
         '''
         super(Quantizer, self).__init__()
