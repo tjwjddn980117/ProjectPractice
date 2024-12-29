@@ -63,6 +63,6 @@ class DallE(nn.Module):
         if self.training:
             # Pass one position shifted tokens as targets only in training
             labels = torch.cat((text[:, 1:], target_image_tokens), dim=1)
-        # Loss of text and Loss image separately so that we can get better images
+        # Loss of text and Loss image separately so that we can get better images. 
         logits, loss_text, loss_image = self.gpt(image_tokens, text, targets=labels)
         return logits, loss_text, loss_image
