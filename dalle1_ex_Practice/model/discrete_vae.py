@@ -39,8 +39,8 @@ class DiscreteVAE(nn.Module):
         # x.shape = B,C,H,W
         enc_logits = self.encoder(x)
         # enc_logits.shape = [B, C, H/8, W/8]
-        # enc_logits.shape = B,C,H,W
         indices = torch.argmax(enc_logits, dim=1)
+        # indices.shape = [B,H/8,W/8]
         return indices
     
     def decode_from_codebook_indices(self, indices):
