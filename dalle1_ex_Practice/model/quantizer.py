@@ -52,6 +52,7 @@ class Quantizer(nn.Module):
         # log_uniform은 픽셀단위로 해상 픽셀어 어떤 channel을 가르킬 것인지 대해 확률은 모두 동일하다는 것을 보이는 타겟으로 균등분포이다.  
         # Log_uniform is a target that shows that the probabilities are all the same for which channel to teach the maritime pixel word in pixel units. 
         log_uniform = torch.log(torch.tensor([1. / self.num_embeddings], device=torch.device(x.device)))
+        # 다시 설명 적어야함. 
         # log_uniform은 broadcasting되어 [B, pixel, channel]로 될 것이다. 
         # 이렇게 목적함수가 균등분포인 이유는, 결국 code book을 거쳐서 나온 embedding 들은 이진적인 성격을 가지고 있으며, 
         #  특정 image에 관해 특징을 encoding한 channel들을 code book을 거친 것이기에, 
