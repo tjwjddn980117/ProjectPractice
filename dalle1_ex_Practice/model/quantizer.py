@@ -59,7 +59,13 @@ class Quantizer(nn.Module):
         log_uniform = torch.log(torch.tensor([1. / self.num_embeddings], device=torch.device(x.device)))
         # 잠재공간을 균등분포로 만들어 이진적인 성격을 지니게 한다.
         kl_div = torch.nn.functional.kl_div(log_uniform, log_qy, None, None, 'batchmean', log_target=True)
-        # 이 코드에서우리가 익히 알고있는 vq-vae가 아니다. 
+        # 이 코드는 우리가 익히 알고있는 vq-vae가 아니다. 
+        # vq-vae는 실제 target y와 모델을 통해 예측 된 값 y'의 loss인 Reconstruction Loss,
+        # encoding을 거친 잠재공간을 고정하고 Code-book을 학습하는 Embedding Loss,
+        # Code-book을 고정하고, encoding을 거친 잠재공간을 학습하는 Commitment Loss로 이루어져있다. 
+        # 하지만, 이 코드는 단순히 vae를 손댄 것으로, 
+        # 기존 vae에서 목표로 하던 Gaussian으로의 근사를 uniform 으로 근사를 하는 것이다.
+        # 그럼으로 이 코드에서는 kl_div을 통해 Regularization term을 구현하고 있다. 
         return sampled, kl_div, logits, log_qy
     
     def quantize_indices(self, indices):
