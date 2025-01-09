@@ -59,7 +59,7 @@ class Quantizer(nn.Module):
         log_uniform = torch.log(torch.tensor([1. / self.num_embeddings], device=torch.device(x.device)))
         # 잠재공간을 균등분포로 만들어 이진적인 성격을 지니게 한다.
         kl_div = torch.nn.functional.kl_div(log_uniform, log_qy, None, None, 'batchmean', log_target=True)
-        # 이 코드에서우리가 익히 알고있는 
+        # 이 코드에서우리가 익히 알고있는 vq-vae가 아니다. 
         return sampled, kl_div, logits, log_qy
     
     def quantize_indices(self, indices):
