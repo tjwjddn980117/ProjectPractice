@@ -45,10 +45,10 @@ class DiscreteVAE(nn.Module):
     
     def decode_from_codebook_indices(self, indices):
         '''
-        the function to reverse codebook indices. 
+        the function to decode from latent space. 
 
         Arguments:
-            indices (tensor): [B, N, H, W]. 
+            indices (tensor): [B, C, H, W]. 
         
         Outputs:
             decoder (tensor): [B, C, X*8, X*8]. 
