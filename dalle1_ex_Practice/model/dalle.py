@@ -51,6 +51,7 @@ class DallE(nn.Module):
 
     def forward(self, im, text):
         # Call Discrete vae
+        # image_tokens.shape = [B, C * (H/8) * (W/8)]. 
         image_tokens = self.vae.get_codebook_indices(im).reshape(im.size(0), -1)
 
         # Shift the target image tokens as image tokens + text vocab size
