@@ -65,7 +65,10 @@ class Quantizer(nn.Module):
         # Code-book을 고정하고, encoding을 거친 잠재공간을 학습하는 Commitment Loss로 이루어져있다. 
         # 하지만, 이 코드는 단순히 vae를 손댄 것으로, 
         # 기존 vae에서 목표로 하던 Gaussian으로의 근사를 uniform 으로 근사를 하는 것이다.
-        # 그럼으로 이 코드에서는 kl_div을 통해 Regularization term을 구현하고 있다. 
+        # 그럼으로 이 코드에서는 kl_div을 통해 Regularization term을 구현하고 있다.
+        # 잠재공간이 균등분포로 근사하게되면, 이산적인 이유:
+        # 차원이 높은 데이터를 차원축소한다고 생각한다. 그렇다면 자연스럽게 어떤 부분에 있어서는 비슷한 녀석들끼리 클러스터링이 되고, 
+        # 비슷한 모양을 지닌 녀석들끼리는 비슷하게 뭉칠 것이다. 
         return sampled, kl_div, logits, log_qy
     
     def quantize_indices(self, indices):
