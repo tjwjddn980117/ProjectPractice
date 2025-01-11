@@ -56,6 +56,7 @@ class DallE(nn.Module):
         image_tokens = self.vae.get_codebook_indices(im).reshape(im.size(0), -1)
 
         # Shift the target image tokens as image tokens + text vocab size
+        # ex) text vocab size가 1000이라면 기존에 갖고있는 image token에 text token을 더해서 image tokens를 미리 준비해놓는다. 
         # Last fc layer will predict 0 to (num_words + num_embeddings) output probabilities
         # We will formulate the target such first num_words-1 are text token probabilities
         # and num_words to num_words+num_embeddings are image token probabilities
