@@ -25,6 +25,10 @@ class DallE(nn.Module):
             im (tensor): [B, C, H, W]. the tensor of image. 
             text (tensor): [B, text_t]. the tensor of text. 
         
+        Outputs:
+            logits (tensor): [B, T, config.text_vocab_size + config.image_vocab_size].
+            loss_text (float): The loss between prediction and text. 
+            loss_image (float): THe loss between prediction and image. 
         '''
         super(DallE, self).__init__()
         self.vae = vae
