@@ -21,6 +21,8 @@ echo start downloading environment for %ENV_NAME%.
 call conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 call conda install -y conda-forge::tqdm conda-forge::matplotlib conda-forge::einops
 call pip install opencv-python
+call pip install datasets
+call pip install mkl==2021.4.0
 
 call conda deactivate
 
