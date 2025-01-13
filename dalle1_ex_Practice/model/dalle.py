@@ -22,8 +22,8 @@ class DallE(nn.Module):
             gpt_config (dict): the config of gpt. 
         
         Inputs:
-            im (tensor): the tensor of image. 
-            text (tensor): the tensor of text. 
+            im (tensor): [B, C, H, W]. the tensor of image. 
+            text (tensor): [B, text_t]. the tensor of text. 
         
         '''
         super(DallE, self).__init__()
