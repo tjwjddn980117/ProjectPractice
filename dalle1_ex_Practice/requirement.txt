@@ -1,3 +1,5 @@
 torch
 tqdm
 einops
+datasets
+mkl==2021.4.0
