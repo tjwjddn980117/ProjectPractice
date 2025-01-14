@@ -12,7 +12,8 @@ class DallE(nn.Module):
         '''
         Class handling the logic for DallE
         Calls the vae and passes the text and image tokens
-        together with target to gpt.
+        together with target to gpt. 
+        target은 self.training의 bool 차이를 두고 확인함. target은 input 되는 image를 그대로 씀. (비지도학습). 
 
         Arguments:
             vae (nn.module): the model of vae. 
