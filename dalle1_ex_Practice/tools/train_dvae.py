@@ -18,7 +18,18 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def train_for_one_epoch(epoch_idx, model, mnist_loader, optimizer, crtierion, config):
     '''
     train with each epoch. 
-    '''
+
+    Inputs:
+        epoch_idx (int): the index of epoch. 
+        model (nn.Module): the model for training. 
+        mnist_loader (Datasets): the dataset for training. 
+        optimizer (optimizer): the optimizer for training. 
+        crtierion (crtierion): the crtierion for training. 
+        config (dict): the config for training. 
+    
+    Outputs:
+        losses (float): the mean of losses. each losses are from each batch(picture). 
+.    '''
     losses = []
     count = 0
     for data in tqdm(mnist_loader):
