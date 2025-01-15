@@ -16,6 +16,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def train_for_one_epoch(epoch_idx, model, mnist_loader, optimizer, crtierion, config):
+    '''
+    train with each epoch. 
+    '''
     losses = []
     count = 0
     for data in tqdm(mnist_loader):
