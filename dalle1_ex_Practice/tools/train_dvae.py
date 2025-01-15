@@ -104,4 +104,6 @@ def train(args):
         'l2': torch.nn.MSELoss()
     }.get(config['train_params']['crit'])
 
+    if not os.path.exists(config['train_params']['task_name']):
+        os.mkdir(config['train_params']['task_name'])
     
