@@ -78,3 +78,28 @@ def train(args):
         
     if not os.path.exists(config['train_params']['task_name']):
         os.mkdir(config['train_params']['task_name'])
+    
+    #######################################
+    # Create the model and dataset
+    num_epochs = config['train_params']['num_epochs']
+    model = DiscreteVAE(
+        num_embeddings=config['model_params']['vae_num_embeddings'],
+        embedding_dim=config['model_params']['vae_embedding_dim']
+    )
+    model.to(device)
+    
+    if os.path.exists('{}/{}'.format(config['train_params']['task_name'],
+                                     config['train_params']['vae_ckpt_name'])):
+        print('Found checkpoint... Starting training from that')
+        model.load_state_dict(torch.load('{}/{}'.format(config['train_params']['task_name'],
+                                     config['train_params']['vae_ckpt_name'])))
+    mnist = MnistVisualLanguageDataset('train', config['dataset_params'])
+    mnist_loader = DataLoader(mnist, batch_size=config['train_params']['batch_size'],
+                              shuffle=True, num_workers=4)
+    
+    optimizer = Adam(model.parameters(), lr=config['train_params']['lr'])
+    scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=1, verbose=True)
+    criterion = {
+        'l1': torch.nn.SmoothL1Loss(beta=0.1),
+        'l2': torch.nn.MSELoss()
+    }.get(config['train_params']['crit'])
