@@ -103,3 +103,5 @@ def train(args):
         'l1': torch.nn.SmoothL1Loss(beta=0.1),
         'l2': torch.nn.MSELoss()
     }.get(config['train_params']['crit'])
+
+    
