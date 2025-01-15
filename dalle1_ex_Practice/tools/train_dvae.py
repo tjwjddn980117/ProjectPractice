@@ -57,3 +57,24 @@ def train_for_one_epoch(epoch_idx, model, mnist_loader, optimizer, crtierion, co
           format(epoch_idx + 1,
                  np.mean(losses)))
     return np.mean(losses)
+
+def train(args):
+    ######## Read the config file #######
+    with open(args.config_path, 'r') as file:
+        try:
+            config = yaml.safe_load(file)
+        except yaml.YAMLError as exc:
+            print(exc)
+    print(config)
+    #######################################
+    
+    ######## Set the desired seed value #######
+    seed = config['train_params']['seed']
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    if device == 'cuda':
+        torch.cuda.manual_seed_all(seed)
+        
+    if not os.path.exists(config['train_params']['task_name']):
+        os.mkdir(config['train_params']['task_name'])
