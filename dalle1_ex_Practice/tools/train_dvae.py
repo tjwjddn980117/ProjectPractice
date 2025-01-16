@@ -106,4 +106,17 @@ def train(args):
 
     if not os.path.exists(config['train_params']['task_name']):
         os.mkdir(config['train_params']['task_name'])
+
+    best_loss = np.inf
+    for epoch_idx in range(num_epochs):
+        mean_loss = train_for_one_epoch(epoch_idx, model, mnist_loader, optimizer, criterion, config)
+        scheduler.step(mean_loss)
+        # Simply update checkpoint if found better version
+        if mean_loss < best_loss:
+            print('Improved Loss from {:.4f} to {:.4f} .... Saving Model'.format(best_loss, mean_loss))
+            torch.save(model.state_dict(), '{}/{}'.format(config['train_params']['task_name'],
+                                                          config['train_params']['vae_ckpt_name']))
+            best_loss = mean_loss
+        else:
+            print('No Loss Improvement. Best Loss : {:.4f}'.format(best_loss))
     
