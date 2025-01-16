@@ -120,3 +120,9 @@ def train(args):
         else:
             print('No Loss Improvement. Best Loss : {:.4f}'.format(best_loss))
     
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Arguments for vae training')
+    parser.add_argument('--config', dest='config_path',
+                        default='config/default.yaml', type=str)
+    args = parser.parse_args()
+    train(args)
