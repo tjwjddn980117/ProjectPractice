@@ -11,3 +11,7 @@ from torch.utils.data.dataloader import DataLoader
 from datasets.mnist_color_texture_dataset import MnistVisualLanguageDataset
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+plt_counts = 0
+
