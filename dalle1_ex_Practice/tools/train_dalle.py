@@ -18,8 +18,10 @@ plt_counts = 0
 def train_for_one_epoch(epoch_idx, model, loader, optimizer, config):
     r"""
     Method to run the training for one epoch.
-    :param epoch_idx: iteration number of current epoch
-    :param model: Dalle model
+
+    Inputs:
+        epoch_idx (int): iteration number of current epoch
+        model (nn.Module): Dalle model
     :param mnist_loader: Data loder
     :param optimizer: optimzier to be used taken from config
     :param crtierion: For computing the loss
