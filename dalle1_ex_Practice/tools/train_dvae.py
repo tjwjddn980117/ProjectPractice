@@ -109,6 +109,7 @@ def train(args):
 
     best_loss = np.inf
     for epoch_idx in range(num_epochs):
+        # training with epoch. 
         mean_loss = train_for_one_epoch(epoch_idx, model, mnist_loader, optimizer, criterion, config)
         scheduler.step(mean_loss)
         # Simply update checkpoint if found better version
