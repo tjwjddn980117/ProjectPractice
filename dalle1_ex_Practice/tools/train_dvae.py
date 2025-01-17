@@ -22,7 +22,7 @@ def train_for_one_epoch(epoch_idx, model, mnist_loader, optimizer, crtierion, co
     Inputs:
         epoch_idx (int): iteration number of current epoch. 
         model (nn.Module): the model for training. 
-        mnist_loader (Datasets): the dataset for training. 
+        mnist_loader (DataLoader): the dataset for training. 
         optimizer (optimizer): the optimizer for training. 
         crtierion (crtierion): the crtierion for training. 
         config (dict): the config for training. 
