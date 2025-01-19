@@ -16,7 +16,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 plt_counts = 0
 
 def train_for_one_epoch(epoch_idx, model, loader, optimizer, config):
-    r"""
+    """
     Method to run the training for one epoch.
 
     Inputs:
