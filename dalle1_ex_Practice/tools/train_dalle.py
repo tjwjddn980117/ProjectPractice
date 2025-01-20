@@ -20,17 +20,19 @@ def train_for_one_epoch(epoch_idx, model, loader, optimizer, config):
     Method to run the training for one epoch.
 
     Inputs:
-        epoch_idx (int): iteration number of current epoch
-        model (nn.Module): Dalle model
-    :param mnist_loader: Data loder
-    :param optimizer: optimzier to be used taken from config
-    :param crtierion: For computing the loss
-    :param config: configuration for the current run
-    :return:
+        epoch_idx (int): iteration number of current epoch. 
+        model (nn.Module): Dalle model. 
+        mnist_loader (DataLoader): Data loder. 
+        optimizer (optimizer): optimzier to be used taken from config. 
+        crtierion (crtierion): For computing the loss. 
+        config (dict): configuration for the current run. 
+
+    Outputs:
+        losses (float): the mean of losses. each losses are from each batch(text and image). 
     """
     losses = []
     for data in tqdm(loader):
-        im = data['image']
+        im = data['image'] 
         text_tokens = data['text_tokens']
         im = im.float().to(device)
         text = text_tokens.long().to(device)
