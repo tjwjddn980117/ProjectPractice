@@ -23,3 +23,15 @@ def infer(args):
             print(exc)
     print(config)
     
+    ######## Set the desired seed value #######
+    # Ignoring the fixed seed value
+    seed = np.random.randint(0, 1000)
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    if device == 'cuda':
+        torch.cuda.manual_seed_all(seed)
+    
+    if not os.path.exists(config['train_params']['task_name']):
+        os.mkdir(config['train_params']['task_name'])
+    
