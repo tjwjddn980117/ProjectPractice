@@ -35,3 +35,6 @@ def infer(args):
     if not os.path.exists(config['train_params']['task_name']):
         os.mkdir(config['train_params']['task_name'])
     
+    # Create db to fetch the configuration values like vocab size (should do something better)
+    mnist = MnistVisualLanguageDataset('train', config['dataset_params'])
+    
