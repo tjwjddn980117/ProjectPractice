@@ -38,3 +38,22 @@ def infer(args):
     # Create db to fetch the configuration values like vocab size (should do something better)
     mnist = MnistVisualLanguageDataset('train', config['dataset_params'])
     
+    ###### Load Discrete VAE#####
+    
+    vae = DiscreteVAE(
+        num_embeddings=config['model_params']['vae_num_embeddings'],
+        embedding_dim=config['model_params']['vae_embedding_dim']
+    )
+    vae.to(device)
+    if os.path.exists('{}/{}'.format(config['train_params']['task_name'],
+                                     config['train_params']['vae_ckpt_name'])):
+        print('Found checkpoint... Taking vae from that')
+        vae.load_state_dict(torch.load('{}/{}'.format(config['train_params']['task_name'],
+                                                      config['train_params']['vae_ckpt_name']), map_location=device))
+    else:
+        print('No checkpoint found at {}/{}... Exiting'.format(config['train_params']['task_name'],
+                                                               config['train_params']['vae_ckpt_name']))
+        print('Train vae first')
+        return
+    vae.eval()
+    vae.requires_grad_(False)
