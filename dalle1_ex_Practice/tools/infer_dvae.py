@@ -25,3 +25,17 @@ def inference(args):
         except yaml.YAMLError as exc:
             print(exc)
     print(config)
+
+def inference(args):
+    r"""
+    Method to infer discrete vae and get
+    reconstructions
+    :param args:
+    :return:
+    """
+    with open(args.config_path, 'r') as file:
+        try:
+            config = yaml.safe_load(file)
+        except yaml.YAMLError as exc:
+            print(exc)
+    print(config)
