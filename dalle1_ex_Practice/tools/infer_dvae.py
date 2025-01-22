@@ -26,6 +26,7 @@ def inference(args):
             print(exc)
     print(config)
 
+    # loading the model. 
     model = DiscreteVAE(
         num_embeddings=config['model_params']['vae_num_embeddings'],
         embedding_dim=config['model_params']['vae_embedding_dim']
@@ -41,10 +42,12 @@ def inference(args):
                                      config['train_params']['vae_ckpt_name']))
         return
     model.eval()
+
     mnist = MnistVisualLanguageDataset('test', config['dataset_params'])
 
-    # Generate reconstructions for 100 samples
-    idxs = torch.randint(0, len(mnist) - 1, (25,))
+    # Generate reconstructions for N samples
+    N = 25
+    idxs = torch.randint(0, len(mnist) - 1, (N,))
     ims = torch.cat([mnist[idx]['image'][None, :] for idx in idxs]).float().to(device)
     output = model(ims)
     generated_im = output[0]
