@@ -26,3 +26,25 @@ def inference(args):
             print(exc)
     print(config)
 
+    model = DiscreteVAE(
+        num_embeddings=config['model_params']['vae_num_embeddings'],
+        embedding_dim=config['model_params']['vae_embedding_dim']
+    )
+    model.to(device)
+    if os.path.exists('{}/{}'.format(config['train_params']['task_name'],
+                                     config['train_params']['vae_ckpt_name'])):
+        print('Found checkpoint... Inferring from that')
+        model.load_state_dict(torch.load('{}/{}'.format(config['train_params']['task_name'],
+                                                        config['train_params']['vae_ckpt_name']), map_location=device))
+    else:
+        print('No checkpoint found at {}/{}... Exiting'.format(config['train_params']['task_name'],
+                                     config['train_params']['vae_ckpt_name']))
+        return
+    model.eval()
+    mnist = MnistVisualLanguageDataset('test', config['dataset_params'])
+
+    # Generate reconstructions for 100 samples
+    idxs = torch.randint(0, len(mnist) - 1, (25,))
+    ims = torch.cat([mnist[idx]['image'][None, :] for idx in idxs]).float().to(device)
+    output = model(ims)
+    generated_im = output[0]
