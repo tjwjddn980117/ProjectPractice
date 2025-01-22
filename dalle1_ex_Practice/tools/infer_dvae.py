@@ -48,3 +48,5 @@ def inference(args):
     ims = torch.cat([mnist[idx]['image'][None, :] for idx in idxs]).float().to(device)
     output = model(ims)
     generated_im = output[0]
+
+    
