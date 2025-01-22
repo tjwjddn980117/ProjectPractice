@@ -49,4 +49,12 @@ def inference(args):
     output = model(ims)
     generated_im = output[0]
 
-    
+    # Dataset generates -1 to 1 we convert it to 0-1
+    ims = (ims + 1) / 2
+    generated_im = (generated_im + 1) / 2
+    out = torch.hstack([ims, generated_im])
+    output = rearrange(out, 'b (c d) h w -> b (d) h (c w)', c=2, d=3)
+    grid = make_grid(output, nrow=5)
+    img = torchvision.transforms.ToPILImage()(grid.detach().cpu())
+    img.save(os.path.join(config['train_params']['task_name'],
+                          'dvae_reconstructions.png'))
