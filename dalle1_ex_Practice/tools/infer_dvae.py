@@ -42,4 +42,9 @@ def inference(args):
         return
     model.eval()
     mnist = MnistVisualLanguageDataset('test', config['dataset_params'])
-    
+
+    # Generate reconstructions for 100 samples
+    idxs = torch.randint(0, len(mnist) - 1, (25,))
+    ims = torch.cat([mnist[idx]['image'][None, :] for idx in idxs]).float().to(device)
+    output = model(ims)
+    generated_im = output[0]
