@@ -57,3 +57,4 @@ def infer(args):
         return
     vae.eval()
     vae.requires_grad_(False)
+
