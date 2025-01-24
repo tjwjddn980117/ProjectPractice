@@ -61,3 +61,10 @@ def inference(args):
     img = torchvision.transforms.ToPILImage()(grid.detach().cpu())
     img.save(os.path.join(config['train_params']['task_name'],
                           'dvae_reconstructions.png'))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Arguments for discrete vae inference')
+    parser.add_argument('--config', dest='config_path',
+                        default='config/default.yaml', type=str)
+    args = parser.parse_args()
+    inference(args)
