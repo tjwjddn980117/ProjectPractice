@@ -49,7 +49,7 @@ def inference(args):
     N = 25
     idxs = torch.randint(0, len(mnist) - 1, (N,))
     ims = torch.cat([mnist[idx]['image'][None, :] for idx in idxs]).float().to(device)
-    output = model(ims) 
+    output = model(ims)
     generated_im = output[0]
 
     # Dataset generates -1 to 1 we convert it to 0-1
