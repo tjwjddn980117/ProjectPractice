@@ -31,7 +31,7 @@ def train_for_one_epoch(epoch_idx, model, loader, optimizer, config):
         losses (float): the mean of losses. each losses are from each batch(text and image). 
     """
     losses = []
-    for data in tqdm(loader): 
+    for data in tqdm(loader):
         im = data['image'] 
         text_tokens = data['text_tokens']
         im = im.float().to(device)
