@@ -16,7 +16,7 @@ class Decoder(nn.Module):
         Parameters:
             _ (tensor) : [B, num_embeddings, X, X]. 
         
-        Returns:
+        Returns: 
             _ (tensor) : [B, C, X\*8, X\*8]. 
         ''' 
         super(Decoder, self).__init__()
