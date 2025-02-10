@@ -71,7 +71,7 @@ class Quantizer(nn.Module):
         # 비슷한 모양을 지닌 녀석들끼리는 비슷하게 뭉칠 것이다. 
         return sampled, kl_div, logits, log_qy
     
-    def quantize_indices(self, indices):
+    def quantize_indices(self, indices): 
         '''
         The function for quantize. 
 
