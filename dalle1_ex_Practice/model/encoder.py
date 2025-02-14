@@ -12,7 +12,7 @@ class Encoder(nn.Module):
         Encoder is conv relu blocks followed by couple of residual blocks. 
         Last 1x1 conv converts to logits with num_embeddings as output size. 
 
-        Arguments: 
+        Arguments:
             num_embeddings (int): the number of embedding/channel. 
             
         Inputs:
