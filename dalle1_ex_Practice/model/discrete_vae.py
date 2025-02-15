@@ -33,7 +33,7 @@ class DiscreteVAE(nn.Module):
         Arguments:
             x (tensor): [B, C, H, W]. 
 
-        Outputs: 
+        Outputs:
             indices (tensor): [B, H/8, W/8]. 
         '''
         # x.shape = B,C,H,W
