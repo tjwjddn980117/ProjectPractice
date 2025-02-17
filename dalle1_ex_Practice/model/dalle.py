@@ -15,7 +15,7 @@ class DallE(nn.Module):
         together with target to gpt. 
         target은 self.training의 bool 차이를 두고 확인함. target은 input 되는 image를 그대로 씀. (비지도학습). 
 
-        Arguments: 
+        Arguments:
             vae (nn.module): the model of vae. 
             num_words (int): the number of words. 
             image_size (int): the size of image. 
