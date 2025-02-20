@@ -144,7 +144,7 @@ class MnistVisualLanguageDataset(Dataset):
         # ex) text_tokens = tensor([ 0,  6,  7,  9, 10,  1,  1,  1,  1,  1,  1,  1,  1,  2]) 
         text_tokens = torch.LongTensor(text_tokens)
         
-        # digit_im is MNIST img. 
+        # digit_im is MNIST img.
         digit_im = cv2.imread(os.path.join(self.db_root, entry['digit_image']))
         digit_im = cv2.cvtColor(digit_im, cv2.COLOR_BGR2RGB)
         digit_im = cv2.resize(digit_im, (self.im_size, self.im_size))
