@@ -2,7 +2,7 @@ dataset_params:
   root_dir: 'data'
   image_size: 112
   drop_background_prob: 0.1
-  drop_color_prob: 0.1
+  drop_color_prob: 0.1 
 
 model_params:
   vae_num_embeddings: 2048
