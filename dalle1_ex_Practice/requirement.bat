@@ -24,6 +24,6 @@ call pip install opencv-python
 call pip install datasets
 call pip install mkl==2021.4.0
 
-call conda deactivate
+call conda deactivate 
 
 echo complete. 
